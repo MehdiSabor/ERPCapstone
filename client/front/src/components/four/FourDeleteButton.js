@@ -14,7 +14,7 @@ const FourDeleteButton = ({ fourId, onSuccess }) => {
   };
 
   return (
-    <button onClick={handleClick}>Delete Four</button>
+    <button onClick={handleClick}>Delete Fournisseur</button>
   );
 };
 
