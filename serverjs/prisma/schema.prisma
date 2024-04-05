@@ -137,7 +137,7 @@ model Devis {
   CODE_COM     Int
   VALIDER      Boolean
   REMARQUE     String?
-  CODE_ENT     Int?
+  
   MODELIV      String?
   MODE_PAIE    String?
   BASEHT       Boolean?
@@ -178,7 +178,7 @@ model Bonliv {
   MNT_TTC       Float
   EN_FACTURE    Boolean
   VALIDER       Boolean
-  CODE_ENT      Int?
+ 
   MODELIV       String?
   MODE_PAIE     String?
   REMARQUE      String?
@@ -222,7 +222,7 @@ model Facture {
   MNT_HT         Float
   MNT_TTC        Float
   CODE_COM       Int
-  CODE_ENT       Int?
+  
   MODELIV        String?
   MODE_PAIE      String?
   MNT_DEV        Float?
@@ -263,7 +263,7 @@ model Avoirs {
   MNT_TTC      Float
   VALIDER      Boolean
   CODE_COM     Int
-  CODE_ENT     Int?
+
   REMARQUE     String?
   BASEHT       Boolean?
   detailAvoirs Detailavoirs[]
