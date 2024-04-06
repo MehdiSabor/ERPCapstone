@@ -5,6 +5,7 @@ exports.createDevisController = async (req, res) => {
     const devis = await devisService.createDevis(req.body);
     res.status(201).json(devis);
   } catch (error) {
+    
     res.status(500).json({ message: error.message });
   }
 };
@@ -15,9 +16,11 @@ exports.getDevisByIdController = async (req, res) => {
     if (devis) {
       res.json(devis);
     } else {
+      
       res.status(404).json({ message: 'Devis not found' });
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: error.message });
   }
 };
@@ -27,6 +30,7 @@ exports.updateDevisController = async (req, res) => {
     const updatedDevis = await devisService.updateDevis(req.params.id, req.body);
     res.json(updatedDevis);
   } catch (error) {
+    
     res.status(500).json({ message: error.message });
   }
 };
@@ -54,6 +58,7 @@ exports.getAllDevisController = async (req, res) => {
     const allDevis = await devisService.getAllDevis();
     res.json(allDevis);
   } catch (error) {
+    
     res.status(500).json({ message: error.message });
   }
 };
@@ -81,6 +86,7 @@ exports.addItemToDevisController = async (req, res) => {
     const item = await devisService.addItemToDevis(req.params.refDevis, req.body);
     res.status(201).json(item);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -96,9 +102,11 @@ exports.deleteItemFromDevisController = async (req, res) => {
 
 exports.updateItemInDevisController = async (req, res) => {
   try {
+   
     const updatedItem = await devisService.updateItemInDevis(req.params.refDevis, req.params.codeArt, req.body);
     res.json(updatedItem);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };

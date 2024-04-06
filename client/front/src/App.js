@@ -6,6 +6,7 @@ import ClientManagementPage from './Pages/client';
 import ArticleManagementPage from './Pages/article';
 import ComManagementPage from './Pages/com';
 import FourManagementPage from './Pages/four';
+import DevisManagementPage from './Pages/devis';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route path="/com" element={<ComManagementPage />} />
             <Route path="/four" element={<FourManagementPage />} />
             <Route path="/article" element={<ArticleManagementPage />} />
+            <Route path="/devis" element={<DevisManagementPage />} />
           </Routes>
         </header>
       </div>

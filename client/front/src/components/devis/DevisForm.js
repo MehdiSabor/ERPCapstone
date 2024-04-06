@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useCreateDevis } from '../../hooks/devisHooks'; // Adjust this path as needed
 
 const DevisForm = () => {
-  const { createDevis } = useCreateDevis(); // This function needs to be implemented in your hooks
+  const { handleCreate } = useCreateDevis(); // This function needs to be implemented in your hooks
   const initialState = {
     REF_DEV: '',
     DATEVALID: '',
@@ -36,29 +36,34 @@ const DevisForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await createDevis(devisData); // Implement this in your hooks
-    setDevisData(initialState); // Reset form after submission
+    const formattedData = {
+      ...devisData,
+      DATEVALID: devisData.DATEVALID ? new Date(devisData.DATEVALID).toISOString() : null,
+      HEUREVALID: devisData.HEUREVALID ? new Date(devisData.HEUREVALID).toISOString() : null,
+      DATE_DEV: devisData.DATE_DEV ? new Date(devisData.DATE_DEV).toISOString() : null,
+    };
+    await handleCreate(formattedData); // Make sure this function correctly handles the data
   };
-
   return (
     <div>
       <h2>Create Devis</h2>
       <form onSubmit={handleSubmit}>
-        {Object.entries(initialState).map(([key, value]) => (
-          <div key={key}>
-            <label>{key.replace('_', ' ')}: </label>
-            <input
-              type={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? 'checkbox' : 
-                    ['DATEVALID', 'HEUREVALID', 'DATE_DEV'].includes(key) ? 'date' :
-                    ['MNT_HT', 'MNT_TTC', 'CODE_COM', 'CODE_ENT', 'NOTES'].includes(key) ? 'number' : 'text'}
-              name={key}
-              value={value}
-              checked={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? devisData[key] : undefined}
-              onChange={handleChange}
-              placeholder={key.replace('_', ' ')}
-            />
-          </div>
-        ))}
+      {Object.entries(initialState).map(([key]) => ( // No need to destructure value here
+  <div key={key}>
+    <label>{key.replace('_', ' ')}: </label>
+    <input
+      type={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? 'checkbox' : 
+            ['DATEVALID', 'HEUREVALID', 'DATE_DEV'].includes(key) ? 'date' :
+            ['MNT_HT', 'MNT_TTC', 'CODE_COM', 'CODE_ENT', 'NOTES'].includes(key) ? 'number' : 'text'}
+      name={key}
+      value={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? '' : devisData[key]} // Corrected to use devisData for value
+      checked={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? devisData[key] : undefined}
+      onChange={handleChange}
+      placeholder={key.replace('_', ' ')}
+    />
+  </div>
+))}
+
         <button type="submit">Submit</button>
       </form>
     </div>

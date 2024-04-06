@@ -6,18 +6,18 @@ const createDevis = async (data) => {
 };
 
 const getDevisById = async (id) => {
-    return await prisma.devis.findUnique({ where: { id } });
+    return await prisma.devis.findUnique({ where: { REF_DEV : id }});
   };
 
   const updateDevis = async (id, data) => {
     return await prisma.devis.update({
-      where: { id },
+      where: { REF_DEV : id },
       data,
     });
   };
 
   const deleteDevis = async (id) => {
-    return await prisma.devis.delete({ where: { id } });
+    return await prisma.devis.delete({ where: { REF_DEV : id } });
   };
   
   const validateDevis = async (refDevis) => {
@@ -133,7 +133,9 @@ const getDevisByClient = async (clientId) => {
   
   
   const deleteItemFromDevis = async (refDevis, codeArt) => {
+    
     return await prisma.devisDetail.deleteMany({
+      
       where: {
         REF_DEV: refDevis,
         CODE_ART: codeArt,

@@ -219,7 +219,7 @@ export const useFetchDevisByCommercial = (commercialId) => {
   };
 
   
-  export const useFetchItemsInDevis = (refDevis) => {
+  export const useFetchItemsInDevis = (refDevis,fetchTrigger) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -237,7 +237,7 @@ export const useFetchDevisByCommercial = (commercialId) => {
             setLoading(false);
           });
       }
-    }, [refDevis]);
+    }, [refDevis, fetchTrigger]);
   
     return { items, loading, error };
   };
