@@ -159,7 +159,7 @@ model DevisDetail {
   REMISE   Float
   REMISEG  Float?
   TVA      Int
-  QTEliv   Float
+ 
   devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV])
   article  Article @relation(fields: [CODE_ART], references: [code_art])
   @@id([REF_DEV, CODE_ART])
@@ -196,7 +196,7 @@ model DetailBonliv {
   ARTICLE  String
   QTECMD   Float
   QTEGRA   Float?
-  qyeliv   Float
+  qteliv   Float @default(0)
   QTE      Float
   QTECTRL  Float
   GRATUIT  Float?

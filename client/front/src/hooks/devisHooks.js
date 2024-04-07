@@ -28,6 +28,7 @@ export const useValidateDevis = (refDevis) => {
 
   const validate = async () => {
     try {
+      
       await validateDevis(refDevis);
       setIsValidated(true);
     } catch (err) {

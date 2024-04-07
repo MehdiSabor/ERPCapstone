@@ -20,6 +20,7 @@ const getDevisById = async (id) => {
     return await prisma.devis.delete({ where: { REF_DEV : id } });
   };
   
+  
   const validateDevis = async (refDevis) => {
     const devis = await prisma.devis.findUnique({
       where: { REF_DEV: refDevis },
@@ -50,6 +51,8 @@ const getDevisById = async (id) => {
         MODELIV: devis.MODELIV,
         MODE_PAIE: devis.MODE_PAIE,
         REMARQUE: devis.REMARQUE,
+        DATEVALID: devis.DATEVALID,
+        EN_FACTURE: true,
         detailBonlivs: {
           create: devis.devisDetails.map(detail => ({
             CODE_ART: detail.CODE_ART,
@@ -61,6 +64,8 @@ const getDevisById = async (id) => {
             PV_TTC: detail.PV_TTC,
             REMISE: detail.REMISE,
             TVA: detail.TVA,
+            qteliv:detail.QTE,
+            QTECTRL:0,
           })),
         },
       },

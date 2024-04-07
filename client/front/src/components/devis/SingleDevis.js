@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useFetchDevisById, useFetchItemsInDevis } from '../../hooks/devisHooks'; // Adjust the import path as necessary
+import { useFetchDevisById, useFetchItemsInDevis, useValidateDevis } from '../../hooks/devisHooks'; // Adjust the import path as necessary
 
 const SingleDevis = ({ devisId , onChangeView }) => {
   const { devis, loading: loadingDevis, error: errorDevis } = useFetchDevisById(devisId);
   const { items, loading: loadingItems, error: errorItems } = useFetchItemsInDevis(devisId);
+  const { validate, error, isValidated } = useValidateDevis(devisId);
+ // Function to handle the click on the Validate button
+ const handleValidateClick = async () => {
+  await validate();
+  if (isValidated) {
+      alert('Devis has been successfully validated.');
+      // Optionally, you can trigger other actions here, such as navigating away or refreshing the data
+  } else {
+      alert(`Failed to validate devis: ${error}`);
+  }
+};
 
   // To ensure that the items are re-fetched when the devis changes
   useEffect(() => {
@@ -23,6 +34,10 @@ const SingleDevis = ({ devisId , onChangeView }) => {
       <button onClick={() => onChangeView('delete', devisId)}>Delete Devis</button>
       <button onClick={() => onChangeView('addItem', devisId)}>Add Item</button>
       <button onClick={() => onChangeView('viewItems', devisId)}>View Items</button>
+      {!isValidated && (
+                <button onClick={handleValidateClick}>Validate Devis</button>
+            )}
+            {error && <p>Error validating devis: {error}</p>}
       <h3>Devis Details</h3>
       <div>
         <strong>Reference:</strong> {devis.REF_DEV}<br/>

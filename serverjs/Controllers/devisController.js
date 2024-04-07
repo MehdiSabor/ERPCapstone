@@ -49,6 +49,7 @@ exports.validateDevisController = async (req, res) => {
     const bonliv = await devisService.validateDevis(req.params.refDevis);
     res.json(bonliv);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };

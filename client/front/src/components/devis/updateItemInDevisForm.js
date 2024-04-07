@@ -29,7 +29,7 @@ const UpdateItemInDevisForm = ({ refDevis, article, onSuccess }) => {
 
     // Parse numbers differently based on the input name
     if (type === 'number') {
-        parsedValue = ['QTE', 'QTEliv'].includes(name) ? parseInt(value, 10) : parseFloat(value);
+        parsedValue = ['QTE'].includes(name) ? parseInt(value, 10) : parseFloat(value);
         if (isNaN(parsedValue)) { // Fallback to 0 if parsing results in NaN
             parsedValue = 0;
         }
@@ -60,7 +60,7 @@ const handleSubmit = async (e) => {
         <div key={key} key={key}>
           <label>{key}:</label>
           <input
-            type={['QTE', 'GRATUIT', 'PA_HT', 'PV_HT', 'PV_TTC', 'REMISE', 'REMISEG', 'TVA', 'QTEliv'].includes(key) ? 'number' : 'text'}
+            type={['QTE', 'GRATUIT', 'PA_HT', 'PV_HT', 'PV_TTC', 'REMISE', 'REMISEG', 'TVA'].includes(key) ? 'number' : 'text'}
             name={key}
             value={typeof formData[key] === 'number' ? formData[key].toString() : formData[key]}
             onChange={handleChange}

@@ -16,7 +16,7 @@ const AddItemToDevisForm = ({ refDevis }) => {
     REMISE: 0,
     REMISEG: 0,
     TVA: 0,
-    QTEliv: 0,
+   
   };
 
   const [itemData, setItemData] = useState(initialState);
