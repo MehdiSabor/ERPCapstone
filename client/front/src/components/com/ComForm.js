@@ -4,7 +4,7 @@ import { useCreateCom } from '../../hooks/comHooks'; // Adjust the import path a
 const ComForm = () => {
   const { handleCreate } = useCreateCom();
   const initialState = {
-    code_com: 0,
+    
     nom: '',
     tel: '',
     email: ''
@@ -27,6 +27,7 @@ const ComForm = () => {
       ...comData,
       // Ensure any specific data transformations if needed
     };
+    console.log(payload);
     await handleCreate(payload);
     // Reset form or provide feedback here
     setComData(initialState);
@@ -41,7 +42,7 @@ const ComForm = () => {
           <div key={key}>
             <label>{key}: </label>
             <input
-              type={key === "code_com" ? "number" : "text"}
+              type= "text"
               name={key}
               value={comData[key]}
               onChange={handleChange}

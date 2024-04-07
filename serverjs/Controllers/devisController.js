@@ -2,10 +2,11 @@ const devisService = require('../Services/devisService');
 
 exports.createDevisController = async (req, res) => {
   try {
+    console.log(req.body)
     const devis = await devisService.createDevis(req.body);
     res.status(201).json(devis);
   } catch (error) {
-    
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -49,7 +50,7 @@ exports.validateDevisController = async (req, res) => {
     const bonliv = await devisService.validateDevis(req.params.refDevis);
     res.json(bonliv);
   } catch (error) {
-    console.log(error);
+    
     res.status(500).json({ message: error.message });
   }
 };
@@ -87,7 +88,7 @@ exports.addItemToDevisController = async (req, res) => {
     const item = await devisService.addItemToDevis(req.params.refDevis, req.body);
     res.status(201).json(item);
   } catch (error) {
-    console.log(error);
+    
     res.status(500).json({ message: error.message });
   }
 };

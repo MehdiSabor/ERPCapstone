@@ -11,7 +11,7 @@ const ClientList = ({ onSelectClient }) => {
         <h2>Clients List</h2>
         <ul>
           {clients.map((client) => (
-            <li key={client.id} onClick={() => onSelectClient(client.id)}>
+            <li key={client.code_clt} onClick={() => onSelectClient(client)}>
             {client.code_clt} {client.nom} - {client.ville}
             </li>
           ))}

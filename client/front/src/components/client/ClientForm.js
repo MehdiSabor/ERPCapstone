@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useCreateClient } from '../../hooks/clientHooks';
-
+import ComList from '../com/ComList';
 
 const ClientForm = () => {
   const { handleCreate } = useCreateClient();
+  const [showComList, setShowComList] = useState(false);
+
   const initialState = {
-    code_clt: '',
+    
     nom: '',
-    compte: '',
+    
     tel: '',
     adresse: '',
     ville: '',
@@ -34,6 +36,11 @@ const ClientForm = () => {
       [name]: type === 'checkbox' ? checked : value
     });
   };
+
+  const handleSelectCom = (code_com) => {
+    setClientData({ ...clientData, code_com });
+    setShowComList(false); // Close the ComList after selection
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,6 +90,12 @@ const ClientForm = () => {
             </div>
           )
         ))}
+        <div>
+                    <button type="button" onClick={() => setShowComList(true)}>Select Commercial</button>
+                    {clientData.code_com && <p>Selected Commercial: {clientData.code_com}</p>}
+                </div>
+                {showComList && <ComList  onSelectCom={handleSelectCom} />}
+
         <button type="submit">Submit</button>
       </form>
     </div>

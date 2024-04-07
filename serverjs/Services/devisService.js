@@ -2,8 +2,26 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const createDevis = async (data) => {
-  return await prisma.devis.create({ data });
+  // Step 1: Create the Devis record without REF_DEV
+  const devis = await prisma.devis.create({
+    data: {
+      ...data,
+      REF_DEV: "", // Temporarily set to an empty string or some placeholder if required
+    },
+  });
+
+  // Step 2: Generate the REF_DEV value based on the autoincremented id
+  const refDevValue = `DV${String(devis.id).padStart(5, '0')}`; // Formats as DV00001, DV00002,...
+
+  // Step 3: Update the record with the generated REF_DEV value
+  const updatedDevis = await prisma.devis.update({
+    where: { id: devis.id },
+    data: { REF_DEV: refDevValue },
+  });
+
+  return updatedDevis;
 };
+
 
 const getDevisById = async (id) => {
     return await prisma.devis.findUnique({ where: { REF_DEV : id }});

@@ -14,8 +14,8 @@ datasource db {
 }
 
 model Client {
-  id                  Int                   @id @default(autoincrement())
-  code_clt            String                @unique
+                 
+  code_clt            Int                 @id @default(autoincrement())
   nom                 String
   compte              String
   tel                 String?
@@ -44,7 +44,7 @@ model Client {
 }
 
 model Comercial {
-  code_com Int      @id
+  code_com Int      @id @default(autoincrement())
   nom      String
   tel      String?
   email    String?
@@ -123,32 +123,30 @@ model Fournisseur {
 }
 
 model Devis {
-  REF_DEV      String        @id
+  REF_DEV      String        @unique
+  id           Int           @id @default(autoincrement())
   DATEVALID    DateTime?
-  HEUREVALID   DateTime?
-  DATE_DEV     DateTime
+  DATE_DEV     DateTime      @default(now())
   COMPTE       String?
-  CODE_CLT     String
+  CODE_CLT     Int
   CLIENT       String
-  MNT_HT       Float
-  MNT_TTC      Float   @default(0)
-  EN_BC        Boolean?
-  EN_BL        Boolean?
+  MNT_HT       Float         @default(0)
+  MNT_TTC      Float         @default(0)
+  REMISEG      Float?
   CODE_COM     Int
-  VALIDER      Boolean
+  VALIDER      Boolean       @default(false)
   REMARQUE     String?
+  MODELIV      String
+  MODE_PAIE    String
+  NOTES        String?
   
-  MODELIV      String?
-  MODE_PAIE    String?
-  BASEHT       Boolean?
-  NOTES        Float?
   client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
   comercial    Comercial     @relation(fields: [CODE_COM], references: [code_com])
   devisDetails DevisDetail[]
 }
 
 model DevisDetail {
-  REF_DEV  String  
+  REF_DEV  String
   CODE_ART String
   ARTICLE  String
   QTE      Float
@@ -157,13 +155,13 @@ model DevisDetail {
   PV_HT    Float
   PV_TTC   Float
   REMISE   Float
-  REMISEG  Float?
   TVA      Int
  
   devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV])
   article  Article @relation(fields: [CODE_ART], references: [code_art])
   @@id([REF_DEV, CODE_ART])
 }
+
 
 model Bonliv {
   REF_BL        String         @id
@@ -172,7 +170,7 @@ model Bonliv {
   REF_DEV       String
   DATE_BL       DateTime
   COMPTE        String?
-  CODE_CLT      String
+  CODE_CLT      Int
   CLIENT        String
   MNT_HT        Float
   MNT_TTC       Float
@@ -217,7 +215,7 @@ model Facture {
   REF_BL         String
   DATE_FAC       DateTime
   COMPTE         String?
-  CODE_CLT       String
+  CODE_CLT       Int
   CLIENT         String
   MNT_HT         Float
   MNT_TTC        Float
@@ -257,7 +255,7 @@ model Avoirs {
   HEUREVALID   DateTime?
   DATE_AVR     DateTime
   COMPTE       String?
-  CODE_CLT     String
+  CODE_CLT     Int
   CLIENT       String
   MNT_HT       Float
   MNT_TTC      Float
@@ -267,8 +265,8 @@ model Avoirs {
   REMARQUE     String?
   BASEHT       Boolean?
   detailAvoirs Detailavoirs[]
-  Client       Client?        @relation(fields: [clientId], references: [id])
-  clientId     Int?
+ client         Client          @relation(fields: [CODE_CLT], references: [code_clt])
+  code_clt     Int?
 }
 
 model Detailavoirs {
@@ -292,7 +290,7 @@ model Reglement {
   REF_REGV         String            @id
   DATEVALID        DateTime
   HEUREVALID       DateTime?
-  CODE_CLT         String
+  CODE_CLT         Int
   CLIENT           String
   DATE_REM         DateTime?
   DATE_ECH         DateTime?
@@ -325,7 +323,7 @@ model UnifiedFactureAvoir {
   DATE_DOC         DateTime
   MNT_TTC          Float
   MNT_REGLER       Float
-  code_clt         String
+  code_clt         Int
   client           Client            @relation(fields: [code_clt], references: [code_clt])
   reglementDetails ReglementDetail[]
 

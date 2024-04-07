@@ -2,6 +2,7 @@ const comercialService = require('../Services/comercialService');
 
 exports.createComercial = async (req, res) => {
   try {
+    console.log(req.body);
     const comercial = await comercialService.createComercial(req.body);
     res.status(201).json(comercial);
   } catch (error) {

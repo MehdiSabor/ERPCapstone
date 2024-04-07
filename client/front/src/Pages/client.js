@@ -10,8 +10,9 @@ const ClientManagementPage = () => {
   const [currentView, setCurrentView] = useState('list');
   const [selectedClientId, setSelectedClientId] = useState(null);
 
-  const handleSelectClient = (id) => {
-    setSelectedClientId(id);
+  const handleSelectClient = (client) => {
+    console.log(client);
+    setSelectedClientId(client.code_clt);
     setCurrentView('view');
   };
 

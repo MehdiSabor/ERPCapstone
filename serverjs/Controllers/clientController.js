@@ -2,6 +2,7 @@ const clientService = require('../Services/clientService');
 
 exports.createClient = async (req, res) => {
   try {
+    console.log(req.body);
     const client = await clientService.createClient(req.body);
     res.status(201).json(client);
   } catch (error) {
@@ -12,10 +13,12 @@ exports.createClient = async (req, res) => {
 
 exports.getClientById = async (req, res) => {
   try {
+    console.log(req.params.id)
     const client = await clientService.getClientById(parseInt(req.params.id));
     if (client) res.json(client);
     else res.status(404).json({ message: "Client not found" });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: error.message });
   }
 };

@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useCreateArticle } from '../../hooks/articleHooks';
+import FourList from '../four/FourList';
 
 const ArticleForm = () => {
   const { handleCreate } = useCreateArticle();
+  const [showFourList, setShowFourList] = useState(false);
+  
+  const [PA_TTC, setPA_TTC] = useState(0);
+  const [PV_TTC, setPV_TTC] = useState(0);
+
   const initialState = {
     code_art: '',
     nom: '',
@@ -11,9 +17,9 @@ const ArticleForm = () => {
     UAF: '',
     PA_HT: '',
     TVA: '',
-    PA_TTC: '',
+    
     PV_HT: '',
-    PV_TTC: '',
+    
     Code_fam: '',
     code_sfam: '',
     STK_MAX: '',
@@ -26,11 +32,28 @@ const ArticleForm = () => {
     ACHAT_BLOQ: false,
     TRANS_BLOQ: false,
     LIQUIDER: false,
-    code_frs: '',
+    
     qte_stk: ''
   };
 
   const [articleData, setArticleData] = useState(initialState);
+
+  const handleSelectFour = (code_frs) => {
+    setArticleData({ ...articleData, code_frs });
+    setShowFourList(false); // Close the ComList after selection
+};
+
+
+useEffect(() => {
+  // Calculate PA_TTC and PV_TTC whenever PA_HT, PV_HT, or TVA changes
+  if(articleData.PA_HT && articleData.TVA) {
+    setPA_TTC(articleData.PA_HT * (1 + articleData.TVA / 100));
+  }
+  if(articleData.PV_HT && articleData.TVA) {
+    setPV_TTC(articleData.PV_HT * (1 + articleData.TVA / 100));
+  }
+}, [articleData.PA_HT, articleData.PV_HT, articleData.TVA]); 
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -66,6 +89,8 @@ const ArticleForm = () => {
       TVA: articleData.TVA !== '' ? parseFloat(articleData.TVA) : null,
       // Continue for other numerical fields as necessary
       // Directly assign booleans and strings, they don't need parsing
+      PA_TTC, 
+      PV_TTC
     };
 
     console.log(payload); // For debugging
@@ -82,7 +107,7 @@ const ArticleForm = () => {
             <label>
               {key.replace(/_/g, ' ')}:
               <input
-                type={['PA_HT', 'TVA', 'PA_TTC', 'PV_HT', 'PV_TTC', 'STK_MAX', 'STK_MIN', 'qte_stk', 'UAF', 'REMISEMAX'].includes(key) ? "number" : key.includes('BLOQ') || key === 'LIQUIDER' ? "checkbox" : "text"}
+                type={['PA_HT', 'TVA', 'PV_HT', 'STK_MAX', 'STK_MIN', 'qte_stk', 'UAF', 'REMISEMAX'].includes(key) ? "number" : key.includes('BLOQ') || key === 'LIQUIDER' ? "checkbox" : "text"}
                 name={key}
                 value={key.includes('BLOQ') || key === 'LIQUIDER' ? articleData[key] : articleData[key]}
                 checked={key.includes('BLOQ') || key === 'LIQUIDER' ? articleData[key] : undefined}
@@ -90,9 +115,17 @@ const ArticleForm = () => {
                 placeholder={key.replace(/_/g, ' ')}
                 // Adjust required fields as necessary based on your application's requirements
               />
+             
             </label>
           </div>
         ))}
+        <p>PA_TTC: {PA_TTC.toFixed(2)}</p>
+        <p>PV_TTC: {PV_TTC.toFixed(2)}</p>
+        <button type="button" onClick={() => setShowFourList(true)}>Select Fournisseur</button>
+                    {articleData.code_frs && <p>Selected Fournisseur: {articleData.code_frs}</p>}
+                
+                {showFourList && <FourList  onSelectFour={handleSelectFour} />}
+
         <button type="submit">Submit</button>
       </form>
     </div>
