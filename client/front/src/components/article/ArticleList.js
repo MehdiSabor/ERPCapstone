@@ -11,7 +11,7 @@ const ArticleList = ({ onSelectArticle }) => {
         <h2>Articles List</h2>
         <ul>
           {articles.map((article) => (
-            <li key={article.id} onClick={() => onSelectArticle(article.id)}>
+            <li key={article.id} onClick={() => onSelectArticle(article)}>
             {article.code_clt} {article.nom} - {article.ville}
             </li>
           ))}

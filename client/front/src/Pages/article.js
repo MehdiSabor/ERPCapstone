@@ -11,7 +11,7 @@ const ArticleManagementPage = () => {
   const [selectedArticleId, setSelectedArticleId] = useState(null);
 
   const handleSelectArticle = (id) => {
-    setSelectedArticleId(id);
+    setSelectedArticleId(id.code_art);
     setCurrentView('view');
   };
 

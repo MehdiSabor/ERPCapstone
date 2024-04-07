@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAddItemToDevis } from '../../hooks/devisHooks'; // Adjust the import path as necessary
+import ArticleList from '../article/ArticleList';
 
 const AddItemToDevisForm = ({ refDevis }) => {
   const { addItem } = useAddItemToDevis();
-  
+  const [showItemList,setShowItemList] = useState(false);
+
   const initialState = {
     REF_DEV: refDevis, // This value is preset and should not change
     CODE_ART: '',
@@ -14,7 +16,7 @@ const AddItemToDevisForm = ({ refDevis }) => {
     PV_HT: 0,
     PV_TTC: 0,
     REMISE: 0,
-    REMISEG: 0,
+    
     TVA: 0,
    
   };
@@ -29,6 +31,22 @@ const AddItemToDevisForm = ({ refDevis }) => {
     }));
   };
 
+  const handleSelectArticle = (article) => {
+    console.log(article);
+    setItemData({ ...itemData, CODE_ART: article.code_art,
+    ARTICLE: article.nom,
+   
+    
+    PA_HT: article.PA_HT,
+    PV_HT: article.PV_HT,
+    PV_TTC: article.PV_TTC,
+    
+    
+    TVA: article.TVA,
+   });
+    setShowItemList(false); // Close the ComList after selection
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addItem(refDevis, itemData);
@@ -40,6 +58,12 @@ const AddItemToDevisForm = ({ refDevis }) => {
     <div>
       <h2>Add Item to Devis</h2>
       <form onSubmit={handleSubmit}>
+
+      <button type="button" onClick={() => setShowItemList(true)}>Select Article</button>
+                    {itemData.code_art && <p>Selected Article: {itemData.code_art}</p>}
+                
+                {showItemList && <ArticleList  onSelectArticle={handleSelectArticle} />}
+
         {/* Skip REF_DEV as it is already set */}
         {Object.keys(initialState).filter(key => key !== 'REF_DEV').map(key => (
           <div key={key}>

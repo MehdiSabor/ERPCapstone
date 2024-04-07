@@ -7,18 +7,18 @@ const createArticle = async (data) => {
 };
 
 const getArticleById = async (id) => {
-  return await prisma.article.findUnique({ where: { id } });
+  return await prisma.article.findUnique({ where: { code_art:id } });
 };
 
 const updateArticle = async (id, data) => {
   return await prisma.article.update({
-    where: { id },
+    where: { code_art:id },
     data,
   });
 };
 
 const deleteArticle = async (id) => {
-  return await prisma.article.delete({ where: { id } });
+  return await prisma.article.delete({ where: { code_art:id } });
 };
 
 const getAllArticles = async () => {
