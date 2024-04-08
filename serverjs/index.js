@@ -4,7 +4,8 @@ const clientRoutes = require('./Routes/clientRoutes');
 const fournisseurRoutes = require('./Routes/fourRoutes');  
 const comercialRoutes = require('./Routes/comercialRoutes');
 const articleRoutes = require('./Routes/articleRoutes');
-const devisRoutes = require('./Routes/devisRoutes');
+const devisRoutes = require('./Routes/DevisRoutes');
+const blRoutes = require('./Routes/blRoutes');
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use('/four', fournisseurRoutes);
 app.use('/com', comercialRoutes);
 app.use('/article', articleRoutes);
 app.use('/devis', devisRoutes);
+app.use('/bl', blRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

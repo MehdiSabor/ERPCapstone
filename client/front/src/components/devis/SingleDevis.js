@@ -7,11 +7,12 @@ const SingleDevis = ({ devisId , onChangeView }) => {
   const { validate, error, isValidated } = useValidateDevis(devisId);
  // Function to handle the click on the Validate button
  const handleValidateClick = async () => {
+  try{
   await validate();
-  if (isValidated) {
+  
       alert('Devis has been successfully validated.');
       // Optionally, you can trigger other actions here, such as navigating away or refreshing the data
-  } else {
+  } catch(error) {
       alert(`Failed to validate devis: ${error}`);
   }
 };
@@ -40,9 +41,12 @@ const SingleDevis = ({ devisId , onChangeView }) => {
             {error && <p>Error validating devis: {error}</p>}
       <h3>Devis Details</h3>
       <div>
+      {console.log(devis)}
         <strong>Reference:</strong> {devis.REF_DEV}<br/>
         <strong>Date:</strong> {devis.DATE_DEV}<br/>
         <strong>Client:</strong> {devis.CLIENT}<br/>
+        <strong>Total:</strong> {devis.MNT_TTC} HT:{devis.MNT_HT}<br/>
+        <strong>{devis.VALIDER}</strong><br/>
         {/* Display other devis details here */}
       </div>
       <h4>Items in Devis</h4>
@@ -50,7 +54,7 @@ const SingleDevis = ({ devisId , onChangeView }) => {
         <ul>
           {items.map(item => (
             <li key={item.CODE_ART}>
-              {item.ARTICLE} - Quantity: {item.QTE} {item.PV_TTC} €
+              {item.ARTICLE} - Quantity: {item.QTE} {item.PV_TTC} € Total: {item.TotalTTC}
               {/* Display other item details here */}
             </li>
           ))}

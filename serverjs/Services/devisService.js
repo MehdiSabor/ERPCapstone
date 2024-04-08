@@ -39,58 +39,77 @@ const getDevisById = async (id) => {
   };
   
   
+
   const validateDevis = async (refDevis) => {
-    const devis = await prisma.devis.findUnique({
-      where: { REF_DEV: refDevis },
-      include: { devisDetails: true },
-    });
+    
+      // Start the transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Fetch Devis including its details
+        const devis = await tx.devis.findUnique({
+          where: { REF_DEV: refDevis },
+          include: { devisDetails: true },
+        });
   
-    if (!devis) throw new Error('Devis not found');
+        if (!devis) {
+          throw new Error('Devis not found');
+        }
   
-    // Validate Devis
-    await prisma.devis.update({
-      where: { REF_DEV: refDevis },
-      data: { VALIDER: true ,DATEVALID: new Date()},
-    });
+        // Update Devis as validated
+        await tx.devis.update({
+          where: { REF_DEV: refDevis },
+          data: { VALIDER: true, DATEVALID: new Date() },
+        });
   
-    // Create Bonliv based on Devis
-    const bonliv = await prisma.bonliv.create({
-      data: {
-        REF_BL: `BL-${devis.REF_DEV}`, // Example of generating REF_BL
-        // Assuming current date for simplicity
-        REF_DEV: devis.REF_DEV,
-        DATE_BL: new Date(), // Assuming current date for simplicity
-        CODE_CLT: devis.CODE_CLT,
-        CLIENT: devis.CLIENT,
-        MNT_HT: devis.MNT_HT,
-        MNT_TTC: devis.MNT_TTC,
-        VALIDER: false, // Initially, Bonliv is not validated
-        CODE_ENT: devis.CODE_ENT,
-        MODELIV: devis.MODELIV,
-        MODE_PAIE: devis.MODE_PAIE,
-        REMARQUE: devis.REMARQUE,
-        DATEVALID: devis.DATEVALID,
-        EN_FACTURE: true,
-        detailBonlivs: {
-          create: devis.devisDetails.map(detail => ({
-            CODE_ART: detail.CODE_ART,
-            ARTICLE: detail.ARTICLE,
-            QTECMD: detail.QTE,
-            QTE: detail.QTE, // Assuming QTE in Bonliv is same as in Devis
-            PA_HT: detail.PA_HT,
-            PV_HT: detail.PV_HT,
-            PV_TTC: detail.PV_TTC,
-            REMISE: detail.REMISE,
-            TVA: detail.TVA,
-            qteliv:detail.QTE,
-            QTECTRL:0,
-          })),
-        },
-      },
-    });
+        // Create Bonliv based on the Devis
+        const bonliv = await tx.bonliv.create({
+          data: {
+            REF_BL: `BL${devis.id}`,
+            REF_DEV: devis.REF_DEV,
+            DATE_BL: new Date(),
+            CODE_CLT: devis.CODE_CLT,
+            CLIENT: devis.CLIENT,
+            MNT_HT: devis.MNT_HT,
+            MNT_TTC: devis.MNT_TTC,
+            VALIDER: false,
+            MODELIV: devis.MODELIV,
+            MODE_PAIE: devis.MODE_PAIE,
+            REMARQUE: devis.REMARQUE,
+            EN_FACTURE: true,
+            // Add additional Bonliv specific data here
+          },
+        });
   
-    return bonliv;
-  }
+        // Create DetailBonliv for each DevisDetail
+        const detailBonlivs = devis.devisDetails.map(detail => ({
+          REF_BL: bonliv.REF_BL,
+          CODE_ART: detail.CODE_ART,
+          ARTICLE: detail.ARTICLE,
+          QTECMD: detail.QTE,
+          QTE: detail.QTE,
+          PA_HT: detail.PA_HT,
+          PV_HT: detail.PV_HT,
+          PV_TTC: detail.PV_TTC,
+          REMISE: detail.REMISE,
+          TVA: detail.TVA,
+         
+          // Add other fields as needed
+        }));
+  
+        // Bulk create DetailBonlivs
+        await tx.detailBonliv.createMany({
+          data: detailBonlivs,
+        });
+  
+        return bonliv;
+      });
+  
+      // Transaction has been committed successfully
+      console.log('Bonliv and DetailBonlivs created successfully:', result);
+      return result;
+    
+  };
+  
+  
 
   const getAllDevis = async () => {
   return await prisma.devis.findMany();
@@ -107,6 +126,7 @@ const getDevisByClient = async (clientId) => {
   const addItemToDevis = async (refDevis, itemData) => {
     const { CODE_ART, PV_HT, TVA, ...restOfItemData } = itemData;
   
+    console.log(itemData);
     // Check if the item already exists for the given Devis
     const existingItem = await prisma.devisDetail.findUnique({
       where: {
@@ -116,27 +136,30 @@ const getDevisByClient = async (clientId) => {
   
     // If item exists, decide to update or delete and create based on your criteria
     if (existingItem) {
+
+      const TotalTTC = itemData.PV_TTC*itemData.QTE;
+
+      const TotalHT = PV_HT*itemData.QTE;
+
       // Example decision: Update the existing item
-      return await prisma.devisDetail.update({
+      const devisDetail = await prisma.devisDetail.update({
         where: {
           REF_DEV_CODE_ART: { REF_DEV: refDevis, CODE_ART: CODE_ART },
         },
         data: {
           ...restOfItemData,
+          TotalHT,
+        TotalTTC
         },
       });
+      await updateDevisTotal(refDevis);
+    return devisDetail;
   
-      /*
-      // If you decide to delete and recreate instead, you could do:
-      await prisma.devisDetail.delete({
-        where: {
-          REF_DEV_CODE_ART: { REF_DEV: refDevis, CODE_ART: CODE_ART },
-        },
-      });
-      // Then recreate the item as new
-      */
+      
     }
-    const PV_TTC = PV_HT + (PV_HT * TVA / 100);
+   const TotalTTC = itemData.PV_TTC*itemData.QTE;
+
+   const TotalHT = PV_HT*itemData.QTE;
     // If the item does not exist, create a new item
     const devisDetail = await prisma.devisDetail.create({
       data: {
@@ -146,7 +169,8 @@ const getDevisByClient = async (clientId) => {
         REF_DEV: refDevis,
         PV_HT,
         TVA,
-        PV_TTC,
+        TotalHT,
+        TotalTTC
       },
     });
     await updateDevisTotal(refDevis);
@@ -206,15 +230,24 @@ const getDevisByClient = async (clientId) => {
     // Sum up all PV_TTC values of the DevisDetails
     const aggregate = await prisma.devisDetail.aggregate({
       _sum: {
-        PV_TTC: true,
+        TotalTTC: true,
+      },
+      where: {
+        REF_DEV: refDevis,
+      },
+    });
+
+    const aggregateHT = await prisma.devisDetail.aggregate({
+      _sum: {
+        TotalHT: true,
       },
       where: {
         REF_DEV: refDevis,
       },
     });
   
-    const totalTTC = aggregate._sum.PV_TTC;
-  
+    const totalTTC = aggregate._sum.TotalTTC;
+    const totalHT = aggregateHT._sum.TotalHT;
     // Update the Devis with the new total
     await prisma.devis.update({
       where: {
@@ -222,6 +255,7 @@ const getDevisByClient = async (clientId) => {
       },
       data: {
         MNT_TTC: totalTTC,
+        MNT_HT: totalHT 
       },
     });
   };

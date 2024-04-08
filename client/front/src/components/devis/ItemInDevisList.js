@@ -28,7 +28,7 @@ const ItemsInDevisList = ({ refDevis }) => {
         <ul>
           {items.map((item, index) => (
             <li key={index}>
-              {item.ARTICLE} - Quantity: {item.QTE} {item.PV_TTC} €
+              {item.ARTICLE} - Quantity: {item.QTE} {item.PV_TTC} € Total: {item.TotalTTC}
               <button onClick={() => handleEditItem(item)}>Edit</button>
               <DeleteItemFromDevisButton refDevis={refDevis} codeArt={item.CODE_ART} onSuccess={() => {
     setView('list');

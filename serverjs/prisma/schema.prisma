@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,8 +8,7 @@ datasource db {
 }
 
 model Client {
-                 
-  code_clt            Int                 @id @default(autoincrement())
+  code_clt            Int                   @id @default(autoincrement())
   nom                 String
   compte              String
   tel                 String?
@@ -34,11 +27,11 @@ model Client {
   mode_liv            String?
   code_cat            Int?
   SOLDE               Int
+  avoirs              Avoirs[]
+  bonliv              Bonliv[]
   comercial           Comercial             @relation(fields: [code_com], references: [code_com])
   devis               Devis[]
-  bonliv              Bonliv[]
   facture             Facture[]
-  avoirs              Avoirs[]
   reglements          Reglement[]
   UnifiedFactureAvoir UnifiedFactureAvoir[]
 }
@@ -79,15 +72,14 @@ model Article {
   TRANS_BLOQ      Boolean         @default(false)
   LIQUIDER        Boolean         @default(false)
   code_frs        String
+  familleCode_fam Int?
+  qte_stk         Int
   fournisseur     Fournisseur     @relation(fields: [code_frs], references: [code_frs])
-  
-  devisDetails    DevisDetail[]
+  famille         famille?        @relation(fields: [familleCode_fam], references: [code_fam])
   bonlivDetails   DetailBonliv[]
   factureDetails  DetailFacture[]
   avoirDetails    Detailavoirs[]
-  famille         famille?        @relation(fields: [familleCode_fam], references: [code_fam])
-  familleCode_fam Int?
-  qte_stk  Int
+  devisDetails    DevisDetail[]
 }
 
 model famille {
@@ -104,13 +96,8 @@ model sfamille {
   famille   famille @relation(fields: [code_fam], references: [code_fam])
 }
 
-
-
-
-
 model Fournisseur {
-
-  code_frs  String     @id
+  code_frs  String    @id
   compte    String?
   sociale   String
   desc      String?
@@ -139,7 +126,6 @@ model Devis {
   MODELIV      String
   MODE_PAIE    String
   NOTES        String?
-  
   client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
   comercial    Comercial     @relation(fields: [CODE_COM], references: [code_com])
   devisDetails DevisDetail[]
@@ -156,19 +142,20 @@ model DevisDetail {
   PV_TTC   Float
   REMISE   Float
   TVA      Int
- 
-  devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV])
+  TotalHT  Float   @default(0)
+  TotalTTC Float   @default(0)
   article  Article @relation(fields: [CODE_ART], references: [code_art])
+  devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV])
+
   @@id([REF_DEV, CODE_ART])
 }
 
-
 model Bonliv {
-  REF_BL        String         @id
-  DATEVALID     DateTime
+  REF_BL        String        @id
+  DATEVALID     DateTime?
   HEUREVALID    DateTime?
   REF_DEV       String
-  DATE_BL       DateTime
+  DATE_BL       DateTime 
   COMPTE        String?
   CODE_CLT      Int
   CLIENT        String
@@ -176,7 +163,6 @@ model Bonliv {
   MNT_TTC       Float
   EN_FACTURE    Boolean
   VALIDER       Boolean
- 
   MODELIV       String?
   MODE_PAIE     String?
   REMARQUE      String?
@@ -184,19 +170,19 @@ model Bonliv {
   CODE_ADR      Int?
   BASEHT        Boolean?
   IMPRIMER      Boolean?
-  client        Client         @relation(fields: [CODE_CLT], references: [code_clt])
+  client        Client        @relation(fields: [CODE_CLT], references: [code_clt])
   detailBonlivs DetailBonliv[]
 }
 
 model DetailBonliv {
-  REF_BL   String  @id
+  REF_BL   String  
   CODE_ART String
   ARTICLE  String
   QTECMD   Float
   QTEGRA   Float?
-  qteliv   Float @default(0)
+  qteliv   Float   @default(0)
   QTE      Float
-  QTECTRL  Float
+  QTECTRL  Float @default(0)
   GRATUIT  Float?
   PA_HT    Float
   PV_HT    Float
@@ -204,12 +190,13 @@ model DetailBonliv {
   REMISE   Float
   REMISEG  Float?
   TVA      Int
-  bonliv   Bonliv  @relation(fields: [REF_BL], references: [REF_BL])
   article  Article @relation(fields: [CODE_ART], references: [code_art])
+  bonliv   Bonliv  @relation(fields: [REF_BL], references: [REF_BL])
+@@id([REF_BL, CODE_ART])
 }
 
 model Facture {
-  REF_FAC        String          @id
+  REF_FAC        String         @id
   DATEVALID      DateTime
   HEUREVALID     DateTime?
   REF_BL         String
@@ -220,7 +207,6 @@ model Facture {
   MNT_HT         Float
   MNT_TTC        Float
   CODE_COM       Int
-  
   MODELIV        String?
   MODE_PAIE      String?
   MNT_DEV        Float?
@@ -228,8 +214,8 @@ model Facture {
   BASEHT         Boolean?
   VALIDER        Boolean
   IMPRIMER       Boolean?
-  client         Client          @relation(fields: [CODE_CLT], references: [code_clt])
-  detailFactures DetailFacture[]
+  detailFactures DetailFacture?
+  client         Client         @relation(fields: [CODE_CLT], references: [code_clt])
 }
 
 model DetailFacture {
@@ -245,12 +231,12 @@ model DetailFacture {
   REMISE   Float
   REMISEG  Float?
   TVA      Int
-  facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC])
   article  Article @relation(fields: [CODE_ART], references: [code_art])
+  facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC])
 }
 
 model Avoirs {
-  REF_AVR      String         @id
+  REF_AVR      String        @id
   DATEVALID    DateTime
   HEUREVALID   DateTime?
   DATE_AVR     DateTime
@@ -261,12 +247,11 @@ model Avoirs {
   MNT_TTC      Float
   VALIDER      Boolean
   CODE_COM     Int
-
   REMARQUE     String?
   BASEHT       Boolean?
-  detailAvoirs Detailavoirs[]
- client         Client          @relation(fields: [CODE_CLT], references: [code_clt])
   code_clt     Int?
+  client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
+  detailAvoirs Detailavoirs?
 }
 
 model Detailavoirs {
@@ -282,12 +267,12 @@ model Detailavoirs {
   REMISEG  Float?
   TVA      Int
   MAJ_STK  Boolean
-  avoirs   Avoirs  @relation(fields: [REF_AVR], references: [REF_AVR])
   article  Article @relation(fields: [CODE_ART], references: [code_art])
+  avoirs   Avoirs  @relation(fields: [REF_AVR], references: [REF_AVR])
 }
 
 model Reglement {
-  REF_REGV         String            @id
+  REF_REGV         String           @id
   DATEVALID        DateTime
   HEUREVALID       DateTime?
   CODE_CLT         Int
@@ -304,8 +289,8 @@ model Reglement {
   TIRER            String?
   VILLE            String?
   DATE_REG         DateTime
-  client           Client            @relation(fields: [CODE_CLT], references: [code_clt])
-  reglementdetails ReglementDetail[]
+  client           Client           @relation(fields: [CODE_CLT], references: [code_clt])
+  reglementdetails ReglementDetail?
 }
 
 model ReglementDetail {
@@ -314,8 +299,8 @@ model ReglementDetail {
   DATE_DOC            DateTime
   MNT_ORIGINAL        Float
   MNT_REGLER          Float
-  reglement           Reglement           @relation(fields: [REF_REGV], references: [REF_REGV])
   unifiedFactureAvoir UnifiedFactureAvoir @relation(fields: [REF_AV_FAC], references: [REF_AV_FAC])
+  reglement           Reglement           @relation(fields: [REF_REGV], references: [REF_REGV])
 }
 
 model UnifiedFactureAvoir {
@@ -324,8 +309,6 @@ model UnifiedFactureAvoir {
   MNT_TTC          Float
   MNT_REGLER       Float
   code_clt         Int
-  client           Client            @relation(fields: [code_clt], references: [code_clt])
   reglementDetails ReglementDetail[]
-
-  // Add any other fields that are relevant to your application
+  client           Client            @relation(fields: [code_clt], references: [code_clt])
 }

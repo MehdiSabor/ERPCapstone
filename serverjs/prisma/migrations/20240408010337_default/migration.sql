@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "DetailBonliv" ALTER COLUMN "QTECTRL" SET DEFAULT 0;
