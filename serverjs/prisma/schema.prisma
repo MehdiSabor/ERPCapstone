@@ -128,7 +128,7 @@ model Devis {
   NOTES        String?
   client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
   comercial    Comercial     @relation(fields: [CODE_COM], references: [code_com])
-  devisDetails DevisDetail[]
+  devisDetails DevisDetail[]  
 }
 
 model DevisDetail {
@@ -145,7 +145,7 @@ model DevisDetail {
   TotalHT  Float   @default(0)
   TotalTTC Float   @default(0)
   article  Article @relation(fields: [CODE_ART], references: [code_art])
-  devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV])
+  devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV], onDelete: Cascade)
 
   @@id([REF_DEV, CODE_ART])
 }
@@ -161,6 +161,8 @@ model Bonliv {
   CLIENT        String
   MNT_HT        Float
   MNT_TTC       Float
+  MNT_HTliv        Float?
+  MNT_TTCliv       Float?
   EN_FACTURE    Boolean
   VALIDER       Boolean
   MODELIV       String?
@@ -170,19 +172,18 @@ model Bonliv {
   CODE_ADR      Int?
   BASEHT        Boolean?
   IMPRIMER      Boolean?
+  
+
   client        Client        @relation(fields: [CODE_CLT], references: [code_clt])
-  detailBonlivs DetailBonliv[]
+  detailBonlivs DetailBonliv[] 
 }
 
 model DetailBonliv {
   REF_BL   String  
   CODE_ART String
   ARTICLE  String
-  QTECMD   Float
-  QTEGRA   Float?
-  qteliv   Float   @default(0)
+  qteliv   Float?
   QTE      Float
-  QTECTRL  Float @default(0)
   GRATUIT  Float?
   PA_HT    Float
   PV_HT    Float
@@ -190,8 +191,12 @@ model DetailBonliv {
   REMISE   Float
   REMISEG  Float?
   TVA      Int
+  TotalHT  Float   @default(0)
+  TotalTTC Float   @default(0)
+  TotalHTliv  Float ?  
+  TotalTTCliv Float ?  
   article  Article @relation(fields: [CODE_ART], references: [code_art])
-  bonliv   Bonliv  @relation(fields: [REF_BL], references: [REF_BL])
+  bonliv   Bonliv  @relation(fields: [REF_BL], references: [REF_BL], onDelete: Cascade)
 @@id([REF_BL, CODE_ART])
 }
 
@@ -214,7 +219,7 @@ model Facture {
   BASEHT         Boolean?
   VALIDER        Boolean
   IMPRIMER       Boolean?
-  detailFactures DetailFacture?
+  detailFactures DetailFacture[] 
   client         Client         @relation(fields: [CODE_CLT], references: [code_clt])
 }
 
@@ -232,7 +237,7 @@ model DetailFacture {
   REMISEG  Float?
   TVA      Int
   article  Article @relation(fields: [CODE_ART], references: [code_art])
-  facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC])
+  facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC], onDelete: Cascade)
 }
 
 model Avoirs {

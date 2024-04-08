@@ -84,14 +84,14 @@ const getDevisById = async (id) => {
           REF_BL: bonliv.REF_BL,
           CODE_ART: detail.CODE_ART,
           ARTICLE: detail.ARTICLE,
-          QTECMD: detail.QTE,
           QTE: detail.QTE,
           PA_HT: detail.PA_HT,
           PV_HT: detail.PV_HT,
           PV_TTC: detail.PV_TTC,
           REMISE: detail.REMISE,
           TVA: detail.TVA,
-         
+          TotalHT: detail.TotalHT,
+          TotalTTC: detail.TotalTTC
           // Add other fields as needed
         }));
   

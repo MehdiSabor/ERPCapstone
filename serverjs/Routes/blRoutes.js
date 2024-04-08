@@ -8,10 +8,10 @@ router.put('/updatebl/:id', blController.updateBonLiv);
 router.delete('/deletebl/:id', blController.deleteBonLiv);
 router.get('/getallbl', blController.getAllBonLivs);
 router.post('/validatebl/:id', blController.validateBonLiv);
-router.get('/getallitem/:refBL', detailBonlivController.getAllDetailBonlivsByBonliv);
-router.get('/getitem/:refBL/:codeArt', detailBonlivController.getDetailBonlivById);
-router.put('/modifyitem/:refBL/detail/:codeArt', detailBonlivController.updateDetailBonliv);
-router.delete('/deleteitem/:refBL/:codeArt', detailBonlivController.deleteDetailBonliv);
+router.get('/getallitems/:refBL', blController.getAllDetailBonlivsByBonliv);
+router.get('/getitem/:refBL/:codeArt', blController.getDetailBonlivById);
+router.put('/updateitem/:refBL/:codeArt', blController.updateDetailBonliv);
+router.delete('/deleteitem/:refBL/:codeArt', blController.deleteDetailBonliv);
 
 
 

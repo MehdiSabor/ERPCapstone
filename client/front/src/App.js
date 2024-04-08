@@ -7,6 +7,7 @@ import ArticleManagementPage from './Pages/article';
 import ComManagementPage from './Pages/com';
 import FourManagementPage from './Pages/four';
 import DevisManagementPage from './Pages/devis';
+import BonlivManagementPage from './Pages/bonliv';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path="/four" element={<FourManagementPage />} />
             <Route path="/article" element={<ArticleManagementPage />} />
             <Route path="/devis" element={<DevisManagementPage />} />
+            <Route path="/bonliv" element={<BonlivManagementPage />} />
           </Routes>
         </header>
       </div>

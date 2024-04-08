@@ -1,4 +1,4 @@
-const blService = require('../Services/blServices');
+const blService = require('../Services/blService');
 
 exports.createBonLiv = async (req, res) => {
   try {
@@ -63,7 +63,7 @@ exports.validateBonLiv = async (req, res) => {
 exports.getAllDetailBonlivsByBonliv = async (req, res) => {
   try {
     const refBL = req.params.refBL;
-    const details = await detailBonlivService.getAllDetailBonlivsByBonliv(refBL);
+    const details = await blService.getAllDetailBonlivsByBonliv(refBL);
     res.json(details);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -73,7 +73,7 @@ exports.getAllDetailBonlivsByBonliv = async (req, res) => {
 exports.getDetailBonlivById = async (req, res) => {
   try {
     const { refBL, codeArt } = req.params;
-    const detail = await detailBonlivService.getDetailBonlivById(refBL, codeArt);
+    const detail = await blService.getDetailBonlivById(refBL, codeArt);
     if (detail) res.json(detail);
     else res.status(404).json({ message: 'DetailBonliv not found' });
   } catch (error) {
@@ -84,7 +84,7 @@ exports.getDetailBonlivById = async (req, res) => {
 exports.updateDetailBonliv = async (req, res) => {
   try {
     const { refBL, codeArt } = req.params;
-    const detail = await detailBonlivService.updateDetailBonliv(refBL, codeArt, req.body);
+    const detail = await blService.updateDetailBonliv(refBL, codeArt, req.body);
     res.json(detail);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -94,7 +94,7 @@ exports.updateDetailBonliv = async (req, res) => {
 exports.deleteDetailBonliv = async (req, res) => {
   try {
     const { refBL, codeArt } = req.params;
-    await detailBonlivService.deleteDetailBonliv(refBL, codeArt);
+    await blService.deleteDetailBonliv(refBL, codeArt);
     res.status(204).send();
   } catch (error) {
     res.status(400).json({ message: error.message });
