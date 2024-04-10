@@ -12,7 +12,7 @@ router.get('/getallitems/:refBL', blController.getAllDetailBonlivsByBonliv);
 router.get('/getitem/:refBL/:codeArt', blController.getDetailBonlivById);
 router.put('/updateitem/:refBL/:codeArt', blController.updateDetailBonliv);
 router.delete('/deleteitem/:refBL/:codeArt', blController.deleteDetailBonliv);
-
+router.post('/bulkupdateitems', blController.bulkUpdateDetailBonliv);
 
 
 module.exports = router;

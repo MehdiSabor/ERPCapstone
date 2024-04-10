@@ -56,6 +56,19 @@ const updateDetailBonliv = async (refBL, codeArt, data) => {
   });
 };
 
+const bulkUpdateDetailBonliv = async (updates) => {
+    return await prisma.$transaction(
+      updates.map(update => {
+        return prisma.detailBonliv.update({
+          where: {
+            REF_BL_CODE_ART: { REF_BL: update.refBL, CODE_ART: update.codeArt },
+          },
+          data: update.data,
+        });
+      })
+    );
+  };
+
 // Delete DetailBonliv
 const deleteDetailBonliv = async (refBL, codeArt) => {
   return await prisma.detailBonliv.delete({
@@ -83,4 +96,5 @@ module.exports = {
   getDetailBonlivById,
   updateDetailBonliv,
   deleteDetailBonliv,
+  
 };

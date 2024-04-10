@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { 
   createBonliv, validateBonliv, getBonlivById, updateBonliv, deleteBonliv,
   getAllBonliv, getBonlivByClient, getBonlivByCommercial, 
-  deleteItemFromBonliv, updateItemInBonliv, getItemsInBonliv
+  deleteItemFromBonliv, updateItemInBonliv, getItemsInBonliv, bulkUpdateItemsInBonliv
 } from '../models/bonlivAPI'; // Adjust the import path as necessary
 
 export const useCreateBonliv = () => {
@@ -228,4 +228,21 @@ export const useFetchBonlivByCommercial = (commercialId) => {
     return { items, loading, error };
   };
   
+  export const useBulkUpdateItemsInBonliv = () => {
+    const [error, setError] = useState('');
+    const [isUpdated, setIsUpdated] = useState(false);
+  
+    const bulkUpdateItems = async (updates) => {
+      try {
+        const response = await bulkUpdateItemsInBonliv(updates);
+        setIsUpdated(true);
+        return response.data; // You can return the updated items if your API does so
+      } catch (err) {
+        setError(err.message);
+        setIsUpdated(false);
+      }
+    };
+  
+    return { bulkUpdateItems, error, isUpdated, setError, setIsUpdated };
+  };
 

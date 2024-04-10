@@ -100,3 +100,14 @@ exports.deleteDetailBonliv = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+exports.bulkUpdateDetailBonliv = async (req, res) => {
+    try {
+      const updates = req.body; // Assuming req.body is an array of update objects
+      const updatedItems = await blService.bulkUpdateDetailBonliv(updates);
+      res.json(updatedItems);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };

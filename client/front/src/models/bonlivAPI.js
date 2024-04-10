@@ -25,3 +25,7 @@ export const deleteItemFromBonliv = (refBonliv, codeArt) => axios.delete(`${API_
 export const updateItemInBonliv = (refBonliv, codeArt, itemData) => axios.put(`${API_BASE_URL}/updateitem/${refBonliv}/${codeArt}`, itemData);
 
 export const getItemsInBonliv = (refBonliv) => axios.get(`${API_BASE_URL}/getallitems/${refBonliv}`);
+
+export const bulkUpdateItemsInBonliv = (updates) => {
+    return axios.post(`${API_BASE_URL}/bulkupdateitems`, updates);
+  };
