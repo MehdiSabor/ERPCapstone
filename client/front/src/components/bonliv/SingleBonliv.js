@@ -3,7 +3,9 @@ import { useFetchBonlivById, useFetchItemsInBonliv, useValidateBonliv } from '..
 
 const SingleBonliv = ({ bonlivId , onChangeView }) => {
   const { bonliv, loading: loadingBonliv, error: errorBonliv } = useFetchBonlivById(bonlivId);
+  
   const { items, loading: loadingItems, error: errorItems } = useFetchItemsInBonliv(bonlivId);
+  console.log(items);
   const { validate, error, isValidated } = useValidateBonliv(bonlivId);
  // Function to handle the click on the Validate button
  const handleValidateClick = async () => {

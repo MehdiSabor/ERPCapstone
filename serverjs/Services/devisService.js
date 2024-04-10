@@ -91,7 +91,9 @@ const getDevisById = async (id) => {
           REMISE: detail.REMISE,
           TVA: detail.TVA,
           TotalHT: detail.TotalHT,
-          TotalTTC: detail.TotalTTC
+          TotalTTC: detail.TotalTTC,
+          TotalHTliv : detail.TotalHT ,
+          TotalTTCliv: detail.TotalTTC,
           // Add other fields as needed
         }));
   
