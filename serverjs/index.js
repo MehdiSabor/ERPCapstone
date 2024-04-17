@@ -9,6 +9,7 @@ const blRoutes = require('./Routes/blRoutes');
 const faRoutes = require('./Routes/faRoutes');
 const avRoutes = require('./Routes/avRoutes');
 const regRoutes = require('./Routes/regRoutes');
+const famRoutes =require('./Routes/familleRoutes');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/bl', blRoutes);
 app.use('/fa',faRoutes);
 app.use('/av',avRoutes);
 app.use('/reglement',regRoutes);
+app.use('/fam', famRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

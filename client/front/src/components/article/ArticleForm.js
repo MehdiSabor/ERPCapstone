@@ -1,10 +1,12 @@
 import React, { useState,useEffect } from 'react';
 import { useCreateArticle } from '../../hooks/articleHooks';
 import FourList from '../four/FourList';
+import FamilleList from '../famille/ListFamilles';
 
 const ArticleForm = () => {
   const { handleCreate } = useCreateArticle();
   const [showFourList, setShowFourList] = useState(false);
+  const [showFamilleList, setShowFamilleList] = useState(false);
   
   const [PA_TTC, setPA_TTC] = useState(0);
   const [PV_TTC, setPV_TTC] = useState(0);
@@ -21,7 +23,7 @@ const ArticleForm = () => {
     PV_HT: '',
     
     Code_fam: '',
-    code_sfam: '',
+    
     STK_MAX: '',
     STK_MIN: '',
     STK_SEC: '',
@@ -42,7 +44,10 @@ const ArticleForm = () => {
     setArticleData({ ...articleData, code_frs });
     setShowFourList(false); // Close the ComList after selection
 };
-
+const handleSelectFamille = (Code_fam) => {
+  setArticleData({ ...articleData, Code_fam });
+  setShowFamilleList(false);
+};
 
 useEffect(() => {
   // Calculate PA_TTC and PV_TTC whenever PA_HT, PV_HT, or TVA changes
@@ -78,7 +83,7 @@ useEffect(() => {
       // Parse integers or set null for empty strings
       UAF: articleData.UAF !== '' ? parseInt(articleData.UAF, 10) : null,
       Code_fam: articleData.Code_fam !== '' ? parseInt(articleData.Code_fam, 10) : null,
-      code_sfam: articleData.code_sfam !== '' ? parseInt(articleData.code_sfam, 10) : null,
+      
       STK_MAX: articleData.STK_MAX !== '' ? parseInt(articleData.STK_MAX, 10) : null,
       STK_SEC: articleData.STK_SEC !== '' ? parseInt(articleData.STK_SEC, 10) : null,
       UVC: articleData.UVC !== '' ? parseInt(articleData.UVC, 10) : null,
@@ -124,6 +129,10 @@ useEffect(() => {
         <button type="button" onClick={() => setShowFourList(true)}>Select Fournisseur</button>
                     {articleData.code_frs && <p>Selected Fournisseur: {articleData.code_frs}</p>}
                 
+                    <button type="button" onClick={() => setShowFamilleList(true)}>Select Famille</button>
+                    {articleData.Code_fam && <p>Selected Famille: {articleData.Code_fam}</p>}
+        {showFamilleList && <FamilleList onSelectFamille={handleSelectFamille} />}
+       
                 {showFourList && <FourList  onSelectFour={handleSelectFour} />}
 
         <button type="submit">Submit</button>

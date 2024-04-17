@@ -60,7 +60,6 @@ model Article {
   PV_HT           Float
   PV_TTC          Float
   Code_fam        Int?
-  code_sfam       Int?
   STK_MAX         Int
   STK_MIN         Int
   STK_SEC         Int?
@@ -83,18 +82,13 @@ model Article {
 }
 
 model famille {
-  code_fam  Int        @id
+  code_fam  Int        @id @default(autoincrement())
   nom       String
   articles  Article[]
-  sfamilles sfamille[]
+  
 }
 
-model sfamille {
-  code_sfam Int     @id
-  nom       String
-  code_fam  Int
-  famille   famille @relation(fields: [code_fam], references: [code_fam])
-}
+
 
 model Fournisseur {
   code_frs  String    @id
