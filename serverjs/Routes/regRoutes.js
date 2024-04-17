@@ -3,10 +3,13 @@ const router = express.Router();
 const regController = require('../controllers/regController');
 
 router.post('/create', regController.createReglementController);
-router.get('/:id', regController.getReglementByIdController);
+router.get('/get/:id', regController.getReglementByIdController);
 router.put('/update/:id', regController.updateReglementController);
 router.delete('/delete/:id', regController.deleteReglementController);
 router.get('/all', regController.getAllReglementsController);
 router.post('/createBatchDetails', regController.createReglementDetailsBatchController);
+router.get('/getAllUnified', regController.getAllUnifiedFactureAvoirController);
+router.post('/addDetail', regController.addDetailReglementController);
+router.delete('/deletedetail/:refRegV/:refAvFac', regController.deleteReglementDetail);
 
 module.exports = router;

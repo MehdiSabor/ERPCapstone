@@ -48,6 +48,7 @@ exports.deleteReglementController = async (req, res) => {
 exports.getAllReglementsController = async (req, res) => {
   try {
     const allReglements = await regService.getAllReglements();
+    
     res.json(allReglements);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -61,5 +62,32 @@ exports.createReglementDetailsBatchController = async (req, res) => {
     res.status(201).json(reglementDetails);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllUnifiedFactureAvoirController = async (req, res) => {
+  try {
+    const unifiedFactureAvoir = await regService.getAllUnifiedFactureAvoir();
+    res.json(unifiedFactureAvoir);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.addDetailReglementController = async (req, res) => {
+  try {
+      const detail = await regService.addDetailReglement(req.body);
+      res.status(201).json(detail);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteReglementDetail = async (req, res) => {
+  try {
+      const result = await regService.deleteReglementDetail(req.params.refRegV, req.params.refAvFac);
+      res.json(result);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
   }
 };

@@ -4,28 +4,42 @@ const prisma = new PrismaClient();
 // Create a Reglement
 const createReglement = async (data) => {
     const transaction = await prisma.$transaction(async (tx) => {
-      // Create the Reglement and set the registration date to current
-      const reglement = await tx.reglement.create({
-        data: {
-          ...data,
-          DATE_REG: new Date(), // Set the registration date to the current date
-        },
-      });
-  
-      // Update client's balance by decrementing the MNT_REGLER from SOLDE
-      if (reglement) {
-        await tx.client.update({
-          where: { code_clt: reglement.CODE_CLT },
-          data: { SOLDE: { decrement: reglement.MNT_REGLER } }
+        // Get the last reglement to determine the next REF_REGV
+        const lastReglement = await tx.reglement.findFirst({
+            orderBy: { DATE_REG: 'desc' },
         });
-      }
-  
-      return reglement;
+
+        let nextRefRegv;
+        if (lastReglement) {
+            const lastRefNumber = parseInt(lastReglement.REF_REGV.replace('REG', '')) || 0;
+            nextRefRegv = `REG${(lastRefNumber + 1).toString().padStart(5, '0')}`;
+        } else {
+            nextRefRegv = 'REG00001'; // Default start if no reglement exists
+        }
+
+        // Create the Reglement with the new REF_REGV and set the registration date to current
+        const reglement = await tx.reglement.create({
+            data: {
+                ...data,
+                REF_REGV: nextRefRegv,
+                DATE_REG: new Date(), // Set the registration date to the current date
+            },
+        });
+
+        // Update client's balance by decrementing the MNT_REGLER from SOLDE
+        if (reglement) {
+            await tx.client.update({
+                where: { code_clt: reglement.CODE_CLT },
+                data: { SOLDE: { decrement: reglement.MNT_REGLER } }
+            });
+        }
+
+        return reglement;
     });
-  
+
     return transaction;
-  };
-  
+};
+
 
 // Get a Reglement by its ID
 const getReglementById = async (id) => {
@@ -119,6 +133,115 @@ const createReglementDetailsBatch = async (regDetailsArray) => {
   };
   
 
+  // Get all UnifiedFactureAvoir records
+const getAllUnifiedFactureAvoir = async () => {
+    return await prisma.unifiedFactureAvoir.findMany({
+      include: {
+        reglementDetails: true,  // Optionally include related reglement details
+        client: true             // Optionally include related client data
+      }
+    });
+  };
+
+
+  // file: services/regService.js
+  const addDetailReglement = async (regDetailData) => {
+    const transaction = await prisma.$transaction(async (tx) => {
+        // Find the specific UnifiedFactureAvoir to ensure it exists and calculate the remaining amount to be registered.
+        const unified = await tx.unifiedFactureAvoir.findUnique({
+            where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
+        });
+
+        if (!unified) {
+            throw new Error('UnifiedFactureAvoir not found for REF_AV_FAC: ' + regDetailData.REF_AV_FAC);
+        }
+
+        // Calculate the maximum allowable amount that can still be registered against this unified invoice/credit.
+        const remainingAmountToRegister = unified.MNT_TTC - unified.MNT_REGLER;
+
+        // Find the Reglement to calculate the total already registered and the total allowed.
+        const reglement = await tx.reglement.findUnique({
+            where: { REF_REGV: regDetailData.REF_REGV },
+            include: { reglementdetails: true }
+        });
+
+        if (!reglement) {
+            throw new Error('Reglement not found for REF_REGV: ' + regDetailData.REF_REGV);
+        }
+
+        // Calculate the total already registered for this Reglement.
+        const totalRegistered = reglement.reglementdetails.reduce((acc, detail) => acc + detail.MNT_REGLER, 0);
+        const remainingReglementBalance = reglement.MNT_REGLER - totalRegistered;
+
+        // Determine the actual amount to register, which is the lesser of the remaining amounts on both the reglement and the unified.
+        const actualAmountToRegister = Math.min(remainingAmountToRegister, remainingReglementBalance, regDetailData.MNT_REGLER);
+
+        // Update the MNT_REGLER in the UnifiedFactureAvoir to increment by the calculated amount.
+        await tx.unifiedFactureAvoir.update({
+            where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
+            data: { MNT_REGLER: { increment: actualAmountToRegister } },
+        });
+
+        // Create the ReglementDetail with the adjusted MNT_REGLER.
+        const regDetail = await tx.reglementDetail.create({
+            data: {
+                ...regDetailData,
+                MNT_REGLER: actualAmountToRegister,
+                MNT_ORIGINAL: unified.MNT_TTC  // Ensure the original amount is also recorded.
+            },
+        });
+
+        return regDetail;
+    });
+
+    return transaction;
+};
+const deleteReglementDetail = async (refRegV, refAvFac) => {
+    const transaction = await prisma.$transaction(async (tx) => {
+        // Correctly structure the compound unique query
+        const regDetail = await tx.reglementDetail.findUnique({
+            where: {
+                REF_REGV_REF_AV_FAC: {
+                    REF_REGV: refRegV,
+                    REF_AV_FAC: refAvFac,
+                }
+            },
+            include: {
+                unifiedFactureAvoir: true // Only if needed for further operations
+            }
+        });
+
+        if (!regDetail) {
+            throw new Error('Reglement detail not found');
+        }
+
+        // If found, perform the deduction of the registered amount from the unified facture avoir
+        await tx.unifiedFactureAvoir.update({
+            where: { REF_AV_FAC: regDetail.REF_AV_FAC },
+            data: { MNT_REGLER: { decrement: regDetail.MNT_REGLER } }
+        });
+
+        // Delete the reglement detail after adjusting the registered amount
+        await tx.reglementDetail.delete({
+            where: {
+                REF_REGV_REF_AV_FAC: {
+                    REF_REGV: refRegV,
+                    REF_AV_FAC: refAvFac,
+                }
+            }
+        });
+
+        return { message: "Deleted successfully" };
+    });
+
+    return transaction;
+};
+
+
+
+
+  
+
 module.exports = {
   createReglement,
   getReglementById,
@@ -126,4 +249,7 @@ module.exports = {
   deleteReglement,
   getAllReglements,
   createReglementDetailsBatch,
+  getAllUnifiedFactureAvoir ,
+  addDetailReglement,
+  deleteReglementDetail
 };

@@ -286,7 +286,7 @@ model DetailAvoirs {
 
 model Reglement {
   REF_REGV         String           @id
-  DATEVALID        DateTime
+  DATEVALID        DateTime?
   HEUREVALID       DateTime?
   CODE_CLT         Int
   CLIENT           String
@@ -303,17 +303,18 @@ model Reglement {
   VILLE            String?
   DATE_REG         DateTime
   client           Client           @relation(fields: [CODE_CLT], references: [code_clt])
-  reglementdetails ReglementDetail?
+  reglementdetails ReglementDetail[]
 }
 
 model ReglementDetail {
-  REF_REGV            String              @id
+  REF_REGV            String              
   REF_AV_FAC          String
-  DATE_DOC            DateTime
+  DATE_DOC            DateTime @default(now())
   MNT_ORIGINAL        Float
   MNT_REGLER          Float
   unifiedFactureAvoir UnifiedFactureAvoir @relation(fields: [REF_AV_FAC], references: [REF_AV_FAC])
   reglement           Reglement           @relation(fields: [REF_REGV], references: [REF_REGV])
+@@id([REF_REGV,  REF_AV_FAC])
 }
 
 model UnifiedFactureAvoir {

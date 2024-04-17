@@ -10,6 +10,7 @@ import DevisManagementPage from './Pages/devis';
 import BonlivManagementPage from './Pages/bonliv';
 import  FactureManagementPage from './Pages/facture';
 import AvoirManagementPage from './Pages/avoir';
+import RegManagementPage from './Pages/reg';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
             <Route path="/bonliv" element={<BonlivManagementPage />} />
             <Route path="/facture" element={<FactureManagementPage />} />
             <Route path="/avoir" element={<AvoirManagementPage />} />
-         
+         <Route path="/reg" element={<RegManagementPage/>} />
           </Routes>
         </header>
       </div>

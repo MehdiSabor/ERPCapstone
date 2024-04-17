@@ -28,7 +28,7 @@ app.use('/devis', devisRoutes);
 app.use('/bl', blRoutes);
 app.use('/fa',faRoutes);
 app.use('/av',avRoutes);
-app.use('/reg',regRoutes);
+app.use('/reglement',regRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
