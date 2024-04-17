@@ -57,7 +57,7 @@ const DevisForm = () => {
     };
 
     if (loadingComs || loadingClients) return <p>Loading...</p>;
-    if (errorComs || errorClients) return <p>Error loading data</p>;
+    if ( errorClients) return <p>Error loading data</p>;
 
     return (
         <div>

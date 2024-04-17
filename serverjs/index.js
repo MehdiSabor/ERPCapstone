@@ -7,6 +7,8 @@ const articleRoutes = require('./Routes/articleRoutes');
 const devisRoutes = require('./Routes/DevisRoutes');
 const blRoutes = require('./Routes/blRoutes');
 const faRoutes = require('./Routes/faRoutes');
+const avRoutes = require('./Routes/avRoutes');
+const regRoutes = require('./Routes/regRoutes');
 
 const app = express();
 
@@ -25,7 +27,8 @@ app.use('/article', articleRoutes);
 app.use('/devis', devisRoutes);
 app.use('/bl', blRoutes);
 app.use('/fa',faRoutes);
-
+app.use('/av',avRoutes);
+app.use('/reg',regRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

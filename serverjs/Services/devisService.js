@@ -193,21 +193,30 @@ const getDevisByClient = async (clientId) => {
     });
   };
   
-
   const updateItemInDevis = async (refDevis, codeArt, updatedData) => {
-    const { PV_HT, TVA, ...otherDetails } = updatedData;
+    const { PV_HT, TVA, QTE, ...otherDetails } = updatedData;
   
-    // Calculate PV_TTC if PV_HT or TVA is updated
+    // Calculate new total prices if necessary
     let updateFields = { ...otherDetails };
     if (PV_HT !== undefined && TVA !== undefined) {
-      const PV_TTC = PV_HT + (PV_HT * TVA / 100);
-      updateFields.PV_HT = PV_HT;
-      updateFields.TVA = TVA;
-      updateFields.PV_TTC = PV_TTC;
+      const PV_TTC = (PV_HT + (PV_HT * TVA / 100) );
+      const TotalTTC = PV_TTC*QTE;
+
+      const TotalHT = PV_HT*QTE;
+      // Calculate based on quantity
+      updateFields = {
+        ...updateFields,
+        PV_HT,
+        QTE,
+        TVA,
+        PV_TTC,
+        TotalHT,
+        TotalTTC // Update to calculated PV_TTC
+      };
     }
   
-    // Update the DevisDetail
-    const devisDetail = await prisma.devisDetail.updateMany({
+    // Update the item details
+    const detailDevis = await prisma.devisDetail.updateMany({
       where: {
         REF_DEV: refDevis,
         CODE_ART: codeArt,
@@ -215,11 +224,12 @@ const getDevisByClient = async (clientId) => {
       data: updateFields,
     });
   
-    // Update the total MNT_TTC in the Devis
+    // Update total amounts in the devis
     await updateDevisTotal(refDevis);
   
-    return devisDetail;
+    return detailDevis;
   };
+  
   
 
 

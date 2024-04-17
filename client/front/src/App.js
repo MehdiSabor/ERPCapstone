@@ -9,6 +9,7 @@ import FourManagementPage from './Pages/four';
 import DevisManagementPage from './Pages/devis';
 import BonlivManagementPage from './Pages/bonliv';
 import  FactureManagementPage from './Pages/facture';
+import AvoirManagementPage from './Pages/avoir';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/devis" element={<DevisManagementPage />} />
             <Route path="/bonliv" element={<BonlivManagementPage />} />
             <Route path="/facture" element={<FactureManagementPage />} />
+            <Route path="/avoir" element={<AvoirManagementPage />} />
          
           </Routes>
         </header>

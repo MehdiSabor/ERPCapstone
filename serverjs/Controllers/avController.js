@@ -1,4 +1,4 @@
-const avoirService = require('../services/avoirService');
+const avoirService = require('../services/avService');
 
 exports.createAvoirController = async (req, res) => {
   try {
@@ -53,6 +53,53 @@ exports.getAllAvoirsController = async (req, res) => {
   try {
     const allAvoirs = await avoirService.getAllAvoirs();
     res.json(allAvoirs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+exports.getAvoirsByClientController = async (req, res) => {
+  try {
+    const avoirs = await avoirService.getAvoirsByClient(req.params.clientId);
+    res.json(avoirs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.addItemToAvoirController = async (req, res) => {
+  try {
+    const item = await avoirService.addItemToAvoir(req.params.refAvoir, req.body);
+    res.status(201).json(item);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteItemFromAvoirController = async (req, res) => {
+  try {
+    await avoirService.deleteItemFromAvoir(req.params.refAvoir, req.params.codeArt);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateItemInAvoirController = async (req, res) => {
+  try {
+    const updatedItem = await avoirService.updateItemInAvoir(req.params.refAvoir, req.params.codeArt, req.body);
+    res.json(updatedItem);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getItemsInAvoirController = async (req, res) => {
+  try {
+    const items = await avoirService.getItemsInAvoir(req.params.refAvoir);
+    res.json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

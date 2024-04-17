@@ -83,7 +83,7 @@ const cancelFactureAndCreateAvoirs = async (refFAC) => {
             data: {
                 REF_AVR: `AV-${facture.REF_FAC}`,
                 DATE_AVR: new Date(),
-                DATEVALID: new Date(),
+                
                 COMPTE: facture.COMPTE,
                 CODE_CLT: facture.CODE_CLT,
                 CLIENT: facture.CLIENT,
@@ -113,7 +113,7 @@ const cancelFactureAndCreateAvoirs = async (refFAC) => {
         });
 
         // Bulk create Detailavoirs
-        await prisma.detailavoirs.createMany({
+        await prisma.detailAvoirs.createMany({
             data: detailAvoirs
         });
 

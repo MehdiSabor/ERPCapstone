@@ -78,12 +78,12 @@ const validateBonLiv = async (refBL) => {
         });
   
         // Update stock in Article
-        if (detail.qteliv !== null) {
+        
           await prisma.article.update({
             where: { code_art: detail.CODE_ART },
             data: { qte_stk: { decrement: detail.qteliv || detail.QTE } } // Decrement stock by qteliv if available
           });
-        }
+        
       });
   
       await Promise.all(detailFactures); // Ensure all operations are completed

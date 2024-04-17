@@ -37,6 +37,7 @@ const SingleBonliv = ({ bonlivId , onChangeView }) => {
       <button onClick={() => onChangeView('delete', bonlivId)}>Delete Bonliv</button>
       <button onClick={() => onChangeView('addItem', bonlivId)}>Add Item</button>
       <button onClick={() => onChangeView('viewItems', bonlivId)}>View Items</button>
+   
       {!isValidated && (
                 <button onClick={handleValidateClick}>Validate Bonliv</button>
             )}
@@ -49,7 +50,8 @@ const SingleBonliv = ({ bonlivId , onChangeView }) => {
         <strong>Client:</strong> {bonliv.CLIENT}<br/>
         <strong>Total:</strong> {bonliv.MNT_TTC} HT:{bonliv.MNT_HT}<br/>
         <strong>Total Liv: {bonliv.MNT_TTCliv} </strong>
-        
+        <strong>Status:</strong> {bonliv.VALIDER ? 'Validated' : 'Not Validated'}<br/>
+       
         <strong>{bonliv.VALIDER}</strong><br/>
         {/* Display other bonliv details here */}
       </div>

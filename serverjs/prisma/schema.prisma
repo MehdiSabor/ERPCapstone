@@ -78,7 +78,7 @@ model Article {
   famille         famille?        @relation(fields: [familleCode_fam], references: [code_fam])
   bonlivDetails   DetailBonliv[]
   factureDetails  DetailFacture[]
-  avoirDetails    Detailavoirs[]
+  avoirDetails    DetailAvoirs[]
   devisDetails    DevisDetail[]
 }
 
@@ -224,7 +224,7 @@ model Facture {
 }
 
 model DetailFacture {
-  REF_FAC  String  @id
+  REF_FAC  String  
   CODE_ART String
   ARTICLE  String
   QTE      Float
@@ -240,29 +240,31 @@ model DetailFacture {
   TVA      Int
   article  Article @relation(fields: [CODE_ART], references: [code_art])
   facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC], onDelete: Cascade)
+@@id([REF_FAC, CODE_ART])
 }
 
 model Avoirs {
-  REF_AVR      String        @id
-  DATEVALID    DateTime
+  REF_AVR      String        @unique
+  id           Int           @id @default(autoincrement())
+  DATEVALID    DateTime?
   HEUREVALID   DateTime?
-  DATE_AVR     DateTime
+  DATE_AVR     DateTime @default(now())
   COMPTE       String?
   CODE_CLT     Int
   CLIENT       String
-  MNT_HT       Float
-  MNT_TTC      Float
-  VALIDER      Boolean
+  MNT_HT       Float @default(0)
+  MNT_TTC      Float @default(0)
+  VALIDER      Boolean @default(false)
   CODE_COM     Int
   REMARQUE     String?
   BASEHT       Boolean?
   code_clt     Int?
   client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
-  detailAvoirs Detailavoirs?
+  detailAvoirs DetailAvoirs[]
 }
 
-model Detailavoirs {
-  REF_AVR  String  @id
+model DetailAvoirs {
+  REF_AVR  String  
   CODE_ART String
   ARTICLE  String
   QTE      Float
@@ -272,10 +274,14 @@ model Detailavoirs {
   PA_HT    Float
   REMISE   Float
   REMISEG  Float?
+  TotalHT  Float   @default(0)
+  TotalTTC Float   @default(0)
   TVA      Int
-  MAJ_STK  Boolean
+  MAJ_STK  Boolean @default(false)
   article  Article @relation(fields: [CODE_ART], references: [code_art])
-  avoirs   Avoirs  @relation(fields: [REF_AVR], references: [REF_AVR])
+  avoirs   Avoirs  @relation(fields: [REF_AVR], references: [REF_AVR], onDelete: Cascade)
+
+@@id([REF_AVR, CODE_ART])
 }
 
 model Reglement {
