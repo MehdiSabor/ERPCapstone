@@ -4,7 +4,7 @@ const API_BASE_URL = 'http://localhost:3000/bl'; // Adjust this as necessary
 
 export const createBonliv = (bonlivData) => axios.post(`${API_BASE_URL}/createbl`, bonlivData);
 
-export const validateBonliv = (refBonliv) => axios.post(`${API_BASE_URL}/validate/${refBonliv}`);
+export const validateBonliv = (refBonliv) => axios.post(`${API_BASE_URL}/validatebl/${refBonliv}`);
 
 export const getBonlivById = (id) => axios.get(`${API_BASE_URL}/getbl/${id}`);
 

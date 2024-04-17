@@ -72,6 +72,7 @@ const getDevisById = async (id) => {
             MNT_TTC: devis.MNT_TTC,
             VALIDER: false,
             MODELIV: devis.MODELIV,
+            CODE_COM:devis.CODE_COM,
             MODE_PAIE: devis.MODE_PAIE,
             REMARQUE: devis.REMARQUE,
             EN_FACTURE: true,

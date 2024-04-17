@@ -168,7 +168,7 @@ model Bonliv {
   MODELIV       String?
   MODE_PAIE     String?
   REMARQUE      String?
-  CODE_CON      Int?
+  CODE_COM      Int?
   CODE_ADR      Int?
   BASEHT        Boolean?
   IMPRIMER      Boolean?
@@ -202,7 +202,7 @@ model DetailBonliv {
 
 model Facture {
   REF_FAC        String         @id
-  DATEVALID      DateTime
+  DATEVALID      DateTime?
   HEUREVALID     DateTime?
   REF_BL         String
   DATE_FAC       DateTime
@@ -233,6 +233,8 @@ model DetailFacture {
   PV_HT    Float
   PV_TTC   Float
   PD_HT    Float?
+  TotalHT  Float   @default(0)
+  TotalTTC Float   @default(0)
   REMISE   Float
   REMISEG  Float?
   TVA      Int

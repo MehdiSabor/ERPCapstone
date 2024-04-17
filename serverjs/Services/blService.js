@@ -27,9 +27,76 @@ const getAllBonLivs = async () => {
 };
 
 // Validate BonLiv
-const validateBonLiv = async (id) => {
-  return await prisma.bonliv.update({ where: { REF_BL: id }, data: { VALIDER: true, DATEVALID: new Date() } });
-};
+const validateBonLiv = async (refBL) => {
+    const transaction = await prisma.$transaction(async (prisma) => {
+      // Validate the BonLiv
+      const validatedBonLiv = await prisma.bonliv.update({
+        where: { REF_BL: refBL },
+        data: { VALIDER: true, DATEVALID: new Date() },
+        include: { detailBonlivs: true }, // Include details to use in Facture creation
+      });
+  
+      // Create Facture based on validated BonLiv
+      const newFacture = await prisma.facture.create({
+        data: {
+          REF_FAC: `FA-${validatedBonLiv.REF_BL}`, // Generate REF_FAC based on REF_BL
+          DATE_FAC: new Date(),
+          REF_BL: refBL,
+          COMPTE: validatedBonLiv.COMPTE,
+          CODE_CLT: validatedBonLiv.CODE_CLT,
+          CLIENT: validatedBonLiv.CLIENT,
+          MNT_HT: validatedBonLiv.MNT_HTliv || validatedBonLiv.MNT_HT, // Use MNT_HTliv if available
+          MNT_TTC: validatedBonLiv.MNT_TTCliv || validatedBonLiv.MNT_TTC, // Use MNT_TTCliv if available
+          CODE_COM: validatedBonLiv.CODE_COM,
+          MODELIV: validatedBonLiv.MODELIV,
+          MODE_PAIE: validatedBonLiv.MODE_PAIE,
+          REMARQUE: validatedBonLiv.REMARQUE,
+          VALIDER: false, // Initially not validated
+          IMPRIMER: false,
+        }
+      });
+  
+      // Create DetailFacture entries and update Article stock
+      const detailFactures = validatedBonLiv.detailBonlivs.map(async detail => {
+        // Create DetailFacture
+        await prisma.detailFacture.create({
+          data: {
+            REF_FAC: newFacture.REF_FAC,
+            CODE_ART: detail.CODE_ART,
+            ARTICLE: detail.ARTICLE,
+            QTE: detail.qteliv || detail.QTE, // Use qteliv if available
+            GRATUIT: detail.GRATUIT,
+            PA_HT: detail.PA_HT,
+            PV_HT: detail.PV_HT,
+            PV_TTC: detail.PV_TTC,
+            PD_HT: detail.PV_HT, // Assuming PD_HT is the same as PV_HT
+            REMISE: detail.REMISE,
+            TVA: detail.TVA,
+            TotalHT:detail.TotalHTliv,
+            TotalTTC:detail.TotalTTCliv
+          }
+        });
+  
+        // Update stock in Article
+        if (detail.qteliv !== null) {
+          await prisma.article.update({
+            where: { code_art: detail.CODE_ART },
+            data: { qte_stk: { decrement: detail.qteliv || detail.QTE } } // Decrement stock by qteliv if available
+          });
+        }
+      });
+  
+      await Promise.all(detailFactures); // Ensure all operations are completed
+      return newFacture;
+    });
+  
+    return transaction;
+  };
+  
+    
+    
+
+
 
 
 // Get all DetailBonliv for a specific BonLiv
