@@ -6,7 +6,6 @@ CREATE TABLE "Client" (
     "tel" TEXT,
     "adresse" TEXT,
     "ville" TEXT NOT NULL,
-    "code_region" INTEGER,
     "note" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "echeance" INTEGER NOT NULL,
@@ -49,7 +48,6 @@ CREATE TABLE "Article" (
     "PV_HT" DOUBLE PRECISION NOT NULL,
     "PV_TTC" DOUBLE PRECISION NOT NULL,
     "Code_fam" INTEGER,
-    "code_sfam" INTEGER,
     "STK_MAX" INTEGER NOT NULL,
     "STK_MIN" INTEGER NOT NULL,
     "STK_SEC" INTEGER,
@@ -69,19 +67,10 @@ CREATE TABLE "Article" (
 
 -- CreateTable
 CREATE TABLE "famille" (
-    "code_fam" INTEGER NOT NULL,
+    "code_fam" SERIAL NOT NULL,
     "nom" TEXT NOT NULL,
 
     CONSTRAINT "famille_pkey" PRIMARY KEY ("code_fam")
-);
-
--- CreateTable
-CREATE TABLE "sfamille" (
-    "code_sfam" INTEGER NOT NULL,
-    "nom" TEXT NOT NULL,
-    "code_fam" INTEGER NOT NULL,
-
-    CONSTRAINT "sfamille_pkey" PRIMARY KEY ("code_sfam")
 );
 
 -- CreateTable
@@ -229,7 +218,7 @@ CREATE TABLE "DetailFacture" (
     "REMISEG" DOUBLE PRECISION,
     "TVA" INTEGER NOT NULL,
 
-    CONSTRAINT "DetailFacture_pkey" PRIMARY KEY ("REF_FAC")
+    CONSTRAINT "DetailFacture_pkey" PRIMARY KEY ("REF_FAC","CODE_ART")
 );
 
 -- CreateTable
@@ -248,13 +237,12 @@ CREATE TABLE "Avoirs" (
     "CODE_COM" INTEGER NOT NULL,
     "REMARQUE" TEXT,
     "BASEHT" BOOLEAN,
-    "code_clt" INTEGER,
 
     CONSTRAINT "Avoirs_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Detailavoirs" (
+CREATE TABLE "DetailAvoirs" (
     "REF_AVR" TEXT NOT NULL,
     "CODE_ART" TEXT NOT NULL,
     "ARTICLE" TEXT NOT NULL,
@@ -265,16 +253,18 @@ CREATE TABLE "Detailavoirs" (
     "PA_HT" DOUBLE PRECISION NOT NULL,
     "REMISE" DOUBLE PRECISION NOT NULL,
     "REMISEG" DOUBLE PRECISION,
+    "TotalHT" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "TotalTTC" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "TVA" INTEGER NOT NULL,
-    "MAJ_STK" BOOLEAN NOT NULL,
+    "MAJ_STK" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "Detailavoirs_pkey" PRIMARY KEY ("REF_AVR","CODE_ART")
+    CONSTRAINT "DetailAvoirs_pkey" PRIMARY KEY ("REF_AVR","CODE_ART")
 );
 
 -- CreateTable
 CREATE TABLE "Reglement" (
     "REF_REGV" TEXT NOT NULL,
-    "DATEVALID" TIMESTAMP(3) NOT NULL,
+    "DATEVALID" TIMESTAMP(3),
     "HEUREVALID" TIMESTAMP(3),
     "CODE_CLT" INTEGER NOT NULL,
     "CLIENT" TEXT NOT NULL,
@@ -289,6 +279,7 @@ CREATE TABLE "Reglement" (
     "REMARQUE" TEXT,
     "TIRER" TEXT,
     "VILLE" TEXT,
+    "remainingAmount" DOUBLE PRECISION,
     "DATE_REG" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Reglement_pkey" PRIMARY KEY ("REF_REGV")
@@ -298,11 +289,11 @@ CREATE TABLE "Reglement" (
 CREATE TABLE "ReglementDetail" (
     "REF_REGV" TEXT NOT NULL,
     "REF_AV_FAC" TEXT NOT NULL,
-    "DATE_DOC" TIMESTAMP(3) NOT NULL,
+    "DATE_DOC" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "MNT_ORIGINAL" DOUBLE PRECISION NOT NULL,
     "MNT_REGLER" DOUBLE PRECISION NOT NULL,
 
-    CONSTRAINT "ReglementDetail_pkey" PRIMARY KEY ("REF_REGV")
+    CONSTRAINT "ReglementDetail_pkey" PRIMARY KEY ("REF_REGV","REF_AV_FAC")
 );
 
 -- CreateTable
@@ -333,9 +324,6 @@ ALTER TABLE "Article" ADD CONSTRAINT "Article_code_frs_fkey" FOREIGN KEY ("code_
 
 -- AddForeignKey
 ALTER TABLE "Article" ADD CONSTRAINT "Article_familleCode_fam_fkey" FOREIGN KEY ("familleCode_fam") REFERENCES "famille"("code_fam") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "sfamille" ADD CONSTRAINT "sfamille_code_fam_fkey" FOREIGN KEY ("code_fam") REFERENCES "famille"("code_fam") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Devis" ADD CONSTRAINT "Devis_CODE_CLT_fkey" FOREIGN KEY ("CODE_CLT") REFERENCES "Client"("code_clt") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -371,10 +359,10 @@ ALTER TABLE "DetailFacture" ADD CONSTRAINT "DetailFacture_REF_FAC_fkey" FOREIGN 
 ALTER TABLE "Avoirs" ADD CONSTRAINT "Avoirs_CODE_CLT_fkey" FOREIGN KEY ("CODE_CLT") REFERENCES "Client"("code_clt") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Detailavoirs" ADD CONSTRAINT "Detailavoirs_CODE_ART_fkey" FOREIGN KEY ("CODE_ART") REFERENCES "Article"("code_art") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DetailAvoirs" ADD CONSTRAINT "DetailAvoirs_CODE_ART_fkey" FOREIGN KEY ("CODE_ART") REFERENCES "Article"("code_art") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Detailavoirs" ADD CONSTRAINT "Detailavoirs_REF_AVR_fkey" FOREIGN KEY ("REF_AVR") REFERENCES "Avoirs"("REF_AVR") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "DetailAvoirs" ADD CONSTRAINT "DetailAvoirs_REF_AVR_fkey" FOREIGN KEY ("REF_AVR") REFERENCES "Avoirs"("REF_AVR") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Reglement" ADD CONSTRAINT "Reglement_CODE_CLT_fkey" FOREIGN KEY ("CODE_CLT") REFERENCES "Client"("code_clt") ON DELETE RESTRICT ON UPDATE CASCADE;

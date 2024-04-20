@@ -143,59 +143,64 @@ const getAllUnifiedFactureAvoir = async () => {
     });
   };
 
-
-  // file: services/regService.js
+ 
   const addDetailReglement = async (regDetailData) => {
     const transaction = await prisma.$transaction(async (tx) => {
-        // Find the specific UnifiedFactureAvoir to ensure it exists and calculate the remaining amount to be registered.
-        const unified = await tx.unifiedFactureAvoir.findUnique({
-            where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
-        });
-
-        if (!unified) {
-            throw new Error('UnifiedFactureAvoir not found for REF_AV_FAC: ' + regDetailData.REF_AV_FAC);
-        }
-
-        // Calculate the maximum allowable amount that can still be registered against this unified invoice/credit.
-        const remainingAmountToRegister = unified.MNT_TTC - unified.MNT_REGLER;
-
-        // Find the Reglement to calculate the total already registered and the total allowed.
-        const reglement = await tx.reglement.findUnique({
-            where: { REF_REGV: regDetailData.REF_REGV },
-            include: { reglementdetails: true }
-        });
-
-        if (!reglement) {
-            throw new Error('Reglement not found for REF_REGV: ' + regDetailData.REF_REGV);
-        }
-
-        // Calculate the total already registered for this Reglement.
-        const totalRegistered = reglement.reglementdetails.reduce((acc, detail) => acc + detail.MNT_REGLER, 0);
-        const remainingReglementBalance = reglement.MNT_REGLER - totalRegistered;
-
-        // Determine the actual amount to register, which is the lesser of the remaining amounts on both the reglement and the unified.
-        const actualAmountToRegister = Math.min(remainingAmountToRegister, remainingReglementBalance, regDetailData.MNT_REGLER);
-
-        // Update the MNT_REGLER in the UnifiedFactureAvoir to increment by the calculated amount.
-        await tx.unifiedFactureAvoir.update({
-            where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
-            data: { MNT_REGLER: { increment: actualAmountToRegister } },
-        });
-
-        // Create the ReglementDetail with the adjusted MNT_REGLER.
-        const regDetail = await tx.reglementDetail.create({
-            data: {
-                ...regDetailData,
-                MNT_REGLER: actualAmountToRegister,
-                MNT_ORIGINAL: unified.MNT_TTC  // Ensure the original amount is also recorded.
-            },
-        });
-
-        return regDetail;
+      const unified = await tx.unifiedFactureAvoir.findUnique({
+        where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
+      });
+  
+      if (!unified) {
+        throw new Error('UnifiedFactureAvoir not found for REF_AV_FAC: ' + regDetailData.REF_AV_FAC);
+      }
+  
+      const remainingAmountToRegister = unified.MNT_TTC - unified.MNT_REGLER;
+  
+      const reglement = await tx.reglement.findUnique({
+        where: { REF_REGV: regDetailData.REF_REGV },
+        include: { reglementdetails: true }
+      });
+  
+      if (!reglement) {
+        throw new Error('Reglement not found for REF_REGV: ' + regDetailData.REF_REGV);
+      }
+  
+      const totalRegistered = reglement.reglementdetails.reduce((acc, detail) => acc + detail.MNT_REGLER, 0);
+      const remainingReglementBalance = reglement.MNT_REGLER - totalRegistered;
+  
+      // Determine the actual amount to register, which is the lesser of the remaining amounts on both the reglement and the unified.
+      const actualAmountToRegister = Math.min(remainingAmountToRegister, remainingReglementBalance, regDetailData.MNT_REGLER);
+  
+      if (actualAmountToRegister <= 0) {
+        throw new Error('No available balance to register this payment.');
+      }
+  
+      // Update the UnifiedFactureAvoir MNT_REGLER
+      await tx.unifiedFactureAvoir.update({
+        where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
+        data: { MNT_REGLER: { increment: actualAmountToRegister } },
+      });
+  
+      // Create the ReglementDetail with the adjusted MNT_REGLER
+      const regDetail = await tx.reglementDetail.create({
+        data: {
+          ...regDetailData,
+          MNT_REGLER: actualAmountToRegister,
+          MNT_ORIGINAL: unified.MNT_TTC
+        },
+      });
+  
+      // Update remaining amount after adding the detail
+      await updateRemainingAmount(tx, regDetailData.REF_REGV);
+  
+      return regDetail;
     });
-
+  
     return transaction;
-};
+  };
+  
+
+ 
 const deleteReglementDetail = async (refRegV, refAvFac) => {
     const transaction = await prisma.$transaction(async (tx) => {
         // Correctly structure the compound unique query
@@ -224,21 +229,39 @@ const deleteReglementDetail = async (refRegV, refAvFac) => {
         // Delete the reglement detail after adjusting the registered amount
         await tx.reglementDetail.delete({
             where: {
-                REF_REGV_REF_AV_FAC: {
-                    REF_REGV: refRegV,
-                    REF_AV_FAC: refAvFac,
-                }
-            }
-        });
-
-        return { message: "Deleted successfully" };
+        REF_REGV_REF_AV_FAC: {
+            REF_REGV: refRegV,
+            REF_AV_FAC: refAvFac,
+        }
+    }
     });
 
-    return transaction;
+    // Update remaining amount after deleting the detail
+    await updateRemainingAmount(tx, refRegV);
+
+    return { message: "Deleted successfully" };
+  });
+
+  return transaction;
 };
 
 
-
+async function updateRemainingAmount(tx, refRegv) {
+    const reglement = await tx.reglement.findUnique({
+      where: { REF_REGV: refRegv },
+      include: { reglementdetails: true }
+    });
+  
+    const totalRegistered = reglement.reglementdetails.reduce((acc, detail) => acc + detail.MNT_REGLER, 0);
+    console.log(totalRegistered);
+    const remainingAmount = reglement.MNT_REGLER - totalRegistered;
+  
+    await tx.reglement.update({
+      where: { REF_REGV: refRegv },
+      data: { remainingAmount }
+    });
+  }
+  
 
   
 

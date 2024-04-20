@@ -14,7 +14,6 @@ model Client {
   tel                 String?
   adresse             String?
   ville               String
-  code_region         Int?
   note                String?
   createdAt           DateTime              @default(now())
   echeance            Int
@@ -252,7 +251,7 @@ model Avoirs {
   CODE_COM     Int
   REMARQUE     String?
   BASEHT       Boolean?
-  code_clt     Int?
+  
   client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
   detailAvoirs DetailAvoirs[]
 }
@@ -295,6 +294,7 @@ model Reglement {
   REMARQUE         String?
   TIRER            String?
   VILLE            String?
+  remainingAmount Float?
   DATE_REG         DateTime
   client           Client           @relation(fields: [CODE_CLT], references: [code_clt])
   reglementdetails ReglementDetail[]

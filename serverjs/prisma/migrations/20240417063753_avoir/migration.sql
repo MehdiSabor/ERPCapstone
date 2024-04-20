@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Reglement" ALTER COLUMN "DATEVALID" DROP NOT NULL;

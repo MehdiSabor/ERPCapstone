@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSidebar } from '../SidebarContext';
 import ArticleList from '../components/article/ArticleList';
 import ArticleForm from '../components/article/ArticleForm';
 import SingleArticle from '../components/article/SingleArticle';
 import ArticleDeleteButton from '../components/article/ArticleDeleteButton';
 import ArticleUpdateForm from '../components/article/ArticleupdateForm';
 
-
 const ArticleManagementPage = () => {
   const [currentView, setCurrentView] = useState('list');
   const [selectedArticleId, setSelectedArticleId] = useState(null);
+  const { setSidebarButtons } = useSidebar();
+
+  useEffect(() => {
+    const buttons = [
+      <button key="list" onClick={() => setCurrentView('list')}>View Articles</button>,
+      <button key="create" onClick={() => setCurrentView('create')}>Create Article</button>
+    ];
+    setSidebarButtons(buttons);
+  }, [setSidebarButtons, setCurrentView]);
 
   const handleSelectArticle = (id) => {
     setSelectedArticleId(id.code_art);
@@ -17,8 +26,6 @@ const ArticleManagementPage = () => {
 
   return (
     <div>
-      <button onClick={() => setCurrentView('list')}>View Articles</button>
-      <button onClick={() => setCurrentView('create')}>Create Article</button>
       {currentView === 'create' && <ArticleForm />}
       {currentView === 'update' && <ArticleUpdateForm articleId={selectedArticleId} />}
       {currentView === 'delete' && <ArticleDeleteButton articleId={selectedArticleId} onSuccess={() => setCurrentView('list')} />}
