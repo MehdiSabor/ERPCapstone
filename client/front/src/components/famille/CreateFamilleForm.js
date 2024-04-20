@@ -1,34 +1,47 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Form, Input, Button, Card } from 'antd';
 import { useCreateFamille } from '../../hooks/familleHooks';
 
 const CreateFamilleForm = () => {
-  const [formData, setFormData] = useState({ nom: '' });
+  const [form] = Form.useForm();
   const { handleCreate, isSubmitting, error } = useCreateFamille();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const result = await handleCreate(formData);
-    console.log('Famille Created:', result);
+  const onFinish = async (values) => {
+    try {
+      const result = await handleCreate(values);
+      console.log('Famille Created:', result);
+      form.resetFields(); // Reset form fields after submission
+    } catch (err) {
+      console.error('Error creating famille:', err);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="nom"
-        value={formData.nom}
-        onChange={handleChange}
-        placeholder="Nom de la famille"
-        required
-      />
-      
-      <button type="submit" disabled={isSubmitting}>Create Famille</button>
-      {error && <p>Error: {error}</p>}
-    </form>
+    <Card title="Create Famille" bordered={false}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          nom: ''
+        }}
+      >
+        <Form.Item
+          name="nom"
+          label="Nom de la famille"
+          rules={[{ required: true, message: 'Please enter the family name!' }]}
+        >
+          <Input placeholder="Enter the name of the family" />
+        </Form.Item>
+        
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={isSubmitting}>
+            Submit
+          </Button>
+        </Form.Item>
+        {error && <p>Error: {error}</p>}
+      </Form>
+    </Card>
   );
 };
 

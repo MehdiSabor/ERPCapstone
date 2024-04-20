@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useSidebar } from '../../SidebarContext';
 import { useFetchDevisById, useFetchItemsInDevis, useValidateDevis } from '../../hooks/devisHooks'; // Adjust the import path as necessary
 
-const SingleDevis = ({ devisId , onChangeView }) => {
+const SingleDevis = ({ devisId, onChangeView }) => {
   const { devis, loading: loadingDevis, error: errorDevis } = useFetchDevisById(devisId);
+  const { setSidebarButtons } = useSidebar();
   const { items, loading: loadingItems, error: errorItems } = useFetchItemsInDevis(devisId);
   const { validate, error, isValidated } = useValidateDevis(devisId);
  // Function to handle the click on the Validate button
@@ -17,24 +19,30 @@ const SingleDevis = ({ devisId , onChangeView }) => {
   }
 };
 
-  // To ensure that the items are re-fetched when the devis changes
   useEffect(() => {
-    if (devisId) {
-      // Fetch details of the devis by ID
-    }
-  }, [devisId]);
+    const devisButtons = [
+        <button key="update" onClick={() => onChangeView('update', devisId)}>Update Devis</button>,
+        <button key="delete" onClick={() => onChangeView('delete', devisId)}>Delete Devis</button>,
+        <button key="addItem" onClick={() => onChangeView('addItem', devisId)}>Add Item</button>,
+        <button key="viewItems" onClick={() => onChangeView('viewItems', devisId)}>View Items</button>
+    ];
+
+    setSidebarButtons(prevButtons => [
+        ...prevButtons.slice(0, 2), // Keep the first two base buttons
+        ...devisButtons
+    ]);
+
+    // Ensure that resetting the sidebar does not affect the validation button
+    return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
+  }, [setSidebarButtons, onChangeView, devisId]);
 
   if (loadingDevis || loadingItems) return <p>Loading...</p>;
   if (errorDevis) return <p>Error fetching devis: {errorDevis}</p>;
   if (errorItems) return <p>Error fetching items: {errorItems}</p>;
   if (!devis) return <p>No devis found</p>;
-
   return (
     <div>
-    <button onClick={() => onChangeView('update', devisId)}>Update Devis</button>
-      <button onClick={() => onChangeView('delete', devisId)}>Delete Devis</button>
-      <button onClick={() => onChangeView('addItem', devisId)}>Add Item</button>
-      <button onClick={() => onChangeView('viewItems', devisId)}>View Items</button>
+      
       {!isValidated && (
                 <button onClick={handleValidateClick}>Validate Devis</button>
             )}

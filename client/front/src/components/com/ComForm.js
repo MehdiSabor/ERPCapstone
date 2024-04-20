@@ -1,58 +1,51 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Form, Input, Button, Card } from 'antd';
 import { useCreateCom } from '../../hooks/comHooks'; // Adjust the import path as necessary
 
 const ComForm = () => {
+  const [form] = Form.useForm();
   const { handleCreate } = useCreateCom();
-  const initialState = {
-    
-    nom: '',
-    tel: '',
-    email: ''
-  };
 
-  const [comData, setComData] = useState(initialState);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    // Since all the fields in ComForm are either text or number, no need for the checkbox logic here
-    setComData({
-      ...comData,
-      [name]: type === 'number' ? parseInt(value, 10) : value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-      ...comData,
-      // Ensure any specific data transformations if needed
-    };
-    console.log(payload);
-    await handleCreate(payload);
-    // Reset form or provide feedback here
-    setComData(initialState);
+  const handleSubmit = async (values) => {
+    console.log('Form Values:', values); // For debugging
+    await handleCreate(values);
+    form.resetFields(); // Reset form after submission
   };
 
   return (
-    <div>
-      <h2>Create Comercial</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Iterate over each field defined in the initialState for input generation */}
-        {Object.keys(initialState).map(key => (
-          <div key={key}>
-            <label>{key}: </label>
-            <input
-              type= "text"
-              name={key}
-              value={comData[key]}
-              onChange={handleChange}
-              placeholder={key}
-            />
-          </div>
-        ))}
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+    <Card title="Create Commercial">
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form.Item
+          label="Name"
+          name="nom"
+          rules={[{ required: true, message: 'Please input the name!' }]}
+        >
+          <Input placeholder="Enter name" />
+        </Form.Item>
+        <Form.Item
+          label="Telephone"
+          name="tel"
+          rules={[{ required: true, message: 'Please input the telephone number!' }]}
+        >
+          <Input placeholder="Enter telephone number" />
+        </Form.Item>
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { type: 'email', message: 'The input is not a valid email!' },
+            { required: true, message: 'Please input the email!' }
+          ]}
+        >
+          <Input placeholder="Enter email" />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

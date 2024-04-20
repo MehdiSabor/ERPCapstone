@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSidebar } from '../../SidebarContext';
 import { useFetchFamilleById } from '../../hooks/familleHooks';
 
-const SingleFamille = ({ familleId, onModify, onDelete }) => {
+const SingleFamille = ({ familleId, onChangeView }) => {
   const { famille, loading, error } = useFetchFamilleById(familleId);
+  const { setSidebarButtons } = useSidebar();
+
+  useEffect(() => {
+    const familleButtons = [
+     
+      <button key="delete" onClick={() => onChangeView('delete', familleId)}>Delete Famille</button>
+    ];
+
+    setSidebarButtons(familleButtons);
+
+    return () => setSidebarButtons([]);
+  }, [setSidebarButtons, onChangeView, familleId]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -12,9 +25,7 @@ const SingleFamille = ({ familleId, onModify, onDelete }) => {
     <div>
       <h3>Famille Details</h3>
       <p>Name: {famille.nom}</p>
-      <p>code: {famille.code_fam}</p>
-      <button onClick={onModify}>Modify Famille</button>
-      <button onClick={onDelete}>Delete Famille</button>
+      <p>Code: {famille.code_fam}</p>
     </div>
   );
 };

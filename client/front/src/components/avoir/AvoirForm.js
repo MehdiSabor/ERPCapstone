@@ -1,112 +1,89 @@
 import React, { useState } from 'react';
+import { Form, Input, Button, Card, Row, Col, Modal } from 'antd';
 import { useCreateAvoir } from '../../hooks/avoirHooks';
-import { useFetchAllComs } from '../../hooks/comHooks';
-import { useFetchAllClients } from '../../hooks/clientHooks';
-import ClientList from '../client/ClientList'; // Adjust paths as necessary
+import ClientList from '../client/ClientList';
 import ComList from '../com/ComList';
 
 const AvoirForm = () => {
     const { handleCreate } = useCreateAvoir();
-    const { Coms, loading: loadingComs, error: errorComs } = useFetchAllComs();
-    const { clients, loading: loadingClients, error: errorClients } = useFetchAllClients();
+    const [form] = Form.useForm();
     const [showClientList, setShowClientList] = useState(false);
     const [showComList, setShowComList] = useState(false);
+    const [selectedCom, setSelectedCom] = useState('');
+    const [selectedClient, setSelectedClient] = useState('');
 
-    const initialState = {
-        CODE_CLT: '',
-        CLIENT: '',
-        MNT_HT: 0,
-        MNT_TTC: 0,
-        CODE_COM: '',
-        REMARQUE: '',
-    };
-
-    const [avoirData, setAvoirData] = useState(initialState);
-
-    const handleChange = (e) => {
-        const { name, value, type } = e.target;
-        setAvoirData(prevData => ({
-            ...prevData,
-            [name]: type === 'number' ? parseFloat(value) || 0 : value,
-        }));
-    };
+    const handleFinish = async (values) => {
+        // Combine all values including hidden ones from client selection
+        const fullValues = {
+          ...values,
+          CODE_CLT: form.getFieldValue('CODE_CLT'), // Ensure client code is included
+          COMPTE: form.getFieldValue('COMPTE') // Ensure client account number is included
+        };
+        console.log('Final Submit Values:', fullValues); // For debugging
+        await handleCreate(fullValues);
+        form.resetFields(); // Reset form after submission
+      };
 
     const handleClientSelect = (client) => {
-        setAvoirData(prevData => ({
-            ...prevData,
+        form.setFieldsValue({
             CODE_CLT: client.code_clt,
             CLIENT: client.nom,
-        }));
+            COMPTE: client.compte // Assuming you need the account number
+        });
+        setSelectedClient(`Selected Client: ${client.nom} (ID: ${client.code_clt})`);
         setShowClientList(false);
     };
 
     const handleComSelect = (com) => {
-        console.log(com);
-          setAvoirData(prevData => ({
-              ...prevData,
-              CODE_COM: com,
-          }));
-          setShowComList(false);
-      };
-  
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        await handleCreate(avoirData);
-        alert('Avoir created successfully');
-        setAvoirData(initialState); // Reset form after submission
+        form.setFieldsValue({ CODE_COM: com });
+        setSelectedCom(`Selected Commercial:  (ID: ${com})`);
+        setShowComList(false);
     };
 
-    if (loadingClients||loadingComs ) return <p>Loading clients/coms...</p>;
-    if (errorComs ||errorClients) return <p>Error loading clients/coms: {errorClients}</p>;
-
     return (
-        <div>
-            <h2>Create Avoir</h2>
-            <form onSubmit={handleSubmit}>
-                <button type="button" onClick={() => setShowClientList(true)}>Select Client</button>
-                {avoirData.CODE_CLT && <p>Selected Client: {avoirData.CLIENT}</p>}
-                {showClientList && <ClientList onSelectClient={handleClientSelect} clients={clients} />}
-                <div>
-                <button type="button" onClick={() => setShowComList(true)}>Select Commercial</button>
-                   
-                {showComList && <ComList  onSelectCom={handleComSelect} />}
- </div>
-                <div>
-                    <label htmlFor="MNT_HT">Amount HT:</label>
-                    <input
-                        type="number"
-                        id="MNT_HT"
-                        name="MNT_HT"
-                        value={avoirData.MNT_HT}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="MNT_TTC">Amount TTC:</label>
-                    <input
-                        type="number"
-                        id="MNT_TTC"
-                        name="MNT_TTC"
-                        value={avoirData.MNT_TTC}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="REMARQUE">Remark:</label>
-                    <textarea
-                        id="REMARQUE"
-                        name="REMARQUE"
-                        value={avoirData.REMARQUE}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <button type="submit">Submit Avoir</button>
-            </form>
-        </div>
+        <Card title="Create Avoir" bordered={false} style={{ width: '100%' }}>
+            <Form form={form} layout="vertical" onFinish={handleFinish}>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item label="Commercial" name="CODE_COM">
+                            <Button onClick={() => setShowComList(true)}>Select Commercial</Button>
+                            {selectedCom && <p>{selectedCom}</p>}
+                            <Modal
+                                title="Select Commercial"
+                                visible={showComList}
+                                onCancel={() => setShowComList(false)}
+                                footer={null}
+                            >
+                                <ComList onSelectCom={handleComSelect} />
+                            </Modal>
+                        </Form.Item>
+                        <Form.Item label="Client" name="CLIENT">
+                            <Button onClick={() => setShowClientList(true)}>Select Client</Button>
+                            {selectedClient && <p>{selectedClient}</p>}
+                            <Modal
+                                title="Select Client"
+                                visible={showClientList}
+                                onCancel={() => setShowClientList(false)}
+                                footer={null}
+                            >
+                                <ClientList onSelectClient={handleClientSelect} />
+                            </Modal>
+                        </Form.Item>
+                        <Form.Item label="Remark" name="REMARQUE">
+                            <Input.TextArea rows={4} placeholder="Add any remarks" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        {/* Optionally add more fields if required */}
+                    </Col>
+                </Row>
+                <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                        Submit Avoir
+                    </Button>
+                </Form.Item>
+            </Form>
+        </Card>
     );
 };
 

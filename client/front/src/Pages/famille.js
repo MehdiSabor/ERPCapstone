@@ -1,45 +1,38 @@
-import React, { useState } from 'react';
-import CreateFamilleForm from '../components/famille/CreateFamilleForm';
+import React, { useState, useEffect } from 'react';
+import { useSidebar } from '../SidebarContext';
 import ListFamilles from '../components/famille/ListFamilles';
+import CreateFamilleForm from '../components/famille/CreateFamilleForm';
+import SingleFamille from '../components/famille/SingleFamille';
 import ModifyFamilleForm from '../components/famille/ModifyFamilleForm';
 import DeleteFamilleButton from '../components/famille/DeleteFamilleButton';
-import SingleFamille from '../components/famille/SingleFamille';
 
 const FamilleManagementPage = () => {
-  const [currentView, setCurrentView] = useState('list'); // Possible values: 'list', 'viewFamille', 'modify', 'delete', 'create'
+  const [currentView, setCurrentView] = useState('list');
   const [selectedFamilleId, setSelectedFamilleId] = useState(null);
+  const { setSidebarButtons } = useSidebar();
+
+  useEffect(() => {
+    const buttons = [
+      <button key="list" onClick={() => setCurrentView('list')}>View All Familles</button>,
+      <button key="create" onClick={() => setCurrentView('create')}>Create New Famille</button>
+    ];
+    setSidebarButtons(buttons);
+  }, [setSidebarButtons, setCurrentView]);
 
   const handleSelectFamille = (id) => {
     setSelectedFamilleId(id);
-    console.log(id);
     setCurrentView('viewFamille');
-  };
-
-  const handleModifyFamille = () => {
-    setCurrentView('modify');
-  };
-
-  const handleDeleteFamille = () => {
-    setCurrentView('delete');
-  };
-
-  const handleCreateFamille = () => {
-    setCurrentView('create');
   };
 
   return (
     <div>
-      <h1>Famille Management</h1>
-      <button onClick={() => setCurrentView('list')}>View All Familles</button>
-      <button onClick={handleCreateFamille}>Create New Famille</button>
-
+      {currentView === 'create' && <CreateFamilleForm onFamilleCreated={() => setCurrentView('list')} />}
+      {currentView === 'modify' && selectedFamilleId && <ModifyFamilleForm familleId={selectedFamilleId} onFamilleModified={() => setCurrentView('list')} />}
+      {currentView === 'delete' && selectedFamilleId && <DeleteFamilleButton familleId={selectedFamilleId} onFamilleDeleted={() => setCurrentView('list')} />}
       {currentView === 'list' && <ListFamilles onSelectFamille={handleSelectFamille} />}
       {currentView === 'viewFamille' && selectedFamilleId && (
-        <SingleFamille familleId={selectedFamilleId} onModify={handleModifyFamille} onDelete={handleDeleteFamille} />
+        <SingleFamille familleId={selectedFamilleId} onChangeView={setCurrentView} />
       )}
-      {currentView === 'create' && <CreateFamilleForm />}
-      {currentView === 'modify' && selectedFamilleId && <ModifyFamilleForm familleId={selectedFamilleId} />}
-      {currentView === 'delete' && selectedFamilleId && <DeleteFamilleButton familleId={selectedFamilleId} />}
     </div>
   );
 };

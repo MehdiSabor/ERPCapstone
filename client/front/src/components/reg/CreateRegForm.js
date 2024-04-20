@@ -1,109 +1,91 @@
 import React, { useState } from 'react';
+import { Form, Input, Button, Card, Row, Col, Modal } from 'antd';
 import { useCreateReglement } from '../../hooks/regHooks';
-import { useFetchAllClients } from '../../hooks/clientHooks'; // Assuming this hook exists and works similarly to devis
-import ClientList from '../client/ClientList'; // Adjust path as necessary
+import { useFetchAllClients } from '../../hooks/clientHooks';
+import ClientList from '../client/ClientList';
 
-const CreateReglementForm = ({ onSuccess }) => {
-  const initialState = {
-    CODE_CLT: '',
-    CLIENT: '',
-    MNT_REGLER: 0,
-    MODE_REG: '',
-    BANQUE: '',
-    REMARQUE: '',
-    VILLE: ''
-  };
-
-  const [reglementData, setReglementData] = useState(initialState);
+const CreateReglementForm = () => {
+  const [form] = Form.useForm();
   const [showClientList, setShowClientList] = useState(false);
   const { handleCreate, isCreating, error } = useCreateReglement();
+  const [selectedClient, setSelectedClient] = useState('');
   const { clients, loading: loadingClients, error: errorClients } = useFetchAllClients();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setReglementData(prev => ({
-      ...prev,
-      [name]: name === 'MNT_REGLER' ? parseFloat(value) || 0 : value
-    }));
+  const handleFinish = async (values) => {
+    // Combine all values including hidden ones from client selection
+    const fullValues = {
+      ...values,
+      CODE_CLT: form.getFieldValue('CODE_CLT'), // Ensure client code is included
+      COMPTE: form.getFieldValue('COMPTE'),
+      MNT_REGLER: parseFloat(values.MNT_REGLER), // Ensure client account number is included
+    };
+    console.log('Final Submit Values:', fullValues); // For debugging
+    await handleCreate(fullValues);
+    form.resetFields(); // Reset form after submission
   };
 
+
   const handleClientSelect = (client) => {
-    setReglementData(prevData => ({
-      ...prevData,
+    // Set values in form to be submitted
+    form.setFieldsValue({
       CODE_CLT: client.code_clt,
-      CLIENT: client.nom
-    }));
+      CLIENT: client.nom,
+      COMPTE: client.compte
+    });
+    setSelectedClient(`Selected Client: ${client.nom} (ID: ${client.code_clt})`);
     setShowClientList(false);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const result = await handleCreate(reglementData);
-    if (result) {
-      onSuccess(); // Refresh or navigate away
-    }
-  };
 
   if (loadingClients) return <p>Loading clients...</p>;
   if (errorClients) return <p>Error loading clients: {errorClients}</p>;
 
   return (
-    <form onSubmit={handleSubmit}>
-      <button type="button" onClick={() => setShowClientList(!showClientList)}>
-        Select Client
-      </button>
-      {showClientList && <ClientList onSelectClient={handleClientSelect} clients={clients} />}   
-      {reglementData.CODE_CLT && <p>Selected client: {reglementData.CODE_CLT}</p>}
-                
-      <label>
-        Amount:
-        <input
-          name="MNT_REGLER"
-          type="number"
-          value={reglementData.MNT_REGLER}
-          onChange={handleChange}
-        />
-      </label>
-      {/* Additional fields here */}
-      <label>
-        Payment Mode:
-        <input
-          name="MODE_REG"
-          type="text"
-          value={reglementData.MODE_REG}
-          onChange={handleChange}
-        />
-      </label>
-      <label>
-        Bank:
-        <input
-          name="BANQUE"
-          type="text"
-          value={reglementData.BANQUE}
-          onChange={handleChange}
-        />
-      </label>
-      <label>
-        Remark:
-        <input
-          name="REMARQUE"
-          type="text"
-          value={reglementData.REMARQUE}
-          onChange={handleChange}
-        />
-      </label>
-      <label>
-        City:
-        <input
-          name="VILLE"
-          type="text"
-          value={reglementData.VILLE}
-          onChange={handleChange}
-        />
-      </label>
-      <button type="submit" disabled={isCreating}>Create Reglement</button>
-      {error && <p>Error: {error}</p>}
-    </form>
+    <Card title="Create Reglement" bordered={false}>
+      <Form form={form} layout="vertical" onFinish={handleFinish}>
+        <Row gutter={16}>
+          <Col span={12}>
+          <Form.Item label="Client" name="CLIENT">
+              <div>
+                <Button onClick={() => setShowClientList(true)}>Select Client</Button>
+                {selectedClient && <p>{selectedClient}</p>}
+              </div>
+              <Modal
+                title="Select Client"
+                visible={showClientList}
+                onCancel={() => setShowClientList(false)}
+                footer={null}
+              >
+                <ClientList onSelectClient={handleClientSelect} />
+              </Modal>
+            </Form.Item>
+            <Form.Item label="Amount" name="MNT_REGLER" rules={[{ required: true }]}>
+              <Input type="number" placeholder="Enter amount" />
+            </Form.Item>
+            <Form.Item label="Payment Mode" name="MODE_REG" rules={[{ required: true }]}>
+              <Input placeholder="Enter payment mode" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Bank" name="BANQUE">
+              <Input placeholder="Enter bank name" />
+            </Form.Item>
+            <Form.Item label="City" name="VILLE">
+              <Input placeholder="Enter city" />
+            </Form.Item>
+            <Form.Item label="Remark" name="REMARQUE">
+              <Input placeholder="Enter any remarks" />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={isCreating}>
+            Create Reglement
+          </Button>
+        </Form.Item>
+        {error && <p>Error: {error}</p>}
+      </Form>
+    </Card>
   );
 };
 

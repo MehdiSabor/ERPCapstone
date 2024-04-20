@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useFetchBonlivById, useFetchItemsInBonliv, useValidateBonliv } from '../../hooks/bonlivHooks'; // Adjust the import path as necessary
+import React, { useEffect } from 'react';
+import { useSidebar } from '../../SidebarContext';
+import { useFetchBonlivById, useFetchItemsInBonliv, useValidateBonliv } from '../../hooks/bonlivHooks';
 
-const SingleBonliv = ({ bonlivId , onChangeView }) => {
+const SingleBonliv = ({ bonlivId, onChangeView }) => {
   const { bonliv, loading: loadingBonliv, error: errorBonliv } = useFetchBonlivById(bonlivId);
   
   const { items, loading: loadingItems, error: errorItems } = useFetchItemsInBonliv(bonlivId);
@@ -18,13 +19,23 @@ const SingleBonliv = ({ bonlivId , onChangeView }) => {
       alert(`Failed to validate bonliv: ${error}`);
   }
 };
+  const { setSidebarButtons } = useSidebar();
 
-  // To ensure that the items are re-fetched when the bonliv changes
   useEffect(() => {
-    if (bonlivId) {
-      // Fetch details of the bonliv by ID
-    }
-  }, [bonlivId]);
+    const bonlivButtons = [
+      <button key="update" onClick={() => onChangeView('update', bonlivId)}>Update Bonliv</button>,
+      <button key="delete" onClick={() => onChangeView('delete', bonlivId)}>Delete Bonliv</button>,
+      
+      <button key="viewItems" onClick={() => onChangeView('viewItems', bonlivId)}>View Items</button>
+    ];
+
+    setSidebarButtons(prevButtons => [
+      ...prevButtons.slice(0, 1), // Keep the first base button
+      ...bonlivButtons
+    ]);
+
+    return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 1));
+  }, [setSidebarButtons, onChangeView, bonlivId]);
 
   if (loadingBonliv || loadingItems) return <p>Loading...</p>;
   if (errorBonliv) return <p>Error fetching bonliv: {errorBonliv}</p>;
@@ -33,17 +44,12 @@ const SingleBonliv = ({ bonlivId , onChangeView }) => {
 
   return (
     <div>
-    <button onClick={() => onChangeView('update', bonlivId)}>Update Bonliv</button>
-      <button onClick={() => onChangeView('delete', bonlivId)}>Delete Bonliv</button>
-      <button onClick={() => onChangeView('addItem', bonlivId)}>Add Item</button>
-      <button onClick={() => onChangeView('viewItems', bonlivId)}>View Items</button>
-   
+      <h3>Bonliv Details</h3>
       {!isValidated && (
                 <button onClick={handleValidateClick}>Validate Bonliv</button>
             )}
             {error && <p>Error validating bonliv: {error}</p>}
-      <h3>Bonliv Details</h3>
-      <div>
+            <div>
       {console.log(bonliv)}
         <strong>Reference:</strong> {bonliv.REF_BL}<br/>
         <strong>Date:</strong> {bonliv.DATE_BL}<br/>

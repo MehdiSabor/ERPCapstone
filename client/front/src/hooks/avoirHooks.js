@@ -22,11 +22,11 @@ export const useCreateAvoir = () => {
   return { handleCreate, error, isCreated };
 };
 
-export const useValidateAvoir = (refAvoir) => {
+export const useValidateAvoir = () => {
   const [error, setError] = useState('');
   const [isValidated, setIsValidated] = useState(false);
 
-  const validate = async () => {
+  const validate = async (refAvoir) => {
     try {
       
       await validateAvoir(refAvoir);

@@ -95,10 +95,10 @@ model Fournisseur {
   sociale   String
   desc      String?
   pays      String?
-  echeance  Boolean
+  echeance  Boolean @default(false)
   note      String?
-  cond_paie Boolean
-  bloquer   Boolean
+  cond_paie Boolean @default(false)
+  bloquer   Boolean @default(false)
   articles  Article[]
 }
 
@@ -283,6 +283,7 @@ model Reglement {
   HEUREVALID       DateTime?
   CODE_CLT         Int
   CLIENT           String
+  COMPTE           String?
   DATE_REM         DateTime?
   DATE_ECH         DateTime?
   DATE_PNT         DateTime?

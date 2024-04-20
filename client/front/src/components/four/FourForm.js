@@ -1,65 +1,94 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Form, Input, Button, Checkbox, Row, Col, Card } from 'antd';
 import { useCreateFour } from '../../hooks/fourHooks'; // Adjust the import path as necessary
 
 const FourForm = () => {
+  const [form] = Form.useForm();
   const { handleCreate } = useCreateFour();
-  const initialState = {
-    code_frs: '',
-    compte: '',
-    sociale: '',
-    desc: '',
-    pays: '',
-    echeance: false,
-    note: '',
-    cond_paie: false,
-    bloquer: false
-  };
 
-  const [fourData, setFourData] = useState(initialState);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFourData(prevData => ({
-      ...prevData,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Transform boolean strings back to booleans
-    const payload = {
-      ...fourData,
-      echeance: fourData.echeance === 'true',
-      cond_paie: fourData.cond_paie === 'true',
-      bloquer: fourData.bloquer === 'true'
-    };
-    await handleCreate(payload);
-    // Reset form or provide feedback here
-    setFourData(initialState);
+  const handleSubmit = async (values) => {
+    console.log('Form Values:', values); // For debugging
+    await handleCreate(values);
+    form.resetFields(); // Reset form after submission
   };
 
   return (
-    <div>
-      <h2>Create Four</h2>
-      <form onSubmit={handleSubmit}>
-        {Object.keys(initialState).map(key => (
-          <div key={key}>
-            <label>{key}: </label>
-            <input
-              type={key === 'echeance' || key === 'cond_paie' || key === 'bloquer' ? 'checkbox' : 'text'}
-              name={key}
-              value={fourData[key]}
-              onChange={handleChange}
-              placeholder={key}
-              // For checkboxes, you might want to manage the checked state differently
-              checked={['echeance', 'cond_paie', 'bloquer'].includes(key) ? fourData[key] : undefined}
-            />
-          </div>
-        ))}
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+    <Card title="Create Supplier" bordered={false} style={{ width: '100%' }}>
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Supplier Code"
+              name="code_frs"
+              rules={[{ required: true, message: 'Please input the supplier code!' }]}
+            >
+              <Input placeholder="Enter supplier code" />
+            </Form.Item>
+            <Form.Item
+              label="Account"
+              name="compte"
+              rules={[{ required: true, message: 'Please input the account!' }]}
+            >
+              <Input placeholder="Enter account number" />
+            </Form.Item>
+            <Form.Item
+              label="Social Name"
+              name="sociale"
+              rules={[{ required: true, message: 'Please input the social name!' }]}
+            >
+              <Input placeholder="Enter social name" />
+            </Form.Item>
+            <Form.Item
+              label="Description"
+              name="desc"
+            >
+              <Input placeholder="Enter description" />
+            </Form.Item>
+            <Form.Item
+              label="Country"
+              name="pays"
+              rules={[{ required: true, message: 'Please enter the country!' }]}
+            >
+              <Input placeholder="Enter country" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Echeance"
+              name="echeance"
+              valuePropName="checked"
+            >
+              <Checkbox>Echeance</Checkbox>
+            </Form.Item>
+            <Form.Item
+              label="Payment Condition"
+              name="cond_paie"
+              valuePropName="checked"
+            >
+              <Checkbox>Payment Condition</Checkbox>
+            </Form.Item>
+            <Form.Item
+              label="Block"
+              name="bloquer"
+              valuePropName="checked"
+            >
+              <Checkbox>Block</Checkbox>
+            </Form.Item>
+            <Form.Item
+              label="Note"
+              name="note"
+            >
+              <Input.TextArea rows={4} placeholder="Enter any notes" />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

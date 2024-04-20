@@ -22,7 +22,8 @@ const createReglement = async (data) => {
             data: {
                 ...data,
                 REF_REGV: nextRefRegv,
-                DATE_REG: new Date(), // Set the registration date to the current date
+                DATE_REG: new Date(),
+                remainingAmount:data.MNT_REGLER // Set the registration date to the current date
             },
         });
 
@@ -119,7 +120,8 @@ const createReglementDetailsBatch = async (regDetailsArray) => {
         const regDetail = await tx.reglementDetail.create({
           data: {
             ...regDetailData,
-            MNT_REGLER: paymentAmount, // Use the adjusted payment amount
+            MNT_REGLER: paymentAmount, 
+            // Use the adjusted payment amount
           },
         });
   
@@ -171,9 +173,7 @@ const getAllUnifiedFactureAvoir = async () => {
       // Determine the actual amount to register, which is the lesser of the remaining amounts on both the reglement and the unified.
       const actualAmountToRegister = Math.min(remainingAmountToRegister, remainingReglementBalance, regDetailData.MNT_REGLER);
   
-      if (actualAmountToRegister <= 0) {
-        throw new Error('No available balance to register this payment.');
-      }
+      
   
       // Update the UnifiedFactureAvoir MNT_REGLER
       await tx.unifiedFactureAvoir.update({

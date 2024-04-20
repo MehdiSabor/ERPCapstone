@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSidebar } from '../SidebarContext';
 import AvoirList from '../components/avoir/AvoirList';
 import AvoirForm from '../components/avoir/AvoirForm';
 import SingleAvoir from '../components/avoir/SingleAvoir';
@@ -13,6 +14,15 @@ const AvoirManagementPage = () => {
   const [currentView, setCurrentView] = useState('list');
   const [selectedAvoirId, setSelectedAvoirId] = useState(null);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const { setSidebarButtons } = useSidebar();
+
+  useEffect(() => {
+    const buttons = [
+      <button key="list" onClick={() => setCurrentView('list')}>View Avoir</button>,
+      <button key="create" onClick={() => setCurrentView('create')}>Create Avoir</button>
+    ];
+    setSidebarButtons(buttons);
+  }, [setSidebarButtons, setCurrentView]);
 
   const handleSelectAvoir = (id) => {
     setSelectedAvoirId(id);
@@ -26,8 +36,6 @@ const AvoirManagementPage = () => {
 
   return (
     <div>
-      <button onClick={() => setCurrentView('list')}>View Avoir</button>
-      <button onClick={() => setCurrentView('create')}>Create Avoir</button>
       {currentView === 'create' && <AvoirForm />}
       {currentView === 'update' && <AvoirUpdateForm avoirId={selectedAvoirId} />}
       {currentView === 'delete' && <AvoirDeleteButton avoirId={selectedAvoirId} onSuccess={() => setCurrentView('list')} />}

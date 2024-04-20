@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSidebar } from '../SidebarContext';
 import DevisList from '../components/devis/DevisList';
 import DevisForm from '../components/devis/DevisForm';
 import SingleDevis from '../components/devis/SingleDevis';
@@ -12,22 +13,30 @@ import DeleteItemFromDevisButton from '../components/devis/DeleteItemFromDevisBu
 const DevisManagementPage = () => {
   const [currentView, setCurrentView] = useState('list');
   const [selectedDevisId, setSelectedDevisId] = useState(null);
+  const { setSidebarButtons } = useSidebar();
   const [selectedItemId, setSelectedItemId] = useState(null);
+
+
+
+  const handleViewItemInDevis = (itemId) => {
+    setSelectedItemId(itemId);
+    setCurrentView('viewItemInDevis');
+  };
+  useEffect(() => {
+    const buttons = [
+      <button key="list" onClick={() => setCurrentView('list')}>View Devis</button>,
+      <button key="create" onClick={() => setCurrentView('create')}>Create Devis</button>
+    ];
+    setSidebarButtons(buttons);
+  }, [setSidebarButtons, setCurrentView]);
 
   const handleSelectDevis = (id) => {
     setSelectedDevisId(id);
     setCurrentView('viewDevis');
   };
 
-  const handleViewItemInDevis = (itemId) => {
-    setSelectedItemId(itemId);
-    setCurrentView('viewItemInDevis');
-  };
-
   return (
     <div>
-      <button onClick={() => setCurrentView('list')}>View Devis</button>
-      <button onClick={() => setCurrentView('create')}>Create Devis</button>
       {currentView === 'create' && <DevisForm />}
       {currentView === 'update' && <DevisUpdateForm devisId={selectedDevisId} />}
       {currentView === 'delete' && <DevisDeleteButton devisId={selectedDevisId} onSuccess={() => setCurrentView('list')} />}

@@ -1,16 +1,32 @@
-import React, { useEffect } from 'react';
-import { useFetchFactureById, useValidateFacture, useFetchDetailFacturesByFacture } from '../../hooks/factureHooks';
-import CancelFactureButton from './CancelFactureButton'; // Make sure the path is correct
+import React, { useEffect, useState } from 'react';
+import { Modal, Button } from 'antd';
+import { useSidebar } from '../../SidebarContext';
+import { useFetchFactureById, useFetchDetailFacturesByFacture, useValidateFacture } from '../../hooks/factureHooks';
+import SingleClient from '../client/SingleClient'; // Ensure the correct path
+import CancelFactureButton from './CancelFactureButton'; // Ensure the correct path
 
 const SingleFacture = ({ factureId }) => {
   const { facture, loading: loadingFacture, error: errorFacture } = useFetchFactureById(factureId);
   const { details, loading: loadingDetails, error: errorDetails } = useFetchDetailFacturesByFacture(factureId);
   const { validate, isValidated, error: validationError } = useValidateFacture();
+  const { setSidebarButtons } = useSidebar();
+  const [showClientModal, setShowClientModal] = useState(false);
 
-  // Function to handle the click on the Validate button
+  useEffect(() => {
+    const factureButtons = [
+      <Button key="viewClient" type="primary" onClick={() => setShowClientModal(true)}>View Client</Button>
+    ];
+
+    setSidebarButtons(prevButtons => [
+      ...prevButtons.slice(0, 1), // Maintain the first base button
+      ...factureButtons
+    ]);
+
+    return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 1));
+  }, [setSidebarButtons, factureId]);
+
   const handleValidateClick = async () => {
     try {
-      
       await validate(factureId);
       alert('Facture has been successfully validated.');
     } catch (error) {
@@ -18,15 +34,10 @@ const SingleFacture = ({ factureId }) => {
     }
   };
 
-  useEffect(() => {
-    if (factureId) {
-      // Additional logic if needed when factureId changes
-    }
-  }, [factureId]);
-
   if (loadingFacture || loadingDetails) return <p>Loading...</p>;
   if (errorFacture) return <p>Error fetching facture: {errorFacture}</p>;
   if (errorDetails) return <p>Error fetching facture details: {errorDetails}</p>;
+  if (validationError) return <p>Error validating facture: {validationError}</p>;
   if (!facture) return <p>No facture found</p>;
 
   return (
@@ -39,9 +50,8 @@ const SingleFacture = ({ factureId }) => {
         <strong>Total HT:</strong> {facture.MNT_HT.toFixed(2)}€<br/>
         <strong>Total TTC:</strong> {facture.MNT_TTC.toFixed(2)}€<br/>
         <strong>Status:</strong> {facture.VALIDER ? 'Validated' : 'Not Validated'}<br/>
-        {!isValidated && <button onClick={handleValidateClick}>Validate Facture</button>}
+        {!isValidated && <Button onClick={handleValidateClick}>Validate Facture</Button>}
         {facture.VALIDER && <CancelFactureButton refFAC={factureId} />}
-        {validationError && <p>Error validating facture: {validationError}</p>}
       </div>
       <h4>Items in Facture</h4>
       {details.length > 0 ? (
@@ -49,12 +59,27 @@ const SingleFacture = ({ factureId }) => {
           {details.map(detail => (
             <li key={detail.CODE_ART}>
               {detail.ARTICLE} - Quantity: {detail.QTE} - Price: {detail.PV_TTC.toFixed(2)}€
-              {/* You can add more detail attributes here */}
             </li>
           ))}
         </ul>
       ) : (
         <p>No items found in this facture.</p>
+      )}
+
+      {showClientModal && (
+        <Modal
+          title="Client Details"
+          visible={showClientModal}
+          onOk={() => setShowClientModal(false)}
+          onCancel={() => setShowClientModal(false)}
+          footer={[
+            <Button key="back" onClick={() => setShowClientModal(false)}>
+              Close
+            </Button>
+          ]}
+        >
+          <SingleClient clientId={facture.CODE_CLT} />
+        </Modal>
       )}
     </div>
   );
