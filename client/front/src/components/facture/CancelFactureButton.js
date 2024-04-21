@@ -1,4 +1,5 @@
 import React from 'react';
+import {Button} from 'antd';
 import { useCancelFacture } from '../../hooks/factureHooks';
 
 const CancelFactureButton = ({ refFAC }) => {
@@ -10,9 +11,9 @@ const CancelFactureButton = ({ refFAC }) => {
 
     return (
         <div>
-            <button onClick={onClickCancel}>Cancel Facture</button>
-            {isCancelled && <p>Facture was cancelled successfully!</p>}
-            {error && <p>Error cancelling facture: {error}</p>}
+            <Button type="primary" onClick={onClickCancel}>Cancel Facture</Button>
+            {isCancelled && <alert>Facture was cancelled successfully!</alert>}
+            {error && <alert>Error cancelling facture: {error}</alert>}
         </div>
     );
 };

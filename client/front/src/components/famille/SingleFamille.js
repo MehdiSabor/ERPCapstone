@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
+import { Card, Row, Col, Typography } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchFamilleById } from '../../hooks/familleHooks';
+
+const { Title, Text } = Typography;
 
 const SingleFamille = ({ familleId, onChangeView }) => {
   const { famille, loading, error } = useFetchFamilleById(familleId);
@@ -8,7 +11,6 @@ const SingleFamille = ({ familleId, onChangeView }) => {
 
   useEffect(() => {
     const familleButtons = [
-     
       <button key="delete" onClick={() => onChangeView('delete', familleId)}>Delete Famille</button>
     ];
 
@@ -21,12 +23,25 @@ const SingleFamille = ({ familleId, onChangeView }) => {
   if (error) return <p>Error: {error}</p>;
   if (!famille) return <p>No Famille found</p>;
 
+  const titleStyle = {
+    marginBottom: '4px', // Reduce space between title and text
+    marginTop: '0px' // Remove top margin
+  };
+
+
   return (
-    <div>
-      <h3>Famille Details</h3>
-      <p>Name: {famille.nom}</p>
-      <p>Code: {famille.code_fam}</p>
-    </div>
+    <Card title="Famille Details" bordered={false}>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Title level={5}style={titleStyle}>Name</Title>
+          <Text>{famille.nom}</Text>
+        </Col>
+        <Col span={12}>
+          <Title level={5}style={titleStyle}>Code</Title>
+          <Text>{famille.code_fam}</Text>
+        </Col>
+      </Row>
+    </Card>
   );
 };
 

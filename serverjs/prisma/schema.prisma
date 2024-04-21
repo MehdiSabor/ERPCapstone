@@ -165,7 +165,7 @@ model Bonliv {
   CODE_ADR      Int?
   BASEHT        Boolean?
   IMPRIMER      Boolean?
-  
+  REMISEG  Float?
 
   client        Client        @relation(fields: [CODE_CLT], references: [code_clt])
   detailBonlivs DetailBonliv[] 
@@ -182,7 +182,7 @@ model DetailBonliv {
   PV_HT    Float
   PV_TTC   Float
   REMISE   Float
-  REMISEG  Float?
+  
   TVA      Int
   TotalHT  Float   @default(0)
   TotalTTC Float   @default(0)
@@ -216,25 +216,25 @@ model Facture {
   client         Client         @relation(fields: [CODE_CLT], references: [code_clt])
 }
 
-model DetailFacture {
-  REF_FAC  String  
-  CODE_ART String
-  ARTICLE  String
-  QTE      Float
-  GRATUIT  Float?
-  PA_HT    Float
-  PV_HT    Float
-  PV_TTC   Float
-  PD_HT    Float?
-  TotalHT  Float   @default(0)
-  TotalTTC Float   @default(0)
-  REMISE   Float
-  REMISEG  Float?
-  TVA      Int
-  article  Article @relation(fields: [CODE_ART], references: [code_art])
-  facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC], onDelete: Cascade)
-@@id([REF_FAC, CODE_ART])
-}
+  model DetailFacture {
+    REF_FAC  String  
+    CODE_ART String
+    ARTICLE  String
+    QTE      Float
+    GRATUIT  Float?
+    PA_HT    Float
+    PV_HT    Float
+    PV_TTC   Float
+    PD_HT    Float?
+    TotalHT  Float   @default(0)
+    TotalTTC Float   @default(0)
+    REMISE   Float
+    REMISEG  Float?
+    TVA      Int
+    article  Article @relation(fields: [CODE_ART], references: [code_art])
+    facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC], onDelete: Cascade)
+  @@id([REF_FAC, CODE_ART])
+  }
 
 model Avoirs {
   REF_AVR      String        @unique
