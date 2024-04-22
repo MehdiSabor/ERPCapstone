@@ -70,7 +70,6 @@ model Article {
   TRANS_BLOQ      Boolean         @default(false)
   LIQUIDER        Boolean         @default(false)
   code_frs        String
-  familleCode_fam Int?
   qte_stk         Int
   fournisseur     Fournisseur     @relation(fields: [code_frs], references: [code_frs])
   famille         famille?        @relation(fields: [familleCode_fam], references: [code_fam])
@@ -320,4 +319,25 @@ model UnifiedFactureAvoir {
   code_clt         Int
   reglementDetails ReglementDetail[]
   client           Client            @relation(fields: [code_clt], references: [code_clt])
+}
+
+
+model User {
+  UserID               Int      @id @default(autoincrement())
+  Email                String   @unique
+  Name                 String
+  PasswordHash         String
+  IsManager            Boolean  @default(false)
+  CanManageQuote       Boolean  @default(false)
+  CanManageDeliveryNote Boolean @default(false)
+  CanManageInvoice Boolean @default(false)
+  CanProcessPayments   Boolean  @default(false)
+  CanProcessReturns    Boolean  @default(false)
+  CanManageArticles    Boolean  @default(false)
+  CanManageClients     Boolean  @default(false)
+  CanManageCommercials Boolean  @default(false)
+  CanManageFournisseurs Boolean @default(false)
+  LastLoginDate        DateTime?
+  CreatedAt            DateTime @default(now())
+  UpdatedAt            DateTime @updatedAt
 }

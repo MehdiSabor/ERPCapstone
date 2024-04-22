@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { Card, Row, Col } from 'antd';
+import { Card, Row, Col, Image, Typography } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchArticleById } from '../../hooks/articleHooks';
 
+const { Title, Text } = Typography;
 const SingleArticle = ({ articleId, onChangeView }) => {
     const { article, loading, error } = useFetchArticleById(articleId);
     const { setSidebarButtons } = useSidebar();
@@ -26,6 +27,8 @@ const SingleArticle = ({ articleId, onChangeView }) => {
     if (!article) return <p>No article found</p>;
 
     const formatDate = (date) => new Date(date).toLocaleDateString();
+// Placeholder image URL
+const placeholderImage = "https://via.placeholder.com/150";
 
     return (
         <div style={{ background: '#ececec', padding: '30px' }}>
@@ -33,17 +36,34 @@ const SingleArticle = ({ articleId, onChangeView }) => {
                 {/* Card 1 */}
                 <Col span={24}>
                     <Card title="General Information">
-                        <Row gutter={16}>
-                            <Col span={12}>ID: {article.id}</Col>
-                            <Col span={12}>Code Art: {article.code_art}</Col>
-                            <Col span={12}>Code Fam: {article.Code_fam || "None"}</Col>
-                            <Col span={12}>Name: {article.nom}</Col>
-                            <Col span={12}>Description: {article.desc}</Col>
-                            <Col span={12}>Photo: {article.photo}</Col>
-                            <Col span={12}>UAF: {article.UAF}</Col>
-                            <Col span={12}>Ref OEM: {article.REF_OEM}</Col>
-                            <Col span={12}>Code Frs: {article.code_frs}</Col>
-                        </Row>
+                        
+                {/* Card 1 */}
+                <Row gutter={16} align="middle">
+    <Col span={6}>
+        <Image
+            width={150}
+            src={article.photo || placeholderImage}
+            fallback={placeholderImage}
+            alt="Article"
+        />
+    </Col>
+    <Col span={18}>
+        <Row gutter={16}>
+            <Col span={12}> {/* Middle column */}
+                <Text strong>ID:</Text> {article.id}<br/>
+                <Text strong>Code Art:</Text> {article.code_art}<br/>
+                <Text strong>Code Fam:</Text> {article.Code_fam || "None"}<br/>
+                <Text strong>Name:</Text> {article.nom}<br/>
+            </Col>
+            <Col span={12}> {/* Right column */}
+                <Text strong>Description:</Text> {article.desc}<br/>
+                <Text strong>UAF:</Text> {article.UAF}<br/>
+                <Text strong>Ref OEM:</Text> {article.REF_OEM}<br/>
+                <Text strong>Code Frs:</Text> {article.code_frs}<br/>
+            </Col>
+        </Row>
+    </Col>
+</Row>
                     </Card>
                 </Col>
 

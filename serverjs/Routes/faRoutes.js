@@ -9,5 +9,4 @@ router.get('/getallitems/:id', factureController.getAllDetailFacturesByFacture);
 router.post('/cancelFacture/:id', factureController.cancelFacture);
 
 
-
 module.exports = router;

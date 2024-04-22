@@ -1,74 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { useUpdateItemInDevis } from '../../hooks/devisHooks'; // Adjust the import path as necessary
+import { Form, Input, Button, Typography } from 'antd';
+import { useUpdateItemInDevis } from '../../hooks/devisHooks';
+
+const { Text } = Typography;
 
 const UpdateItemInDevisForm = ({ refDevis, article, onSuccess }) => {
   const { updateItem, isUpdated } = useUpdateItemInDevis();
-
   const [formData, setFormData] = useState(article || {});
-  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   useEffect(() => {
-    // When the article prop changes, update the formData state
-    setFormData(article || {});
-  }, [article]);
-  
-  useEffect(() => {
-    if (submitAttempted && isUpdated) {
+    if (isUpdated) {
       console.log('Item updated successfully');
-      if (onSuccess) {
-        onSuccess(); // Call the onSuccess callback
-      }
-      setSubmitAttempted(false); // Reset submit attempt state
+      onSuccess();
     }
-  }, [isUpdated, onSuccess, submitAttempted]);
-
+  }, [isUpdated, onSuccess]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    let parsedValue = value;
-
-    // Parse numbers differently based on the input name
-    if (type === 'number') {
-        parsedValue = ['QTE'].includes(name) ? parseInt(value, 10) : parseFloat(value);
-        if (isNaN(parsedValue)) { // Fallback to 0 if parsing results in NaN
-            parsedValue = 0;
-        }
-    } else if (type === 'checkbox') {
-        parsedValue = checked;
-    }
-
-    setFormData(prevState => ({
-        ...prevState,
-        [name]: parsedValue
-    }));
-};
-
-
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitAttempted(true); // Indicate that a submit has been attempted
-    await updateItem(refDevis, formData.CODE_ART, formData);
-    // Move response handling to useEffect
+    const newValue = type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) || 0 : value;
+    setFormData(prevData => ({ ...prevData, [name]: newValue }));
   };
 
-  // Early return if article is not provided
-  if (!article) return <p>No article selected for update.</p>;
+  if (!article) return <Text>No article selected for update.</Text>;
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Form layout="vertical" onFinish={() => updateItem(refDevis, formData.CODE_ART, formData)}>
       {Object.keys(formData).map(key => (
-        <div key={key} key={key}>
-          <label>{key}:</label>
-          <input
-            type={['QTE', 'GRATUIT', 'PA_HT', 'PV_HT', 'PV_TTC', 'REMISE', 'REMISEG', 'TVA'].includes(key) ? 'number' : 'text'}
+        <Form.Item label={key} key={key}>
+          <Input
+            type={['QTE', 'GRATUIT', 'PA_HT', 'PV_HT', 'PV_TTC', 'REMISE', 'TVA'].includes(key) ? 'number' : 'text'}
             name={key}
-            value={typeof formData[key] === 'number' ? formData[key].toString() : formData[key]}
+            value={formData[key]}
             onChange={handleChange}
           />
-        </div>
+        </Form.Item>
       ))}
-      <button type="submit">Update Item</button>
-    </form>
+      <Button type="primary" htmlType="submit">Update Item</Button>
+    </Form>
   );
 };
 

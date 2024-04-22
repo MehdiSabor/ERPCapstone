@@ -1,21 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import { Button, Card, Modal, Typography } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useDeleteClient } from '../../hooks/clientHooks';
 
-const ClientDeleteButton = ({ clientId, onSuccess }) => {
+const { Title, Paragraph } = Typography;
+
+const ClientDeletePage = ({ clientId }) => {
+  const [loading, setLoading] = useState(false);
+
   const { handleDelete } = useDeleteClient();
 
-  const handleClick = async () => {
-    if (window.confirm('Are you sure you want to delete this client?')) {
+  const handleConfirmDelete = async () => {
+    setLoading(true);
+    try {
       await handleDelete(clientId);
-      if (typeof onSuccess === 'function') {
-        onSuccess();
-      }
+      // Navigate back or to another relevant page on success
+      
+    } catch (error) {
+      Modal.error({
+        title: 'Failed to delete client',
+        content: error.message,
+      });
+      setLoading(false);
     }
   };
 
+  const handleCancel = () => {
+    
+  };
+
   return (
-    <button onClick={handleClick}>Delete Client</button>
+    <Card bordered={false} style={{ maxWidth: 600, margin: '40px auto' }}>
+      <Title level={2} style={{ textAlign: 'center', marginBottom: 20 }}>
+        <ExclamationCircleOutlined style={{ color: 'red' }} /> Delete Client
+      </Title>
+      <Paragraph>
+        Are you sure you want to delete this client? This action cannot be undone and will permanently remove all related client data.
+      </Paragraph>
+      <div style={{ textAlign: 'center', marginTop: 40 }}>
+        <Button type="danger" onClick={handleConfirmDelete} loading={loading} style={{ marginRight: 20 }}>
+          Yes, delete it
+        </Button>
+        <Button onClick={handleCancel}>
+          Cancel
+        </Button>
+      </div>
+    </Card>
   );
 };
 
-export default ClientDeleteButton;
+export default ClientDeletePage;

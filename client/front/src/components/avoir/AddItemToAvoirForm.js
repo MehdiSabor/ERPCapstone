@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { Button, Card, Typography, InputNumber, Form } from 'antd';
 import { useAddItemToAvoir } from '../../hooks/avoirHooks'; // Adjust the import path as necessary
 import ArticleList from '../article/ArticleList';
+
+const { Title } = Typography;
 
 const AddItemToAvoirForm = ({ refAvoir }) => {
   const { addItem } = useAddItemToAvoir();
@@ -21,54 +24,42 @@ const AddItemToAvoirForm = ({ refAvoir }) => {
 
   const [itemData, setItemData] = useState(initialState);
 
-  const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    setItemData(prevData => ({
-      ...prevData,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value
-    }));
-  };
-
   const handleSelectArticle = (article) => {
-    setItemData({ ...itemData, 
-      CODE_ART: article.code_art,
-      ARTICLE: article.nom,
-      PA_HT: article.PA_HT,
-      PV_HT: article.PV_HT,
-      PV_TTC: article.PV_TTC,
-      TVA: article.TVA,
-    });
+    console.log(article);
+    setItemData({ ...itemData, CODE_ART: article.code_art, ARTICLE: article.nom, PA_HT: article.PA_HT, PV_HT: article.PV_HT, PV_TTC: article.PV_TTC, TVA: article.TVA });
     setShowItemList(false); // Close the ArticleList after selection
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     await addItem(refAvoir, itemData);
-    setItemData(initialState); // Reset form after submission
+    setItemData(initialState); // Optionally reset the form or provide feedback
   };
 
   return (
-    <div>
-      <h2>Add Item to Avoir</h2>
-      <form onSubmit={handleSubmit}>
-        <button type="button" onClick={() => setShowItemList(true)}>Select Article</button>
-        {itemData.CODE_ART && <p>Selected Article: {itemData.ARTICLE}</p>}
-        {showItemList && <ArticleList onSelectArticle={handleSelectArticle} />}
-        {Object.keys(initialState).filter(key => key !== 'REF_AVR').map(key => (
-          <div key={key}>
-            <label>{key}: </label>
-            <input
-              type={key.includes('QTE') || key.includes('GRATUIT') || key.includes('PA_HT') || key.includes('PV_HT') || key.includes('PV_TTC') || key.includes('REMISE') || key === 'TVA' ? "number" : "text"}
-              name={key}
-              value={itemData[key]}
-              onChange={handleChange}
-              placeholder={key}
-            />
-          </div>
-        ))}
-        <button type="submit">Add Item</button>
-      </form>
-    </div>
+    <Card bordered={false} style={{  margin: '20px auto' }}>
+      <Title level={4}>Add Item to Avoir</Title>
+      <Button type="default" onClick={() => setShowItemList(true)} style={{ marginBottom: 16 }}>
+        Select Article
+      </Button>
+      {itemData.CODE_ART && <p>Selected Article: {itemData.ARTICLE}</p>}
+      {showItemList && <ArticleList onSelectArticle={handleSelectArticle} />}
+
+      <Form onFinish={handleSubmit} layout="vertical">
+        <Form.Item label="Quantity (QTE)">
+          <InputNumber
+            min={0}
+            value={itemData.QTE}
+            onChange={value => setItemData(prevData => ({ ...prevData, QTE: value }))}
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Add Item
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

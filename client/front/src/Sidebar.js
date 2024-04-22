@@ -17,7 +17,7 @@ const Sidebar = () => {
             <Menu
                 mode="inline"
                 theme="light"
-                style={{ borderRight: 'none' }}
+                style={{ borderRight: 'none',width: '250px', }}
             >
                 <Menu.ItemGroup key="g1" title="Sidebar Menu" style={{ color: 'grey' }}>
                     {sidebarButtons.map((button, index) => (

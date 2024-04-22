@@ -10,6 +10,8 @@ const faRoutes = require('./Routes/faRoutes');
 const avRoutes = require('./Routes/avRoutes');
 const regRoutes = require('./Routes/regRoutes');
 const famRoutes =require('./Routes/familleRoutes');
+const accountRoutes = require('./Routes/accountRoutes');
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 
@@ -20,7 +22,13 @@ const corsOptions = {
 app.use(cors(corsOptions)); 
 
 
+
+// Use the account routes
+
 app.use(express.json()); 
+app.use('/account', accountRoutes);
+
+app.use(authMiddleware); 
 app.use('/client', clientRoutes); 
 app.use('/four', fournisseurRoutes);
 app.use('/com', comercialRoutes);

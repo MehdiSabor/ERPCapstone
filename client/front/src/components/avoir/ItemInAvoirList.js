@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { useFetchItemsInAvoir } from '../../hooks/avoirHooks';
+import { Button, List, Card, Typography, Divider } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import UpdateItemInAvoirForm from './updateItemInAvoirForm';
 import DeleteItemFromAvoirButton from './DeleteItemFromAvoirButton';
+import { useFetchItemsInAvoir } from '../../hooks/avoirHooks';
+
+const { Text, Title } = Typography;
 
 const ItemsInAvoirList = ({ refAvoir }) => {
-    const [fetchTrigger, setFetchTrigger] = useState(false);
-    const { items, loading, error } = useFetchItemsInAvoir(refAvoir, fetchTrigger); 
+    const { items, loading, error } = useFetchItemsInAvoir(refAvoir); 
     const [selectedItem, setSelectedItem] = useState(null);
-    const [view, setView] = useState('list'); // 'list', 'update', 'single'
+    const [view, setView] = useState('list'); // 'list' or 'update'
 
-    if (loading) return <p>Loading items...</p>;
-    if (error) return <p>Error fetching items: {error}</p>;
-    if (!items || items.length === 0) return <p>No items found for this avoir.</p>;
+    if (loading) return <Text>Loading items...</Text>;
+    if (error) return <Text type="danger">Error fetching items: {error}</Text>;
+    if (!items || items.length === 0) return <Text>No items found for this avoir.</Text>;
 
     const handleEditItem = (item) => {
         setSelectedItem(item);
@@ -19,33 +22,35 @@ const ItemsInAvoirList = ({ refAvoir }) => {
     };
 
     return (
-        <div>
-            <h3>Items in Avoir</h3>
+        <Card bordered={false} style={{ margin: '16px' }}>
+            <Title level={4}>Items in Avoir</Title>
             {view === 'list' && (
-                <ul>
-                    {items.map((item, index) => (
-                        <li key={index}>
-                            {item.ARTICLE} - Quantity: {item.QTE} {item.PV_TTC} € Total: {item.TotalTTC}
-                            <button onClick={() => handleEditItem(item)}>Edit</button>
-                            <DeleteItemFromAvoirButton refAvoir={refAvoir} codeArt={item.CODE_ART} onSuccess={() => {
-                                setView('list');
-                                setFetchTrigger(prev => !prev); // Toggle fetchTrigger to re-fetch items
-                            }} />
-                        </li>
-                    ))}
-                </ul>
-            )}
-            {view === 'update' && selectedItem && (
-                <UpdateItemInAvoirForm 
-                    refAvoir={refAvoir} 
-                    article={selectedItem} 
-                    onSuccess={() => {
-                        setView('list');
-                        setFetchTrigger(prev => !prev); // Toggle fetchTrigger to re-fetch items
-                    }} 
+                <List
+                    itemLayout="horizontal"
+                    dataSource={items}
+                    renderItem={item => (
+                        <List.Item
+                            actions={[
+                                <Button icon={<EditOutlined />} onClick={() => handleEditItem(item)}>Edit</Button>,
+                                <DeleteItemFromAvoirButton refAvoir={refAvoir} codeArt={item.CODE_ART} onSuccess={() => setView('list')} />
+                            ]}
+                        >
+                            <List.Item.Meta
+                                title={`${item.ARTICLE} - Quantity: ${item.QTE}`}
+                                description={`€${item.PV_TTC} Total: €${item.TotalTTC}`}
+                            />
+                        </List.Item>
+                    )}
                 />
             )}
-        </div>
+            {view === 'update' && selectedItem && (
+                <UpdateItemInAvoirForm
+                    refAvoir={refAvoir}
+                    article={selectedItem}
+                    onSuccess={() => setView('list')}
+                />
+            )}
+        </Card>
     );
 };
 

@@ -1,46 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useUpdateFour, useFetchFourById} from '../../hooks/fourHooks'; // Adjust the import path as necessary
+import React, { useEffect } from 'react';
+import { Form, Input, Checkbox, Button, Card, Typography, Row, Col } from 'antd';
+import { useUpdateFour, useFetchFourById } from '../../hooks/fourHooks';
+
+const { Title } = Typography;
 
 const FourUpdateForm = ({ fourId }) => {
   const { Four, loading: fetching } = useFetchFourById(fourId);
-  
   const { handleUpdate, isUpdated } = useUpdateFour();
-
-  // Reflecting Four's fields based on your schema
-  const initialState = {
-    code_frs: '',
-    compte: '',
-    sociale: '',
-    desc: '',
-    pays: '',
-    echeance: false,
-    note: '',
-    cond_paie: false,
-    bloquer: false
-  };
-
-  const [formData, setFormData] = useState(initialState);
+  const [form] = Form.useForm();
 
   useEffect(() => {
-    
     if (Four) {
-      // Populate form data with the Four's current data
-      setFormData({ ...initialState, ...Four });
+      form.setFieldsValue(Four);
     }
-    
-  }, [Four]);
+  }, [Four, form]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? parseInt(value, 10) : value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await handleUpdate(fourId, formData);
+  const onFinish = async (values) => {
+    await handleUpdate(fourId, values);
     if (isUpdated) {
       // Handle successful update (e.g., show a message or redirect)
     }
@@ -49,23 +25,29 @@ const FourUpdateForm = ({ fourId }) => {
   if (fetching) return <p>Loading...</p>;
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Iterate over formData to generate input fields */}
-      {Object.keys(formData).map(key => (
-        <div key={key}>
-          <label>{key}: </label>
-          <input
-            type={key === 'echeance' || key === 'cond_paie' || key === 'bloquer' ? 'checkbox' : 'text'}
+    <Card bordered={false} style={{ maxWidth: 800, margin: '20px auto' }}>
+      <Title level={4}>Update Fournisseur</Title>
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        {Object.keys(Four || {}).map(key => (
+          <Form.Item
+            key={key}
             name={key}
-            value={formData[key]}
-            onChange={handleChange}
-            placeholder={key}
-            checked={key === 'echeance' || key === 'cond_paie' || key === 'bloquer' ? formData[key] : undefined}
-          />
-        </div>
-      ))}
-      <button type="submit">Update Four</button>
-    </form>
+            label={key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}
+            valuePropName={['echeance', 'cond_paie', 'bloquer'].includes(key) ? 'checked' : 'value'}
+          >
+            {['echeance', 'cond_paie', 'bloquer'].includes(key) ?
+              <Checkbox /> : <Input type="text" />}
+          </Form.Item>
+        ))}
+        <Row justify="end">
+          <Col>
+            <Button type="primary" htmlType="submit">
+              Update Fournisseur
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+    </Card>
   );
 };
 

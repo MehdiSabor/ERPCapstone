@@ -1,55 +1,57 @@
 import React, { useState } from 'react';
-import { useFetchItemsInDevis } from '../../hooks/devisHooks';
+import { Button, List, Card, Typography, Divider } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import UpdateItemInDevisForm from './updateItemInDevisForm';
 import DeleteItemFromDevisButton from './DeleteItemFromDevisButton';
+import { useFetchItemsInDevis } from '../../hooks/devisHooks';
+
+const { Text, Title } = Typography;
 
 const ItemsInDevisList = ({ refDevis }) => {
+    const { items, loading, error } = useFetchItemsInDevis(refDevis); 
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [view, setView] = useState('list'); // 'list' or 'update'
 
-    const [fetchTrigger, setFetchTrigger] = useState(false);
-    const { items, loading, error } = useFetchItemsInDevis(refDevis, fetchTrigger); 
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [view, setView] = useState('list'); // 'list', 'update', 'single'
+    if (loading) return <Text>Loading items...</Text>;
+    if (error) return <Text type="danger">Error fetching items: {error}</Text>;
+    if (!items || items.length === 0) return <Text>No items found for this devis.</Text>;
 
-  if (loading) return <p>Loading items...</p>;
-  if (error) return <p>Error fetching items: {error}</p>;
-  if (!items || items.length === 0) return <p>No items found for this devis.</p>;
+    const handleEditItem = (item) => {
+        setSelectedItem(item);
+        setView('update');
+    };
 
-  
-
-  const handleEditItem = (item) => {
-    setSelectedItem(item);
-    setView('update');
-  };
-
-  return (
-    <div>
-      <h3>Items in Devis</h3>
-      {view === 'list' && (
-        <ul>
-          {items.map((item, index) => (
-            <li key={index}>
-              {item.ARTICLE} - Quantity: {item.QTE} {item.PV_TTC} € Total: {item.TotalTTC}
-              <button onClick={() => handleEditItem(item)}>Edit</button>
-              <DeleteItemFromDevisButton refDevis={refDevis} codeArt={item.CODE_ART} onSuccess={() => {
-    setView('list');
-    setFetchTrigger(prev => !prev); // Toggle fetchTrigger to re-fetch items
-  }}  />
-            </li>
-          ))}
-        </ul>
-      )}
-      {view === 'update' && selectedItem && (
-        <UpdateItemInDevisForm 
-  refDevis={refDevis} 
-  article={selectedItem} 
-  onSuccess={() => {
-    setView('list');
-    setFetchTrigger(prev => !prev); // Toggle fetchTrigger to re-fetch items
-  }} 
-/> )}
-      
-    </div>
-  );
+    return (
+        <Card bordered={false} style={{ margin: '16px' }}>
+            <Title level={4}>Items in Devis</Title>
+            {view === 'list' && (
+                <List
+                    itemLayout="horizontal"
+                    dataSource={items}
+                    renderItem={item => (
+                        <List.Item
+                            actions={[
+                                <Button icon={<EditOutlined />} onClick={() => handleEditItem(item)}>Edit</Button>,
+                                <DeleteItemFromDevisButton refDevis={refDevis} codeArt={item.CODE_ART} onSuccess={() => setView('list')} />
+                            ]}
+                        >
+                            <List.Item.Meta
+                                title={`${item.ARTICLE} - Quantity: ${item.QTE}`}
+                                description={`€${item.PV_TTC} Total: €${item.TotalTTC}`}
+                            />
+                        </List.Item>
+                    )}
+                />
+            )}
+            {view === 'update' && selectedItem && (
+                <UpdateItemInDevisForm
+                    refDevis={refDevis}
+                    article={selectedItem}
+                    onSuccess={() => setView('list')}
+                />
+            )}
+        </Card>
+    );
 };
 
 export default ItemsInDevisList;

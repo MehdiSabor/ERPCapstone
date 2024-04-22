@@ -1,20 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Button, Card, Modal, Typography } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useDeleteCom } from '../../hooks/comHooks';
 
+const { Title, Paragraph } = Typography;
+
 const ComDeleteButton = ({ comId, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
   const { handleDelete } = useDeleteCom();
 
-  const handleClick = async () => {
-    if (window.confirm('Are you sure you want to delete this com?')) {
+  const handleConfirmDelete = async () => {
+    setLoading(true);
+    try {
       await handleDelete(comId);
       if (typeof onSuccess === 'function') {
-        onSuccess();
+        onSuccess();  // Invoke onSuccess callback if provided
       }
+      // Optionally navigate back or to another relevant page on success
+    } catch (error) {
+      Modal.error({
+        title: 'Failed to delete com',
+        content: error.message,
+      });
+      setLoading(false);
     }
   };
 
+  const handleCancel = () => {
+    // Optionally handle cancel scenario
+  };
+
   return (
-    <button onClick={handleClick}>Delete Com</button>
+    <Card bordered={false} style={{ maxWidth: 600, margin: '40px auto' }}>
+      <Title level={2} style={{ textAlign: 'center', marginBottom: 20 }}>
+        <ExclamationCircleOutlined style={{ color: 'red' }} /> Delete Com
+      </Title>
+      <Paragraph>
+        Are you sure you want to delete this com? This action cannot be undone and will permanently remove the com.
+      </Paragraph>
+      <div style={{ textAlign: 'center', marginTop: 40 }}>
+        <Button type="danger" onClick={handleConfirmDelete} loading={loading} style={{ marginRight: 20 }}>
+          Yes, delete it
+        </Button>
+        <Button onClick={handleCancel}>
+          Cancel
+        </Button>
+      </div>
+    </Card>
   );
 };
 

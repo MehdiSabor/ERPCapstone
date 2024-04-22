@@ -1,30 +1,40 @@
 import React from 'react';
+import { Button, Modal } from 'antd';
 import { useDeleteItemFromDevis } from '../../hooks/devisHooks'; // Adjust the import path as necessary
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const DeleteItemFromDevisButton = ({ refDevis, codeArt, onSuccess }) => {
   const { deleteItem } = useDeleteItemFromDevis();
 
   const handleClick = async () => {
-    if (!window.confirm('Are you sure you want to remove this item from the devis?')) {
-      return; // Exit if the user cancels the operation
-    }
-  
-    try {
-      await deleteItem(refDevis, codeArt); // Assume success if this line does not throw
-      if (onSuccess) {
-        onSuccess(); // Call the onSuccess callback
+    Modal.confirm({
+      title: 'Are you sure you want to remove this item?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'This action cannot be undone and will permanently remove the item from the devis.',
+      okText: 'Yes, remove it',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          await deleteItem(refDevis, codeArt);
+          if (onSuccess) {
+            onSuccess(); // Call the onSuccess callback
+          }
+        } catch (error) {
+          // Handle any errors that occur during the deletion
+          Modal.error({
+            title: 'Failed to delete item',
+            content: error.message || 'An error occurred while trying to delete the item.',
+          });
+        }
       }
-    } catch (error) {
-      // Handle any errors that occur during the deletion
-      console.error('Failed to delete item:', error);
-      alert('Could not delete the item from the devis. ' + (error.message || ''));
-    }
+    });
   };
-  
-
 
   return (
-    <button onClick={handleClick}>Remove Item</button>
+    <Button onClick={handleClick} type="danger" icon={<ExclamationCircleOutlined />}>
+      Remove Item
+    </Button>
   );
 };
 
