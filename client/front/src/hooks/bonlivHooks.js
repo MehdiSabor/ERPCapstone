@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+
 import { 
   createBonliv, validateBonliv, getBonlivById, updateBonliv, deleteBonliv,
   getAllBonliv, getBonlivByClient, getBonlivByCommercial, 
@@ -40,14 +41,17 @@ export const useValidateBonliv = (refBonliv) => {
   return { validate, error, isValidated };
 };
 
+
 export const useFetchBonlivById = (id) => {
   const [bonliv, setBonliv] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchBonliv = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(''); // Reset error state before new fetch attempt
       getBonlivById(id)
         .then(response => {
           setBonliv(response.data);
@@ -60,8 +64,15 @@ export const useFetchBonlivById = (id) => {
     }
   }, [id]);
 
-  return { bonliv, loading, error };
+  // Invoke fetchBonliv when the component mounts and when id changes
+  useEffect(() => {
+    fetchBonliv();
+  }, [fetchBonliv]);
+
+  // Return all the state management vars and the refetch function
+  return { bonliv, loading, error, refetch: fetchBonliv };
 };
+
 
 export const useUpdateBonliv = () => {
   const [error, setError] = useState('');

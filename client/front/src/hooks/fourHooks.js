@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getAllFours,getFourById, updateFour,createFour,deleteFour } from '../models/fourAPI';
 
 export const useFetchAllFours = () => {
@@ -23,14 +23,17 @@ export const useFetchAllFours = () => {
 };
 
 
+
 export const useFetchFourById = (id) => {
   const [Four, setFour] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchFour = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(''); // Reset error state before new fetch attempt
       getFourById(id)
         .then(response => {
           setFour(response.data);
@@ -43,8 +46,15 @@ export const useFetchFourById = (id) => {
     }
   }, [id]);
 
-  return { Four, loading, error };
+  // Invoke fetchFour when the component mounts and when id changes
+  useEffect(() => {
+    fetchFour();
+  }, [fetchFour]);
+
+  // Return all the state management vars and the refetch function
+  return { Four, loading, error, refetch: fetchFour };
 };
+
 
 
 export const useUpdateFour = () => {

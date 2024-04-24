@@ -95,6 +95,7 @@ const SingleAvoir = ({ avoirId , onChangeView }) => {
       render: (text) => `${parseFloat(text).toFixed(2)}€`, // Format as currency
     }
   ];
+  
 
   const handleValidateClick = async () => {
     try {

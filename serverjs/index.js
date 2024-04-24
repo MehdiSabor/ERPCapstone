@@ -23,7 +23,7 @@ app.use(cors(corsOptions));
 
 
 
-// Use the account routes
+
 
 app.use(express.json()); 
 app.use('/account', accountRoutes);

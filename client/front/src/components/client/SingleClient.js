@@ -1,19 +1,35 @@
-import React, { useEffect } from 'react';
-import { Card, Row, Col, Button } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Button, Modal, message } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchClientById } from '../../hooks/clientHooks';
+import ClientUpdateForm from './ClientupdateForm'; // You need to create this
+import ClientDeleteButton from './ClientDeleteButton'; // You need to create this
 
 const SingleClient = ({ clientId, onChangeView }) => {
-    const { client, loading, error } = useFetchClientById(clientId);
+    const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const { client, loading, error, refetch } = useFetchClientById(clientId);
     const { setSidebarButtons } = useSidebar();
+
+
+    const handleUpdateSuccess = () => {
+        message.success('Client updated successfully!');
+        setIsUpdateModalVisible(false);
+        refetch();
+    };
+
+    const handleDeleteSuccess = () => {
+        message.success('Client deleted successfully!');
+        setIsDeleteModalVisible(false);
+        onChangeView('list'); // Navigate back to the client list or dashboard
+    };
 
     useEffect(() => {
       // Define SingleClient specific buttons
       const clientButtons = [
-          <Button key="update" onClick={() => onChangeView('update', clientId)}>Update Client</Button>,
-          <Button key="delete" onClick={() => onChangeView('delete', clientId)}>Delete Client</Button>
-      ];
-
+        <Button key="update" type="primary" onClick={() => setIsUpdateModalVisible(true)}>Update Client</Button>,
+        <Button key="delete" type="danger" onClick={() => setIsDeleteModalVisible(true)}>Delete Client</Button>
+    ];
       // Set the buttons for this client view
       setSidebarButtons(prevButtons => [
           ...prevButtons.slice(0, 2), // Assume first two are base buttons, adjust slice as necessary
@@ -33,7 +49,7 @@ const SingleClient = ({ clientId, onChangeView }) => {
     const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'Not provided';
 
     return (
-        
+        <div>
             <Row gutter={16}>
                 {/* Card 1 */}
                 <Col span={24}>
@@ -77,6 +93,23 @@ const SingleClient = ({ clientId, onChangeView }) => {
                     </Card>
                 </Col>
             </Row>
+            <Modal
+                title="Update Client"
+                visible={isUpdateModalVisible}
+                footer={null}
+                onCancel={() => setIsUpdateModalVisible(false)}
+            >
+                <ClientUpdateForm clientId={clientId} onFinishedUpdate={handleUpdateSuccess} />
+            </Modal>
+            <Modal
+                title="Delete Client"
+                visible={isDeleteModalVisible}
+                footer={null}
+                onCancel={() => setIsDeleteModalVisible(false)}
+            >
+                <ClientDeleteButton clientId={clientId} onSuccess={handleDeleteSuccess} />
+            </Modal>
+            </div>
         
     );
 };

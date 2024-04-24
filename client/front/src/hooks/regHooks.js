@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { createReglement, updateReglement,getReglementById
     ,deleteReglementDetail, deleteReglement , getAllReglements,getAllUnifiedFactureAvoir,
      createReglementDetailsBatch, addDetailReglement   } from '../models/regAPI';
@@ -49,14 +50,17 @@ export const useUpdateReglement = () => {
 };
 
 
+
 export const useFetchReglementById = (id) => {
   const [reglement, setReglement] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchReglement = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(null); // Reset error state before new fetch attempt
       getReglementById(id)
         .then(response => {
           setReglement(response.data);
@@ -69,8 +73,15 @@ export const useFetchReglementById = (id) => {
     }
   }, [id]);
 
-  return { reglement, loading, error };
+  // Invoke fetchReglement when the component mounts and when id changes
+  useEffect(() => {
+    fetchReglement();
+  }, [fetchReglement]);
+
+  // Return all the state management vars and the refetch function
+  return { reglement, loading, error, refetch: fetchReglement };
 };
+
 
 
 export const useDeleteReglement = () => {

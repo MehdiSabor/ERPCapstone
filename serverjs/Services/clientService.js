@@ -46,10 +46,11 @@ const getClientById = async (code_clt) => {
 
 const updateClient = async (code_clt, clientData) => {
   return prisma.client.update({
-    where: { code_clt },
-    data: clientData,
+    where: { code_clt }, // Ensuring that the client is identified by the correct field
+    data: clientData,    // Passing the entire `clientData` object to the update operation
   });
 };
+
 
 const deleteClient = async (code_clt) => {
   return prisma.client.delete({

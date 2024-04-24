@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { 
   createDevis, validateDevis, getDevisById, updateDevis, deleteDevis,
   getAllDevis, getDevisByClient, getDevisByCommercial, addItemToDevis,
@@ -40,14 +41,17 @@ export const useValidateDevis = (refDevis) => {
   return { validate, error, isValidated };
 };
 
+
 export const useFetchDevisById = (id) => {
   const [devis, setDevis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchDevis = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(''); // Reset error state before new fetch attempt
       getDevisById(id)
         .then(response => {
           setDevis(response.data);
@@ -60,8 +64,15 @@ export const useFetchDevisById = (id) => {
     }
   }, [id]);
 
-  return { devis, loading, error };
+  // Invoke fetchDevis when the component mounts and when id changes
+  useEffect(() => {
+    fetchDevis();
+  }, [fetchDevis]);
+
+  // Return all the state management vars and the refetch function
+  return { devis, loading, error, refetch: fetchDevis };
 };
+
 
 export const useUpdateDevis = () => {
   const [error, setError] = useState('');

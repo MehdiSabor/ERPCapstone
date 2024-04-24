@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   createAvoir, validateAvoir, getAvoirById, updateAvoir, deleteAvoir,
   getAllAvoir, getAvoirByClient, getAvoirByCommercial, addItemToAvoir,
@@ -45,9 +45,11 @@ export const useFetchAvoirById = (id) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchAvoir = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(''); // Reset error state before new fetch attempt
       getAvoirById(id)
         .then(response => {
           setAvoir(response.data);
@@ -60,8 +62,15 @@ export const useFetchAvoirById = (id) => {
     }
   }, [id]);
 
-  return { avoir, loading, error };
+  // Invoke fetchAvoir when the component mounts and when id changes
+  useEffect(() => {
+    fetchAvoir();
+  }, [fetchAvoir]);
+
+  // Return all the state management vars and the refetch function
+  return { avoir, loading, error, refetch: fetchAvoir };
 };
+
 
 export const useUpdateAvoir = () => {
   const [error, setError] = useState('');

@@ -26,9 +26,7 @@ const ArticleDeleteButton = ({ articleId, onSuccess }) => {
     }
   };
 
-  const handleCancel = () => {
-    // Optionally handle cancel scenario
-  };
+  
 
   return (
     <Card bordered={false} style={{ maxWidth: 600, margin: '40px auto' }}>
@@ -42,9 +40,7 @@ const ArticleDeleteButton = ({ articleId, onSuccess }) => {
         <Button type="danger" onClick={handleConfirmDelete} loading={loading} style={{ marginRight: 20 }}>
           Yes, delete it
         </Button>
-        <Button onClick={handleCancel}>
-          Cancel
-        </Button>
+        
       </div>
     </Card>
   );

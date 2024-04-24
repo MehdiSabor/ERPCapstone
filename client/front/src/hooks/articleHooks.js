@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useCallback } from 'react';
 import { getAllArticles,getArticleById, updateArticle,createArticle,deleteArticle } from '../models/articleAPI';
 
 export const useFetchAllArticles = () => {
@@ -23,14 +23,17 @@ export const useFetchAllArticles = () => {
 };
 
 
+
 export const useFetchArticleById = (id) => {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function
+  const fetchArticle = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError('');  // Reset the error state on new fetch
       getArticleById(id)
         .then(response => {
           setArticle(response.data);
@@ -43,7 +46,13 @@ export const useFetchArticleById = (id) => {
     }
   }, [id]);
 
-  return { article, loading, error };
+  // Call fetchArticle on initial mount and when `id` changes
+  useEffect(() => {
+    fetchArticle();
+  }, [fetchArticle]);
+
+  // Return everything including the fetchArticle function renamed as refetch for external usage
+  return { article, loading, error, refetch: fetchArticle };
 };
 
 

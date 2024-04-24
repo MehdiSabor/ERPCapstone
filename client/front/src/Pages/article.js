@@ -27,9 +27,7 @@ const ArticleManagementPage = () => {
   return (
     <div>
       {currentView === 'create' && <ArticleForm />}
-      {currentView === 'update' && <ArticleUpdateForm articleId={selectedArticleId} />}
-      {currentView === 'delete' && <ArticleDeleteButton articleId={selectedArticleId} onSuccess={() => setCurrentView('list')} />}
-  
+      
       {currentView === 'list' && <ArticleList onSelectArticle={handleSelectArticle} />}
       {currentView === 'view' && selectedArticleId && (
         <SingleArticle articleId={selectedArticleId} onChangeView={setCurrentView} />

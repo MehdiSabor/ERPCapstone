@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { getAllComs,getComById, updateCom,createCom,deleteCom } from '../models/comAPI';
 
 export const useFetchAllComs = () => {
@@ -23,14 +23,17 @@ export const useFetchAllComs = () => {
 };
 
 
+
 export const useFetchComById = (id) => {
   const [Com, setCom] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchCom = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(''); // Reset error state before new fetch attempt
       getComById(id)
         .then(response => {
           setCom(response.data);
@@ -43,8 +46,15 @@ export const useFetchComById = (id) => {
     }
   }, [id]);
 
-  return { Com, loading, error };
+  // Invoke fetchCom when the component mounts and when id changes
+  useEffect(() => {
+    fetchCom();
+  }, [fetchCom]);
+
+  // Return all the state management vars and the refetch function
+  return { Com, loading, error, refetch: fetchCom };
 };
+
 
 
 export const useUpdateCom = () => {

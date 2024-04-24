@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { Form, Input, Checkbox, Button, Card, Row, Col, Typography } from 'antd';
+import { Form, Input, Checkbox, Button, Card, Row, Col, Typography,message } from 'antd';
 import { useUpdateArticle, useFetchArticleById } from '../../hooks/articleHooks';
 
 const { Title } = Typography;
 
-const ArticleUpdateForm = ({ articleId }) => {
+const ArticleUpdateForm = ({ articleId, onFinishedUpdate })=> {
   const { article, loading: fetching } = useFetchArticleById(articleId);
   const { handleUpdate, isUpdated } = useUpdateArticle();
   const [form] = Form.useForm();
@@ -17,12 +17,19 @@ const ArticleUpdateForm = ({ articleId }) => {
   }, [article, form]);
 
   const onFinish = async (values) => {
-    await handleUpdate(articleId, values);
-    if (isUpdated) {
-      // Handle successful update, e.g., notification or redirection
-      console.log('Article updated successfully!');
+    try {
+      // Assume handleUpdate returns a Promise that resolves when the update is successful
+      await handleUpdate(articleId, values);
+      // If we reach this point, the update was successful
+      
+      onFinishedUpdate(); // This will close the modal and refetch the article
+    } catch (error) {
+      // If the update fails, handle the error here
+      message.error('Update failed: ' + error.message);
     }
   };
+  
+
 
   if (fetching) return <p>Loading...</p>;
 

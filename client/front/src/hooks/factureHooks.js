@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   getFactureById,
   getAllFactures,
@@ -7,14 +7,18 @@ import {
   cancelFacture,
 } from '../models/factureAPI'; // Adjust the import path as necessary
 
+
+
 export const useFetchFactureById = (id) => {
   const [facture, setFacture] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchFacture = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(''); // Reset error state before new fetch attempt
       getFactureById(id)
         .then(response => {
           setFacture(response.data);
@@ -27,7 +31,13 @@ export const useFetchFactureById = (id) => {
     }
   }, [id]);
 
-  return { facture, loading, error };
+  // Invoke fetchFacture when the component mounts and when id changes
+  useEffect(() => {
+    fetchFacture();
+  }, [fetchFacture]);
+
+  // Return all the state management vars and the refetch function
+  return { facture, loading, error, refetch: fetchFacture };
 };
 
 export const useFetchAllFactures = () => {

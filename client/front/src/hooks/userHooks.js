@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import * as userAPI from '../models/userAPI';
 
 export const useUsers = () => {
@@ -80,24 +80,36 @@ export const useUpdateUser = () => {
     return { handleDelete, isDeleting, error };
   };
   
+ 
   export const useFetchUserById = (id) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
   
-    useEffect(() => {
-      setLoading(true);
-      userAPI.getUserById(id)
-        .then(response => {
-          setUser(response.data);
-          setLoading(false);
-        })
-        .catch(err => {
-          setError(err.message);
-          setLoading(false);
-        });
+    // Define the fetching logic as a callable function using useCallback
+    const fetchUser = useCallback(() => {
+      if (id) {
+        setLoading(true);
+        setError(null); // Reset error state before new fetch attempt
+        userAPI.getUserById(id)
+          .then(response => {
+            setUser(response.data);
+            setLoading(false);
+          })
+          .catch(err => {
+            setError(err.message);
+            setLoading(false);
+          });
+      }
     }, [id]);
   
-    return { user, loading, error };
+    // Invoke fetchUser when the component mounts and when id changes
+    useEffect(() => {
+      fetchUser();
+    }, [fetchUser]);
+  
+    // Return all the state management vars and the refetch function
+    return { user, loading, error, refetch: fetchUser };
   };
+  
   

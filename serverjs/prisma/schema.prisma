@@ -72,7 +72,7 @@ model Article {
   code_frs        String
   qte_stk         Int
   fournisseur     Fournisseur     @relation(fields: [code_frs], references: [code_frs])
-  famille         famille?        @relation(fields: [familleCode_fam], references: [code_fam])
+  famille         famille?        @relation(fields: [Code_fam], references: [code_fam])
   bonlivDetails   DetailBonliv[]
   factureDetails  DetailFacture[]
   avoirDetails    DetailAvoirs[]
@@ -136,8 +136,8 @@ model DevisDetail {
   TVA      Int
   TotalHT  Float   @default(0)
   TotalTTC Float   @default(0)
-  article  Article @relation(fields: [CODE_ART], references: [code_art])
-  devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV], onDelete: Cascade)
+  article  Article @relation(fields: [CODE_ART], references: [code_art], onDelete: Cascade)
+devis    Devis   @relation(fields: [REF_DEV], references: [REF_DEV], onDelete: Cascade)
 
   @@id([REF_DEV, CODE_ART])
 }
@@ -187,7 +187,7 @@ model DetailBonliv {
   TotalTTC Float   @default(0)
   TotalHTliv  Float ?  
   TotalTTCliv Float ?  
-  article  Article @relation(fields: [CODE_ART], references: [code_art])
+  article  Article @relation(fields: [CODE_ART], references: [code_art], onDelete: Cascade)
   bonliv   Bonliv  @relation(fields: [REF_BL], references: [REF_BL], onDelete: Cascade)
 @@id([REF_BL, CODE_ART])
 }
@@ -230,7 +230,7 @@ model Facture {
     REMISE   Float
     REMISEG  Float?
     TVA      Int
-    article  Article @relation(fields: [CODE_ART], references: [code_art])
+    article  Article @relation(fields: [CODE_ART], references: [code_art], onDelete: Cascade)
     facture  Facture @relation(fields: [REF_FAC], references: [REF_FAC], onDelete: Cascade)
   @@id([REF_FAC, CODE_ART])
   }
@@ -270,7 +270,7 @@ model DetailAvoirs {
   TotalTTC Float   @default(0)
   TVA      Int
   MAJ_STK  Boolean @default(false)
-  article  Article @relation(fields: [CODE_ART], references: [code_art])
+  article  Article @relation(fields: [CODE_ART], references: [code_art], onDelete: Cascade)
   avoirs   Avoirs  @relation(fields: [REF_AVR], references: [REF_AVR], onDelete: Cascade)
 
 @@id([REF_AVR, CODE_ART])

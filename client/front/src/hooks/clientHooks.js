@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { getAllClients,getClientById, updateClient,createClient,deleteClient } from '../models/clientAPI';
 
 export const useFetchAllClients = () => {
@@ -23,14 +23,17 @@ export const useFetchAllClients = () => {
 };
 
 
+
 export const useFetchClientById = (id) => {
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchClient = useCallback(() => {
     if (id) {
       setLoading(true);
+      setError(''); // Reset the error state on new fetch
       getClientById(id)
         .then(response => {
           setClient(response.data);
@@ -43,8 +46,15 @@ export const useFetchClientById = (id) => {
     }
   }, [id]);
 
-  return { client, loading, error };
+  // Call fetchClient on initial mount and when `id` changes
+  useEffect(() => {
+    fetchClient();
+  }, [fetchClient]);
+
+  // Return everything including the fetchClient function, renamed as refetch for external usage
+  return { client, loading, error, refetch: fetchClient };
 };
+
 
 
 export const useUpdateClient = () => {

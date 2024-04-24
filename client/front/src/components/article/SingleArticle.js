@@ -1,17 +1,29 @@
-import React, { useEffect } from 'react';
-import { Card, Row, Col, Image, Typography } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Image, Typography, Modal, Button, message } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchArticleById } from '../../hooks/articleHooks';
+import ArticleDeleteButton from './ArticleDeleteButton';
+import ArticleUpdateForm from './ArticleupdateForm';
 
 const { Title, Text } = Typography;
+
 const SingleArticle = ({ articleId, onChangeView }) => {
-    const { article, loading, error } = useFetchArticleById(articleId);
+    const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const { article, loading, error, refetch } = useFetchArticleById(articleId);
     const { setSidebarButtons } = useSidebar();
+
+
+    const handleUpdateSuccess = () => {
+        message.success('Article updated successfully!');
+        setIsUpdateModalVisible(false);
+        refetch();  // Assuming `refetch` is a function from your hook that re-fetches article data
+    };
 
     useEffect(() => {
         const articleButtons = [
-            <button key="update" onClick={() => onChangeView('update', articleId)}>Update Article</button>,
-            <button key="delete" onClick={() => onChangeView('delete', articleId)}>Delete Article</button>
+            <Button key="update" type="primary" onClick={() => setIsUpdateModalVisible(true)}>Update Article</Button>,
+            <Button key="delete" type="danger" onClick={() => setIsDeleteModalVisible(true)}>Delete Article</Button>
         ];
 
         setSidebarButtons(prevButtons => [
@@ -20,19 +32,21 @@ const SingleArticle = ({ articleId, onChangeView }) => {
         ]);
 
         return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
-    }, [setSidebarButtons, onChangeView, articleId]);
+    }, [setSidebarButtons]);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
     if (!article) return <p>No article found</p>;
 
+
     const formatDate = (date) => new Date(date).toLocaleDateString();
-// Placeholder image URL
-const placeholderImage = "https://via.placeholder.com/150";
+    const placeholderImage = "https://via.placeholder.com/150";
+
 
     return (
-        <div style={{ background: '#ececec', padding: '30px' }}>
-            <Row gutter={16}>
+        <div style={{ background: '#ececec',  }}>
+            
+                    <Row gutter={16}>
                 {/* Card 1 */}
                 <Col span={24}>
                     <Card title="General Information">
@@ -108,6 +122,30 @@ const placeholderImage = "https://via.placeholder.com/150";
                     </Card>
                 </Col>
             </Row>
+                   
+                {/* Additional cards omitted for brevity */}
+
+                <Modal
+                    title="Update Article"
+                    visible={isUpdateModalVisible}
+                    footer={null}
+                    onCancel={() => setIsUpdateModalVisible(false)}
+                >
+                    <ArticleUpdateForm articleId={articleId} onFinishedUpdate={handleUpdateSuccess} />
+                </Modal>
+
+                <Modal
+                    title="Delete Article"
+                    visible={isDeleteModalVisible}
+                    footer={null}
+                    onCancel={() => setIsDeleteModalVisible(false)}
+                >
+                    <ArticleDeleteButton articleId={articleId} onSuccess={() => {
+                        setIsDeleteModalVisible(false);
+                        onChangeView('list');
+                    }} />
+                </Modal>
+           
         </div>
     );
 };
