@@ -4,7 +4,7 @@ import { useUpdateItemInAvoir } from '../../hooks/avoirHooks';
 
 const { Text } = Typography;
 
-const UpdateItemInAvoirForm = ({ refAvoir, article, onSuccess }) => {
+const UpdateItemInAvoirForm = ({ refAvoir, article, onSuccess, onRefetch }) => {
   const { updateItem, isUpdated } = useUpdateItemInAvoir();
   const [formData, setFormData] = useState(article || {});
 
@@ -12,8 +12,9 @@ const UpdateItemInAvoirForm = ({ refAvoir, article, onSuccess }) => {
     if (isUpdated) {
       console.log('Item updated successfully');
       onSuccess();
+      onRefetch(); // Call the refetch method after successful update
     }
-  }, [isUpdated, onSuccess]);
+  }, [isUpdated, onSuccess, onRefetch]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

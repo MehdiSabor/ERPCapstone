@@ -21,9 +21,11 @@ const SingleFacture = ({ factureId }) => {
       // ... potentially other buttons
     ];
 
-    setSidebarButtons(factureButtons);
-
-    return () => setSidebarButtons([]);
+    setSidebarButtons(prevButtons => [
+      ...prevButtons.slice(0, 1), // Keep the first two base buttons
+      ...factureButtons
+    ]);
+    return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
   }, [setSidebarButtons, factureId]);
 
   const handleValidateClick = async () => {
@@ -115,7 +117,7 @@ const SingleFacture = ({ factureId }) => {
         title={
           <>
             Facture Details - {facture.REF_FAC}
-            {isValidated ? (
+            {!facture.isValidated ? (
               <Tag color="green" style={{ marginLeft: '8px' }}>
                 Validated
               </Tag>
@@ -128,7 +130,7 @@ const SingleFacture = ({ factureId }) => {
         }
         bordered={false}
         extra={
-  !isValidated ? (
+  facture.isValidated ? (
     <Button type="primary" onClick={handleValidateClick}>
       Validate Facture
     </Button>

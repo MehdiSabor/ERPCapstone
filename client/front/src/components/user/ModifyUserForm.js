@@ -4,7 +4,7 @@ import { useUpdateUser, useFetchUserById } from '../../hooks/userHooks';
 
 const { Title, Text } = Typography;
 
-const UserUpdateForm = ({ userId }) => {
+const UserUpdateForm = ({ userId,onFinishedUpdate }) => {
   const { user, loading, error } = useFetchUserById(userId);
   const { handleUpdate, isUpdated } = useUpdateUser();
   const [form] = Form.useForm();
@@ -17,9 +17,7 @@ const UserUpdateForm = ({ userId }) => {
 
   const onFinish = async (values) => {
     await handleUpdate(userId, values);
-    if (isUpdated) {
-      // Handle successful update (e.g., show a message or redirect)
-    }
+    onFinishedUpdate();
   };
 
   if (loading) return <Typography.Text>Loading...</Typography.Text>;

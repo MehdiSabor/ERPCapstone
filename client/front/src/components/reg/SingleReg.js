@@ -1,29 +1,44 @@
-import React, { useEffect, useCallback } from 'react';
-import { Card, Col, Row, Spin, Alert, Typography } from 'antd';
+import React, { useEffect,useState, useCallback,useMemo } from 'react';
+import { Modal,Card, Col, Row, Spin,message, Alert, Typography } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import UnifiedFactureAvoirList from './UnifiedFactureAvoirsList';
 import ReglementDetailsList from './RegDetailsList';
-import { useFetchReglementById } from '../../hooks/regHooks';
+import { useFetchAllUnifiedFactureAvoir, useFetchReglementById } from '../../hooks/regHooks';
+import ModifyRegForm from './ModifyRegForm';
+import RegDeleteButton from './DeleteRegButton';
 
 const { Title, Text } = Typography;
 
 const SingleReglement = ({ reglementId, onChangeView }) => {
-  const { reglement, loading, error } = useFetchReglementById(reglementId);
+  const { reglement, loading, error, refetch: fetchReglement } = useFetchReglementById(reglementId);
+  const { unifiedRecords, refetch: fetchUnifiedRecords } = useFetchAllUnifiedFactureAvoir();
+ // Calculate the sum of all registered amounts
+ const totalRegistered = useMemo(() => reglement?.reglementdetails?.reduce((total, detail) => total + detail.MNT_REGLER, 0) || 0, [reglement]);
+ const remainingAmount = reglement?.MNT_REGLER - totalRegistered;
+ const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  
 
   useEffect(() => {
     // This example assumes `useFetchReglementById` already manages state internally.
   }, [reglementId]);
 
+  
   const { setSidebarButtons } = useSidebar();
   const stableOnChangeView = useCallback(onChangeView, []);
 
   useEffect(() => {
     const reglementButtons = [
-      <button key="modify" onClick={() => stableOnChangeView('modify', reglementId)}>Modify Reglement</button>,
-      <button key="delete" onClick={() => stableOnChangeView('delete', reglementId)}>Delete Reglement</button>,
+      <button key="modify" onClick={() => setIsUpdateModalVisible(true)}>Modify Reglement</button>,
+      <button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete Reglement</button>,
     ];
-    setSidebarButtons(reglementButtons);
-    return () => setSidebarButtons([]);
+    setSidebarButtons(prevButtons => [
+      ...prevButtons.slice(0, 2),
+      ...reglementButtons
+    ]);
+    return () => {
+      setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
+    };
   }, [setSidebarButtons, stableOnChangeView, reglementId]);
 
   if (loading) return <Spin spinning={true} tip="Loading..."><div style={{ minHeight: '200px' }} /></Spin>;
@@ -35,6 +50,23 @@ const SingleReglement = ({ reglementId, onChangeView }) => {
     marginTop: '0px' // Remove top margin
   };
 
+  const handleRefetch = () => {
+    fetchReglement();
+    fetchUnifiedRecords();
+  };
+  
+  const handleUpdateSuccess = () => {
+    message.success('Fournisseur updated successfully!');
+    setIsUpdateModalVisible(false);
+    handleRefetch();
+  };
+
+  const handleDeleteSuccess = () => {
+    message.success('Fournisseur deleted successfully!');
+    setIsDeleteModalVisible(false);
+    onChangeView('list'); // Navigate back to the fournisseur list or dashboard
+  };
+ 
   return (
     <div>
       <Card title={`Reglement Overview - ${reglementId}`} style={{ marginBottom: 16 }}>
@@ -71,18 +103,44 @@ const SingleReglement = ({ reglementId, onChangeView }) => {
             <Title level={5} style={titleStyle}>Remarks</Title>
             <Text>{reglement.REMARQUE || 'None'}</Text>
           </Col>
+          <Col span={8}>
+            <Title level={5} style={titleStyle}>Total Registred</Title>
+            <Text>{totalRegistered || 'None'}</Text>
+          </Col>
+          <Col span={8}>
+            <Title level={5} style={titleStyle}>Remaining Amount</Title>
+            <Text>{remainingAmount || 'None'}</Text>
+          </Col>
         </Row>
       </Card>
       <Card title={`Reglement Details - ${reglementId}`} >
         <Row gutter={16}>
           <Col span={12}>
-            <UnifiedFactureAvoirList reglementId={reglementId} />
+            <UnifiedFactureAvoirList reglementId={reglementId} handleRefetch={handleRefetch} />
           </Col>
           <Col span={12}>
-            <ReglementDetailsList reglementId={reglementId} reglement={reglement} />
+            <ReglementDetailsList reglementId={reglementId} reglement={reglement} handleRefetch={handleRefetch} loading={loading} error={error}/>
           </Col>
         </Row>
       </Card>
+
+
+      <Modal
+        title="Update Reglement"
+        visible={isUpdateModalVisible}
+        footer={null}
+        onCancel={() => setIsUpdateModalVisible(false)}
+      >
+        <ModifyRegForm reglementId={reglementId} onFinishedUpdate={handleUpdateSuccess} />
+      </Modal>
+      <Modal
+        title="Delete Reglement"
+        visible={isDeleteModalVisible}
+        footer={null}
+        onCancel={() => setIsDeleteModalVisible(false)}
+      >
+        <RegDeleteButton reglementId={reglementId} onDeleted={handleDeleteSuccess} />
+      </Modal>
     </div>
   );
 };

@@ -5,7 +5,7 @@ import ArticleList from '../article/ArticleList';
 
 const { Title } = Typography;
 
-const AddItemToAvoirForm = ({ refAvoir }) => {
+const AddItemToAvoirForm = ({ refAvoir,onSuccess  }) => {
   const { addItem } = useAddItemToAvoir();
   const [showItemList, setShowItemList] = useState(false);
 
@@ -32,6 +32,7 @@ const AddItemToAvoirForm = ({ refAvoir }) => {
 
   const handleSubmit = async () => {
     await addItem(refAvoir, itemData);
+    onSuccess(); 
     setItemData(initialState); // Optionally reset the form or provide feedback
   };
 

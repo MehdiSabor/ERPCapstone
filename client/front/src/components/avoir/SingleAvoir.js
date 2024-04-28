@@ -1,39 +1,108 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button, Card, Table, Typography, Tag, Row, Col, Spin, Alert } from 'antd';
+import React, { useState,useEffect } from 'react';
+import { Modal, Card,message, Button, List, Typography, Row, Col,Spin,Alert,Tag, Table } from 'antd';
 import { useSidebar } from '../../SidebarContext';
-import { useFetchAvoirById, useFetchItemsInAvoir, useValidateAvoir } from '../../hooks/avoirHooks';
- // Ensure you have this component
- import SingleClient from '../client/SingleClient';
-
+import { useFetchAvoirById, useFetchItemsInAvoir, useValidateAvoir } from '../../hooks/avoirHooks'; // Adjust the import path as necessary
+import AvoirUpdateForm from './AvoirupdateForm';  // You need to create this
+import AvoirDeleteButton from './AvoirDeleteButton';  // You need to create this
+import AvoirAddItemForm from './AddItemToAvoirForm'; // You need to create this
+import ItemsInAvoirList from './ItemInAvoirList';
+import UpdateItemInAvoirForm from './updateItemInAvoirForm';
+import SingleClient from '../client/SingleClient';
 
 const { Title, Text } = Typography;
 
-const SingleAvoir = ({ avoirId , onChangeView }) => {
-  const { avoir, loading: loadingAvoir, error: errorAvoir } = useFetchAvoirById(avoirId);
-  const { items, loading: loadingItems, error: errorItems } = useFetchItemsInAvoir(avoirId);
-  const { validate, isValidated, error: validationError } = useValidateAvoir(avoirId);
+const SingleAvoir = ({ avoirId, onChangeView }) => {
+  const { avoir, loading: loadingAvoir, error: errorAvoir,refetch } = useFetchAvoirById(avoirId);
+  const { items, loading: loadingItems, error: errorItems, refetch: fetchItems } = useFetchItemsInAvoir(avoirId);
+  const { validate, error, isValidated } = useValidateAvoir(avoirId);
   const { setSidebarButtons } = useSidebar();
-
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
+  const [isItemsModalVisible, setIsItemsModalVisible] = useState(false);
+  const [selectedItemForUpdate, setSelectedItemForUpdate] = useState(null);
   const [showClientModal, setShowClientModal] = useState(false);
+
+
+  const refetchData = () => {
+    refetch();
+     fetchItems(); // This function should be defined to fetch items related to the avoir
+  };
+  // Function to handle the click on the Validate button
+  const handleValidateClick = async () => {
+    try {
+      await validate();
+      message.success('Avoir has been successfully validated.');
+      refetchData();// Optionally, you can trigger other actions here, such as navigating away or refreshing the data
+    } catch (error) {
+      message.error(`Failed to validate avoir: ${error}`);
+    }
+  };
 
   useEffect(() => {
     const avoirButtons = [
-      <button key="update" onClick={() => onChangeView('update', avoirId)}>Update Avoir</button>,
-      <button key="delete" onClick={() => onChangeView('delete', avoirId)}>Delete Avoir</button>,
-      <button key="addItem" onClick={() => onChangeView('addItem', avoirId)}>Add Item</button>,
-      <button key="viewItems" onClick={() => onChangeView('viewItems', avoirId)}>View Items</button>,
-      <Button key="viewClient" type="primary" onClick={() => setShowClientModal(true)}>View Client</Button>
-     
-    ];
+      <Button key="update" onClick={() => setIsUpdateModalVisible(true)}>Update Avoir</Button>,
+      <Button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete Avoir</Button>,
+      <Button key="addItem" onClick={() => setIsAddItemModalVisible(true)}>Add Item</Button>,
+     <Button key="viewItems" onClick={handleOpenItemsModal}>View Items</Button>,
+    <Button key="viewClient" type="primary" onClick={() => setShowClientModal(true)}>View Client</Button>
     
+    ];
 
     setSidebarButtons(prevButtons => [
       ...prevButtons.slice(0, 2), // Keep the first two base buttons
       ...avoirButtons
     ]);
 
+    
+
+    // Ensure that resetting the sidebar does not affect the validation button
     return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
   }, [setSidebarButtons, onChangeView, avoirId]);
+
+  const handleUpdateSuccess = () => {
+    message.success('Avoir updated successfully!');
+    setIsUpdateModalVisible(false);
+    refetch();
+  };
+
+  const handleDeleteSuccess = () => {
+    message.success('Avoir deleted successfully!');
+    setIsDeleteModalVisible(false);
+    onChangeView('list'); // Navigate back to the avoirnisseur list or dashboard
+  };
+
+  const handleAddItemSuccess = () => {
+    message.success('Item added successfully!');
+    
+    refetchData(); // Refresh to display new items
+  };
+  const handleEditItem = (item) => {
+    setSelectedItemForUpdate(item);
+  };
+
+  const handleUpdateItemSuccess = () => {
+    message.success('Item updated successfully!');
+    setSelectedItemForUpdate(null);
+    refetchData();
+  };
+  const handleOpenItemsModal = () => {
+    setIsItemsModalVisible(true);
+  };
+  const handleCloseItemsModal = () => {
+    setIsItemsModalVisible(false);
+  };
+
+  const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'Not provided';
+
+  if (loadingAvoir || loadingItems) return <Spin tip="Loading..."/>;
+  if (errorAvoir || errorItems) return <Alert message="Error" description={errorAvoir || errorItems} type="error" showIcon />;
+  if (!avoir) return <Alert message="No avoir found" type="info" showIcon />;
+
+  const titleStyle = {
+    marginBottom: '4px', // Reduce space between title and text
+    marginTop: '0px' // Remove top margin
+  };
 
   const columns = [
     {
@@ -50,31 +119,33 @@ const SingleAvoir = ({ avoirId , onChangeView }) => {
       title: 'Quantity',
       dataIndex: 'QTE',
       key: 'QTE',
-      render: (text) => `${parseFloat(text).toFixed(2)}`, // Ensures numbers are shown with two decimal places
     },
     {
       title: 'Free',
       dataIndex: 'GRATUIT',
       key: 'GRATUIT',
-      render: (text) => text ? `${parseFloat(text).toFixed(2)}` : 'N/A', // Shows 'N/A' if GRATUIT is null
+      render: (text) => text || 'N/A', // Render 'N/A' if GRATUIT is null/undefined
+    },
+    {
+      title: 'PA HT',
+      dataIndex: 'PA_HT',
+      key: 'PA_HT',
     },
     {
       title: 'PV HT',
       dataIndex: 'PV_HT',
       key: 'PV_HT',
-      render: (text) => `${parseFloat(text).toFixed(2)}€`, // Format as currency
     },
     {
       title: 'PV TTC',
       dataIndex: 'PV_TTC',
       key: 'PV_TTC',
-      render: (text) => `${parseFloat(text).toFixed(2)}€`, // Format as currency
     },
     {
       title: 'Discount',
       dataIndex: 'REMISE',
       key: 'REMISE',
-      render: (text) => text ? `${parseFloat(text).toFixed(2)}%` : '0%', // Shows '0%' if REMISE is null
+      render: (text) => `${text}%` || '0%', // Append '%' symbol or render '0%' if REMISE is null/undefined
     },
     {
       title: 'VAT',
@@ -86,36 +157,14 @@ const SingleAvoir = ({ avoirId , onChangeView }) => {
       title: 'Total HT',
       dataIndex: 'TotalHT',
       key: 'TotalHT',
-      render: (text) => `${parseFloat(text).toFixed(2)}€`, // Format as currency
     },
     {
       title: 'Total TTC',
       dataIndex: 'TotalTTC',
       key: 'TotalTTC',
-      render: (text) => `${parseFloat(text).toFixed(2)}€`, // Format as currency
-    }
+    },
   ];
   
-
-  const handleValidateClick = async () => {
-    try {
-        
-      await validate(avoirId);
-      alert('Avoir has been successfully validated.');
-    } catch (error) {
-      alert(`Failed to validate avoir: ${error}`);
-    }
-  };
-
-  // Define your columns for Table here as in the example provided
-
-  if (loadingAvoir || loadingItems) return <Spin tip="Loading..." />;
-  if (errorAvoir || errorItems) return <Alert message="Error" description={errorAvoir || errorItems} type="error" showIcon />;
-  if (!avoir) return <Alert message="No avoir found" type="info" showIcon />;
-  if (validationError) return <Alert message="Validation Error" description={validationError} type="error" showIcon />;
-  
-  // Add any other title styles you may have
-  const titleStyle = { marginBottom: '4px', marginTop: '0px' };
 
   return (
     <div>
@@ -207,9 +256,68 @@ const SingleAvoir = ({ avoirId , onChangeView }) => {
         <SingleClient clientId={avoir.CODE_CLT} />
           {/* SingleClient component content */}
         </Modal>
+        
+      )}
+    
+<Modal
+        title="Update Avoir"
+        visible={isUpdateModalVisible}
+        footer={null}
+        onCancel={() => setIsUpdateModalVisible(false)}
+      >
+        <AvoirUpdateForm avoirId={avoirId} onFinishedUpdate={handleUpdateSuccess} />
+      </Modal>
+      <Modal
+        title="Delete Avoir"
+        visible={isDeleteModalVisible}
+        footer={null}
+        onCancel={() => setIsDeleteModalVisible(false)}
+      >
+        <AvoirDeleteButton avoirId={avoirId} onSuccess={handleDeleteSuccess} />
+      </Modal>
+      <Modal
+        title="Add Item to Avoir"
+        visible={isAddItemModalVisible}
+        footer={null}
+        onCancel={() => setIsAddItemModalVisible(false)}
+        width= {1000}
+      >
+        <AvoirAddItemForm refAvoir={avoir.REF_AVR} onSuccess={handleAddItemSuccess} />
+      </Modal>
+      <Modal
+        title="Items in Avoir"
+        visible={isItemsModalVisible}
+        onCancel={handleCloseItemsModal}
+        footer={null}
+        width="80%"
+      >
+        <ItemsInAvoirList
+          refAvoir={avoirId}
+          onSelectItemForUpdate={handleEditItem}
+          onCloseModal={handleCloseItemsModal}
+          onRefetch={refetchData}
+        />
+      </Modal>
+
+      {selectedItemForUpdate && (
+        <Card title="Update Item in Avoir">
+          <UpdateItemInAvoirForm
+            refAvoir={avoirId}
+            article={selectedItemForUpdate}
+            onSuccess={handleUpdateItemSuccess}
+          />
+        </Card>
       )}
     </div>
   );
+
+
+  
+
+
 };
+
+
+
 
 export default SingleAvoir;

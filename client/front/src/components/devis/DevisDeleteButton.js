@@ -42,9 +42,7 @@ const DevisDeleteButton = ({ devisId, onSuccess }) => {
         <Button type="danger" onClick={handleConfirmDelete} loading={loading} style={{ marginRight: 20 }}>
           Yes, delete it
         </Button>
-        <Button onClick={handleCancel}>
-          Cancel
-        </Button>
+        
       </div>
     </Card>
   );

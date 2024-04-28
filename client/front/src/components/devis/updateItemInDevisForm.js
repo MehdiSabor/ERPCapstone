@@ -4,7 +4,7 @@ import { useUpdateItemInDevis } from '../../hooks/devisHooks';
 
 const { Text } = Typography;
 
-const UpdateItemInDevisForm = ({ refDevis, article, onSuccess }) => {
+const UpdateItemInDevisForm = ({ refDevis, article, onSuccess, onRefetch }) => {
   const { updateItem, isUpdated } = useUpdateItemInDevis();
   const [formData, setFormData] = useState(article || {});
 
@@ -12,8 +12,9 @@ const UpdateItemInDevisForm = ({ refDevis, article, onSuccess }) => {
     if (isUpdated) {
       console.log('Item updated successfully');
       onSuccess();
+      onRefetch(); // Call the refetch method after successful update
     }
-  }, [isUpdated, onSuccess]);
+  }, [isUpdated, onSuccess, onRefetch]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

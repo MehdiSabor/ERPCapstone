@@ -216,28 +216,38 @@ export const useFetchBonlivByCommercial = (commercialId) => {
   };
 
   
-  export const useFetchItemsInBonliv = (refBonliv,fetchTrigger) => {
+
+export const useFetchItemsInBonliv = (refBonliv, fetchTrigger) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-  
+
+    // Define the fetching logic as a callable function using useCallback
+    const fetchItems = useCallback(() => {
+        if (refBonliv) {
+            setLoading(true);
+            setError('');  // Reset error state before new fetch attempt
+            getItemsInBonliv(refBonliv)
+                .then(response => {
+                    setItems(response.data);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    setError(err.message);
+                    setLoading(false);
+                });
+        }
+    }, [refBonliv]);
+
+    // Invoke fetchItems when refBonliv or fetchTrigger changes
     useEffect(() => {
-      if (refBonliv) {
-        setLoading(true);
-        getItemsInBonliv(refBonliv)
-          .then(response => {
-            setItems(response.data);
-            setLoading(false);
-          })
-          .catch(err => {
-            setError(err.message);
-            setLoading(false);
-          });
-      }
-    }, [refBonliv, fetchTrigger]);
-  
-    return { items, loading, error };
-  };
+        fetchItems();
+    }, [fetchItems, fetchTrigger]);
+
+    // Return all the state management vars and the refetch function
+    return { items, loading, error, refetch: fetchItems };
+};
+
   
   export const useBulkUpdateItemsInBonliv = () => {
     const [error, setError] = useState('');

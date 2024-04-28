@@ -231,12 +231,13 @@ export const useFetchDevisByCommercial = (commercialId) => {
   };
 
   
-  export const useFetchItemsInDevis = (refDevis,fetchTrigger) => {
+  export const useFetchItemsInDevis = (refDevis, fetchTrigger) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
   
-    useEffect(() => {
+    // Extract the fetching logic into a separate function
+    const fetchItems = () => {
       if (refDevis) {
         setLoading(true);
         getItemsInDevis(refDevis)
@@ -249,9 +250,16 @@ export const useFetchDevisByCommercial = (commercialId) => {
             setLoading(false);
           });
       }
+    };
+  
+    // Use the fetchItems function inside useEffect
+    useEffect(() => {
+      fetchItems();
     }, [refDevis, fetchTrigger]);
   
-    return { items, loading, error };
+    // Include the fetchItems function in the hook's return value to expose it for manual refetching
+    return { items, loading, error, refetch: fetchItems };
   };
+  
   
 

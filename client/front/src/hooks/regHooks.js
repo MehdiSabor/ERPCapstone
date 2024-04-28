@@ -50,7 +50,6 @@ export const useUpdateReglement = () => {
 };
 
 
-
 export const useFetchReglementById = (id) => {
   const [reglement, setReglement] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -125,13 +124,16 @@ export const useFetchAllReglements = () => {
 };
 
 
+
 export const useFetchAllUnifiedFactureAvoir = () => {
   const [unifiedRecords, setUnifiedRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  // Define the fetching logic as a callable function using useCallback
+  const fetchUnifiedRecords = useCallback(() => {
     setLoading(true);
+    setError(null); // Reset error state before new fetch attempt
     getAllUnifiedFactureAvoir()
       .then(response => {
         setUnifiedRecords(response.data);
@@ -143,8 +145,15 @@ export const useFetchAllUnifiedFactureAvoir = () => {
       });
   }, []);
 
-  return { unifiedRecords, loading, error };
+  // Invoke fetchUnifiedRecords when the component mounts
+  useEffect(() => {
+    fetchUnifiedRecords();
+  }, [fetchUnifiedRecords]);
+
+  // Return all the state management vars and the refetch function
+  return { unifiedRecords, loading, error, refetch: fetchUnifiedRecords };
 };
+
 
 export const useCreateReglementDetailsBatch = () => {
   const [isCreating, setIsCreating] = useState(false);

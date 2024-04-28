@@ -5,7 +5,7 @@ import ArticleList from '../article/ArticleList';
 
 const { Title } = Typography;
 
-const AddItemToDevisForm = ({ refDevis }) => {
+const AddItemToDevisForm = ({ refDevis,onSuccess }) => {
   const { addItem } = useAddItemToDevis();
   const [showItemList, setShowItemList] = useState(false);
 
@@ -31,7 +31,9 @@ const AddItemToDevisForm = ({ refDevis }) => {
   };
 
   const handleSubmit = async () => {
+    
     await addItem(refDevis, itemData);
+    onSuccess();
     setItemData(initialState); // Optionally reset the form or provide feedback
   };
 

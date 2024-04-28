@@ -6,9 +6,9 @@ import { useFetchItemsInBonliv, useUpdateItemInBonliv } from '../../hooks/bonliv
 
 const { Title, Text } = Typography;
 
-const ItemsInBonlivList = ({ refBonliv }) => {
+const ItemsInBonlivList = ({ refBonliv,onSuccess }) => {
     const [fetchTrigger, setFetchTrigger] = useState(false);
-    const { items, loading, error } = useFetchItemsInBonliv(refBonliv, fetchTrigger);
+    const { items, loading, error,refetch:fetchItems } = useFetchItemsInBonliv(refBonliv);
     const { updateItem } = useUpdateItemInBonliv();
     const [editedItems, setEditedItems] = useState({});
 
@@ -30,13 +30,10 @@ const ItemsInBonlivList = ({ refBonliv }) => {
             try {
                 await updateItem(refBonliv, codeArt, { qteliv: parseFloat(itemToBeUpdated.qteliv) || 0 });
                 message.success('Changes applied successfully!');
-                setEditedItems(prevItems => {
-                    const updatedItems = { ...prevItems };
-                    delete updatedItems[codeArt];
-                    return updatedItems;
-                });
-                setFetchTrigger(t => !t); // Toggle fetchTrigger to re-fetch items
-            } catch (error) {
+                onSuccess();
+                fetchItems();
+                
+                 } catch (error) {
                 message.error('Failed to apply changes.');
             }
         }

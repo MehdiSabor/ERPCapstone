@@ -1,38 +1,21 @@
-import React, { useEffect } from 'react';
-import { Card, Button, Table, Typography, Tag, Row, Col, Spin, Alert } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Table, Typography, Tag, Row, Col, Spin, Alert, Modal,message } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchBonlivById, useFetchItemsInBonliv, useValidateBonliv } from '../../hooks/bonlivHooks';
+
+// Assuming these forms exist
+import UpdateBonlivForm from './BonlivupdateForm';
+import DeleteBonlivForm from './BonlivDeleteButton';
+import ItemInBonlivList from './ItemInBonlivList';
 
 const { Title, Text } = Typography;
 
 const SingleBonliv = ({ bonlivId, onChangeView }) => {
-  const { bonliv, loading: loadingBonliv, error: errorBonliv } = useFetchBonlivById(bonlivId);
-  const { items, loading: loadingItems, error: errorItems } = useFetchItemsInBonliv(bonlivId);
-  const { validate, error, isValidated } = useValidateBonliv(bonlivId);
+  const { bonliv, loading: loadingBonliv, error: errorBonliv, refetch } = useFetchBonlivById(bonlivId);
+  const { items, loading: loadingItems, error: errorItems, refetch: fetchItems  } = useFetchItemsInBonliv(bonlivId);
+  const { validate, error: validateError, isValidated } = useValidateBonliv(bonlivId);
   const { setSidebarButtons } = useSidebar();
-
-  const handleValidateClick = async () => {
-    try {
-      await validate();
-      alert('Bonliv has been successfully validated.');
-    } catch (error) {
-      alert(`Failed to validate bonliv: ${error}`);
-    }
-  };
-
-  useEffect(() => {
-    const bonlivButtons = [
-      <Button key="update" onClick={() => onChangeView('update', bonlivId)}>Update Bonliv</Button>,
-      <Button key="delete" onClick={() => onChangeView('delete', bonlivId)}>Delete Bonliv</Button>,
-      <Button key="viewItems" onClick={() => onChangeView('viewItems', bonlivId)}>View Items</Button>
-    ];
-
-    setSidebarButtons(bonlivButtons);
-
-    return () => setSidebarButtons([]);
-  }, [setSidebarButtons, onChangeView, bonlivId]);
-
- 
+  
   const columns = [
     {
       title: 'Code Art',
@@ -107,10 +90,51 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
       render: (text) => text ? parseFloat(text).toFixed(2) : 'N/A',
     },
   ];
-  
+  const [updateModalVisible, setUpdateModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [updateItemsModalVisible, setUpdateItemsModalVisible] = useState(false);
 
+  useEffect(() => {
+    const bonlivButtons = [
+      <Button key="update" onClick={() => setUpdateModalVisible(true)}>Update Bonliv</Button>,
+      <Button key="delete" onClick={() => setDeleteModalVisible(true)}>Delete Bonliv</Button>,
+      <Button key="viewItems" onClick={() => setUpdateItemsModalVisible(true)}>Update Items</Button>
+    ];
 
-  const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'Not provided';
+    setSidebarButtons(prevButtons => [
+      ...prevButtons.slice(0, 1), // Keep the first two base buttons
+      ...bonlivButtons
+    ]);
+    return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 1));
+  }, [setSidebarButtons]);
+
+  const handleValidateClick = async () => {
+    try {
+      await validate();
+      alert('Bonliv has been successfully validated.');
+    } catch (error) {
+      alert(`Failed to validate bonliv: ${error}`);
+    }
+  };
+
+  const handleUpdateSuccess = () => {
+    message.success('Bonliv updated successfully!');
+    setUpdateModalVisible(false);
+    refetch(); // Refresh Bonliv details
+  };
+
+  const handleDeleteSuccess = () => {
+    message.success('Bonliv deleted successfully!');
+    setDeleteModalVisible(false);
+    onChangeView('list'); // Assuming there's a navigation method to go back to the list
+  };
+
+  const handleItemUpdateSuccess = () => {
+    
+    refetch(); 
+    fetchItems(); // Refresh items list
+  };
+
 
   if (loadingBonliv || loadingItems) return <Spin tip="Loading..." />;
   if (errorBonliv || errorItems) return <Alert message="Error" description={errorBonliv || errorItems} type="error" showIcon />;
@@ -118,7 +142,7 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
 
   return (
     <div>
-  <Card
+       <Card
   title={
     <>
       Bonliv Details - {bonliv.REF_BL}
@@ -155,11 +179,11 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
     
     <Col span={8}>
       <Title level={5} style={{ marginBottom: '4px', marginTop: '0px' }}>Total HT Liv</Title>
-      <Text>{bonliv.TotalHTliv ? bonliv.TotalHTliv.toFixed(2) : 'N/A'}€</Text>
+      <Text>{bonliv.MNT_HTliv ? bonliv.MNT_HTliv.toFixed(2) : 'N/A'}€</Text>
     </Col>
     <Col span={8}>
       <Title level={5} style={{ marginBottom: '4px', marginTop: '0px' }}>Total TTC Liv</Title>
-      <Text>{bonliv.TotalTTCliv ? bonliv.TotalTTCliv.toFixed(2) : 'N/A'}€</Text>
+      <Text>{bonliv.MNT_TTCliv ? bonliv.MNT_TTCliv.toFixed(2) : 'N/A'}€</Text>
     </Col>
     <Col span={8}>
       <Title level={5} style={{ marginBottom: '4px', marginTop: '0px' }}>Delivery Mode</Title>
@@ -188,11 +212,36 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
   </Row>
 </Card>
 
-
-
-      <Card title="Items in Bonliv" style={{ marginTop: 20 }}>
-        <Table columns={columns} dataSource={items} rowKey="CODE_ART" pagination={false} />
+      <Card title="Items in Bonliv">
+        <Table columns={columns} dataSource={items} rowKey="CODE_ART" />
       </Card>
+
+      {/* Modals for updating, deleting, and updating items */}
+      
+      <Modal
+        title="Update Bonliv"
+        visible={updateModalVisible}
+        onCancel={() => setUpdateModalVisible(false)}
+        footer={null}
+      >
+        <UpdateBonlivForm bonlivId={bonlivId} onSuccess={handleUpdateSuccess} />
+      </Modal>
+      <Modal
+        title="Delete Bonliv"
+        visible={deleteModalVisible}
+        onCancel={() => setDeleteModalVisible(false)}
+        footer={null}
+      >
+        <DeleteBonlivForm bonlivId={bonlivId} onSuccess={handleDeleteSuccess} />
+      </Modal>
+      <Modal
+        title="Update Items in Bonliv"
+        visible={updateItemsModalVisible}
+        onCancel={() => setUpdateItemsModalVisible(false)}
+        footer={null}
+      >
+        <ItemInBonlivList refBonliv={bonliv.REF_BL} onSuccess={handleItemUpdateSuccess} />
+      </Modal>
     </div>
   );
 };

@@ -1,25 +1,22 @@
 import React, { useMemo } from 'react';
-import { Card, Table, Button, Spin, Alert } from 'antd';
+import { Card, Table, Button, Spin, Alert,message } from 'antd';
 
 import { useFetchReglementById, useDeleteReglementDetail } from '../../hooks/regHooks';
 
-const ReglementDetailsList = ({ reglementId }) => {
-  const { reglement, loading, error } = useFetchReglementById(reglementId);
+const ReglementDetailsList = ({ reglementId,reglement,handleRefetch , loading, error}) => {
   const { handleDelete, isDeleting, error: deleteError } = useDeleteReglementDetail();
 
-  // Calculate the sum of all registered amounts
-  const totalRegistered = useMemo(() => reglement?.reglementdetails?.reduce((total, detail) => total + detail.MNT_REGLER, 0) || 0, [reglement]);
-  const remainingAmount = reglement?.MNT_REGLER - totalRegistered;
-
+  
   const onRemove = async (detail) => {
     const success = await handleDelete(reglementId, detail.REF_AV_FAC);
     if (success) {
-      alert('Detail removed successfully!');
-      window.location.reload(); // Optionally refresh the component/data
+      message.success('Detail removed successfully!');
+      handleRefetch();  // Refresh unified list after deletion
     } else {
-      alert('Failed to remove detail.');
+      message.error('Failed to remove detail.');
     }
   };
+  
 
   const columns = [
     {
@@ -56,10 +53,7 @@ const ReglementDetailsList = ({ reglementId }) => {
 
   return (
     <Card title="Reglement Details" bordered={false}>
-      <p>Total Amount to Regulate: €{reglement.MNT_REGLER.toFixed(2)}</p>
-      <p>Total Registered: €{totalRegistered.toFixed(2)}</p>
-      <p>Remaining Amount: €{remainingAmount.toFixed(2)}</p>
-      <Table dataSource={reglement.reglementdetails} columns={columns} rowKey="id" />
+       <Table dataSource={reglement.reglementdetails} columns={columns} rowKey="id" />
     </Card>
   );
 };

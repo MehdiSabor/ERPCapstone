@@ -1,27 +1,48 @@
-import React, { useEffect } from 'react';
-import { Card, Button, Spin, Alert, Row, Col, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Button, Modal, Row, Col, message,Typography, Spin, Alert } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchComById } from '../../hooks/comHooks';
+import ComUpdateForm from './ComupdateForm';  // You need to create this
+import ComDeleteButton from './ComDeleteButton';  // You need to create this
 
 const { Title, Text } = Typography;
 
 const SingleCom = ({ comId, onChangeView }) => {
-  const { Com, loading, error } = useFetchComById(comId);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const { Com, loading, error, refetch } = useFetchComById(comId);
   const { setSidebarButtons } = useSidebar();
 
   useEffect(() => {
     const comButtons = [
-      <Button key="update" type="primary" onClick={() => onChangeView('update', comId)}>Update Commercial</Button>,
-      <Button key="delete" type="danger" onClick={() => onChangeView('delete', comId)}>Delete Commercial</Button>
+      <Button key="update" type="primary" onClick={() => setIsUpdateModalVisible(true)}>Update Commercial</Button>,
+      <Button key="delete" type="danger" onClick={() => setIsDeleteModalVisible(true)}>Delete Commercial</Button>
     ];
-
     setSidebarButtons(prevButtons => [
-      ...prevButtons.slice(0, 2),
+      ...prevButtons.slice(0, 2), // Adjust slice as necessary
       ...comButtons
     ]);
 
-    return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
+    return () => {
+      setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
+    };
   }, [setSidebarButtons, onChangeView, comId]);
+
+  const handleUpdateSuccess = () => {
+    message.success('Commercial updated successfully!');
+    setIsUpdateModalVisible(false);
+    refetch();
+  };
+
+  const handleDeleteSuccess = () => {
+    message.success('Commercial deleted successfully!');
+    setIsDeleteModalVisible(false);
+    onChangeView('list'); // Navigate back to the commercial list or dashboard
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!Com) return <p>No commercial found</p>;
 
   const itemStyle = {
     marginBottom: '16px'
@@ -32,7 +53,10 @@ const SingleCom = ({ comId, onChangeView }) => {
   };
 
   return (
-    <Card title="Commercial Details" >
+    <div>
+     
+        {/* Dynamic content based on Com properties */}
+        <Card title="Commercial Details" >
       {loading ? (
         <Spin tip="Loading..." />
       ) : error ? (
@@ -64,6 +88,24 @@ const SingleCom = ({ comId, onChangeView }) => {
         </div>
       )}
     </Card>
+     
+      <Modal
+        title="Update Commercial"
+        visible={isUpdateModalVisible}
+        footer={null}
+        onCancel={() => setIsUpdateModalVisible(false)}
+      >
+        <ComUpdateForm comId={comId} onFinishedUpdate={handleUpdateSuccess} />
+      </Modal>
+      <Modal
+        title="Delete Commercial"
+        visible={isDeleteModalVisible}
+        footer={null}
+        onCancel={() => setIsDeleteModalVisible(false)}
+      >
+        <ComDeleteButton comId={comId} onSuccess={handleDeleteSuccess} />
+      </Modal>
+    </div>
   );
 };
 

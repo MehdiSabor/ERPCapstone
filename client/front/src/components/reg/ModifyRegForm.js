@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUpdateReglement, useFetchReglementById } from '../../hooks/regHooks';
 
-const ModifyReglementForm = ({ reglementId, onUpdated }) => {
+const ModifyReglementForm = ({ reglementId, onFinishedUpdate }) => {
   const { reglement, loading: fetching } = useFetchReglementById(reglementId);
   const [reglementData, setReglementData] = useState({ MNT_REGLER: 0 });
   const { handleUpdate, isUpdating, error } = useUpdateReglement();
@@ -15,7 +15,7 @@ const ModifyReglementForm = ({ reglementId, onUpdated }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     await handleUpdate(reglementId, reglementData);
-    onUpdated();
+    onFinishedUpdate();
   };
 
   if (fetching) return <p>Loading...</p>;

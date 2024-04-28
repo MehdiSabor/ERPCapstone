@@ -1,24 +1,46 @@
-import React, { useEffect } from 'react';
-import { Card, Row, Col, Typography } from 'antd';
+import React, { useEffect,useState } from 'react';
+import {message, Card,Modal, Row, Col, Typography } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchUserById } from '../../hooks/userHooks';
+import UserUpdateForm from './ModifyUserForm';  // You need to create this
+import UserDeleteButton from './DeleteUserButton';  // You need to create this
 
 const { Title, Text } = Typography;
 
 const SingleUser = ({ userId, onChangeView }) => {
-  const { user, loading, error } = useFetchUserById(userId);
+  const { user, loading, error,refetch } = useFetchUserById(userId);
   const { setSidebarButtons } = useSidebar();
-
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+ 
   useEffect(() => {
     const userButtons = [
-      <button key="delete" onClick={() => onChangeView('delete', userId)}>Delete User</button>,
-    <button key="modify" onClick={() => onChangeView('modify', userId)}>Modify User</button>
+      <button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete User</button>,
+    <button key="modify" onClick={() => setIsUpdateModalVisible(true)}>Modify User</button>
      ];
 
-    setSidebarButtons(userButtons);
+     setSidebarButtons(prevButtons => [
+      ...prevButtons.slice(0, 2), // Adjust slice as necessary
+      ...userButtons
+    ]);
 
-    return () => setSidebarButtons([]);
+    return () => {
+      setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
+    };
   }, [setSidebarButtons, onChangeView, userId]);
+
+  const handleUpdateSuccess = () => {
+    message.success('User updated successfully!');
+    setIsUpdateModalVisible(false);
+    refetch();
+  };
+
+  const handleDeleteSuccess = () => {
+    message.success('User deleted successfully!');
+    setIsDeleteModalVisible(false);
+    onChangeView('list'); // Navigate back to the commercial list or dashboard
+  };
+
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -30,6 +52,7 @@ const SingleUser = ({ userId, onChangeView }) => {
   };
 
   return (
+    <div>
     <Card title="User Details" bordered={false}>
       <Row gutter={16}>
         <Col span={12}>
@@ -87,6 +110,23 @@ const SingleUser = ({ userId, onChangeView }) => {
         </Col>
       </Row>
     </Card>
+    <Modal
+        title="Update User"
+        visible={isUpdateModalVisible}
+        footer={null}
+        onCancel={() => setIsUpdateModalVisible(false)}
+      >
+        <UserUpdateForm userId={userId} onFinishedUpdate={handleUpdateSuccess} />
+      </Modal>
+      <Modal
+        title="Delete Commercial"
+        visible={isDeleteModalVisible}
+        footer={null}
+        onCancel={() => setIsDeleteModalVisible(false)}
+      >
+        <UserDeleteButton userId={userId} onSuccess={handleDeleteSuccess} />
+      </Modal>
+      </div>
   );
 };
 

@@ -73,22 +73,19 @@ const cancelFactureAndCreateAvoirs = async (refFAC) => {
         }
 
         // Cancel the Facture (update VALIDER to false or other status indicating cancellation)
-        await prisma.facture.update({
-            where: { REF_FAC: refFAC },
-            data: { VALIDER: false }
-        });
+       
 
         // Create the Avoirs
         const avoirs = await prisma.avoirs.create({
             data: {
-                REF_AVR: `AV-${facture.REF_FAC}`,
+                REF_AVR: `AV-F${refFAC.slice(2)}`,
                 DATE_AVR: new Date(),
                 
                 COMPTE: facture.COMPTE,
                 CODE_CLT: facture.CODE_CLT,
                 CLIENT: facture.CLIENT,
-                MNT_HT: facture.MNT_HT,
-                MNT_TTC: facture.MNT_TTC,
+                MNT_HT: -facture.MNT_HT,
+                MNT_TTC: -facture.MNT_TTC,
                 CODE_COM: facture.CODE_COM,
                 REMARQUE: facture.REMARQUE,
                 VALIDER: false, // Assuming direct validation for simplification
@@ -116,6 +113,10 @@ const cancelFactureAndCreateAvoirs = async (refFAC) => {
         await prisma.detailAvoirs.createMany({
             data: detailAvoirs
         });
+        await prisma.facture.update({
+          where: { REF_FAC: refFAC },
+          data: { IsCanceled: true }
+      });
 
         return { facture, avoirs, detailAvoirs };
     });

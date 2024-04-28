@@ -209,6 +209,7 @@ model Facture {
   MNT_DEV        Float?
   REMARQUE       String?
   BASEHT         Boolean?
+  IsCanceled     Boolean @default(false)
   VALIDER        Boolean
   IMPRIMER       Boolean?
   detailFactures DetailFacture[] 

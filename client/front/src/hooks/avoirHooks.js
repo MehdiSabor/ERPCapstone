@@ -229,12 +229,13 @@ export const useFetchAvoirByCommercial = (commercialId) => {
   };
 
   
-  export const useFetchItemsInAvoir = (refAvoir,fetchTrigger) => {
+  export const useFetchItemsInAvoir = (refAvoir, fetchTrigger) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
   
-    useEffect(() => {
+    // Extract the fetching logic into a separate function
+    const fetchItems = () => {
       if (refAvoir) {
         setLoading(true);
         getItemsInAvoir(refAvoir)
@@ -247,9 +248,14 @@ export const useFetchAvoirByCommercial = (commercialId) => {
             setLoading(false);
           });
       }
+    };
+  
+    // Use the fetchItems function inside useEffect
+    useEffect(() => {
+      fetchItems();
     }, [refAvoir, fetchTrigger]);
   
-    return { items, loading, error };
+    // Include the fetchItems function in the hook's return value to expose it for manual refetching
+    return { items, loading, error, refetch: fetchItems };
   };
-  
 

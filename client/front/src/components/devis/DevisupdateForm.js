@@ -1,88 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { useUpdateDevis, useFetchDevisById } from '../../hooks/devisHooks'; // Ensure the path matches your hooks' location
+import React, { useEffect } from 'react';
+import { Form, Input, Checkbox, Button, Card, Typography, Row, Col, message } from 'antd';
+import { useUpdateDevis, useFetchDevisById } from '../../hooks/devisHooks';
 
-const DevisUpdateForm = ({ devisId }) => {
+const { Title } = Typography;
+
+const DevisUpdateForm = ({ devisId, onFinishedUpdate }) => {
   const { devis, loading: fetching } = useFetchDevisById(devisId);
   const { handleUpdate, isUpdated } = useUpdateDevis();
-
-  const initialState = {
-    REF_DEV: '',
-    DATEVALID: '',
-    HEUREVALID: '',
-    DATE_DEV: '',
-    COMPTE: '',
-    CODE_CLT: '',
-    CLIENT: '',
-    MNT_HT: 0,
-    MNT_TTC: 0,
-    EN_BC: false,
-    EN_BL: false,
-    CODE_COM: 0,
-    VALIDER: false,
-    REMARQUE: '',
-    MODELIV: '',
-    MODE_PAIE: '',
-    BASEHT: false,
-    NOTES: 0,
-  };
-
-  const [formData, setFormData] = useState(initialState);
-
-  const toLocalDate = (isoString) => {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    return date.toISOString().split('T')[0];
-  };
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (devis) {
-      setFormData({ ...initialState, ...devis });
+      form.setFieldsValue(devis);
     }
-  }, [devis]);
+  }, [devis, form]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) || 0 : value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await handleUpdate(devisId, formData);
-    if (isUpdated) {
-      // Handle successful update, such as showing a notification or redirecting
+  const onFinish = async (values) => {
+    try {
+      await handleUpdate(devisId, values);
+        onFinishedUpdate();
+      
+    } catch (error) {
+      message.error('Update failed: ' + error.message);
     }
   };
 
   if (fetching) return <p>Loading...</p>;
 
   return (
-    
-    <form onSubmit={handleSubmit}>
-     {Object.keys(formData).map(key => (
-  <div key={key}>
-    <label>{key.replace('_', ' ')}:</label>
-   
-    <input
-      type={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? 'checkbox' :
-            ['MNT_HT', 'MNT_TTC', 'CODE_COM', 'NOTES'].includes(key) ? 'number' :
-            ['DATE_DEV', 'DATEVALID', 'HEUREVALID'].includes(key) ? 'date' : 'text'}
-      name={key}
-      // Use toLocalDate for date inputs, otherwise use formData[key]
-      value={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? '' :
-             ['DATE_DEV', 'DATEVALID', 'HEUREVALID'].includes(key) ? toLocalDate(formData[key]) : formData[key]}
-      // Only for checkboxes
-      checked={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? formData[key] : undefined}
-      onChange={handleChange}
-      placeholder={key.replace('_', ' ')}
-    />
-  </div>
-))}
-
-      <button type="submit">Update Devis</button>
-    </form>
+    <Card bordered={false} style={{ maxWidth: 800, margin: '20px auto' }}>
+      <Title level={4}>Update Devis</Title>
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        {Object.keys(devis || {}).map(key => (
+          <Form.Item
+            key={key}
+            name={key}
+            label={key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}
+            valuePropName={['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ? 'checked' : 'value'}
+          >
+            {['EN_BC', 'EN_BL', 'VALIDER', 'BASEHT'].includes(key) ?
+              <Checkbox /> :
+              <Input type={['MNT_HT', 'MNT_TTC', 'CODE_COM', 'NOTES'].includes(key) ? 'number' :
+                       ['DATE_DEV', 'DATEVALID', 'HEUREVALID'].includes(key) ? 'date' : 'text'} />}
+          </Form.Item>
+        ))}
+        <Row justify="end">
+          <Col>
+            <Button type="primary" htmlType="submit">
+              Update Devis
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+    </Card>
   );
 };
 

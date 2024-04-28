@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { Form, Input, Checkbox, Button, Card, Typography, Row, Col } from 'antd';
+import { Form, Input, Checkbox, Button, Card, Typography, Row, Col, message } from 'antd';
 import { useUpdateFour, useFetchFourById } from '../../hooks/fourHooks';
 
 const { Title } = Typography;
 
-const FourUpdateForm = ({ fourId }) => {
+const FourUpdateForm = ({ fourId, onFinishedUpdate }) => {
   const { Four, loading: fetching } = useFetchFourById(fourId);
   const { handleUpdate, isUpdated } = useUpdateFour();
   const [form] = Form.useForm();
@@ -16,9 +16,11 @@ const FourUpdateForm = ({ fourId }) => {
   }, [Four, form]);
 
   const onFinish = async (values) => {
-    await handleUpdate(fourId, values);
-    if (isUpdated) {
-      // Handle successful update (e.g., show a message or redirect)
+    try {
+      await handleUpdate(fourId, values);
+      onFinishedUpdate();
+    } catch (error) {
+      message.error('Update failed: ' + error.message);
     }
   };
 

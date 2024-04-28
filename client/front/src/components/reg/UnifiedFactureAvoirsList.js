@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Table, Button, Spin, Alert, Tag } from 'antd';
+import { Table, Button, Spin, Alert, Tag,message } from 'antd';
 
 import { useFetchAllUnifiedFactureAvoir, useAddDetailReglement } from '../../hooks/regHooks';
 
-const UnifiedFactureAvoirList = ({ reglementId }) => {
+const UnifiedFactureAvoirList = ({ reglementId,handleRefetch }) => {
     const { unifiedRecords, loading, error } = useFetchAllUnifiedFactureAvoir();
     const { handleAddDetail, isLoading, createError } = useAddDetailReglement();
     const [selectedUnified, setSelectedUnified] = useState(null);
@@ -14,24 +14,26 @@ const UnifiedFactureAvoirList = ({ reglementId }) => {
 
     const handleAdd = async () => {
         if (!selectedUnified) {
-            alert('No unified facture avoir selected.');
-            return;
+          alert('No unified facture avoir selected.');
+          return;
         }
-
+      
         const regDetailData = {
-            REF_REGV: reglementId,
-            REF_AV_FAC: selectedUnified.REF_AV_FAC,
-            MNT_REGLER: selectedUnified.MNT_TTC - selectedUnified.MNT_REGLER // Calculate the amount to be registered
+          REF_REGV: reglementId,
+          REF_AV_FAC: selectedUnified.REF_AV_FAC,
+          MNT_REGLER: selectedUnified.MNT_TTC - selectedUnified.MNT_REGLER
         };
-
+      
         try {
-            await handleAddDetail(regDetailData);
-            alert('Reglement detail added successfully!');
-            setSelectedUnified(null); // Reset selection
+          await handleAddDetail(regDetailData);
+          message.success('Reglement detail added successfully!');
+          setSelectedUnified(null); // Reset selection
+          handleRefetch();  // Refresh reglement details after adding
         } catch (err) {
-            alert('Failed to add reglement detail: ' + err.message);
+          message.error('Failed to add reglement detail: ' + err.message);
         }
-    };
+      };
+      
 
     const columns = [
         {

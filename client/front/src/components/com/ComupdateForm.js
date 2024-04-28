@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { Form, Input, Button, Card, Row, Col, Typography } from 'antd';
+import { Form, Input, Button, Card, Row, Col, Typography, message } from 'antd';
 import { useUpdateCom, useFetchComById } from '../../hooks/comHooks';
 
 const { Title } = Typography;
 
-const ComUpdateForm = ({ comId }) => {
+const ComUpdateForm = ({ comId, onFinishedUpdate }) => {
   const { Com, loading: fetching } = useFetchComById(comId);
   const { handleUpdate, isUpdated } = useUpdateCom();
   const [form] = Form.useForm();
@@ -16,9 +16,11 @@ const ComUpdateForm = ({ comId }) => {
   }, [Com, form]);
 
   const onFinish = async (values) => {
-    await handleUpdate(comId, values);
-    if (isUpdated) {
-      // Handle successful update (e.g., show a message or redirect)
+    try {
+      await handleUpdate(comId, values);
+      onFinishedUpdate();
+    } catch (error) {
+      message.error('Update failed: ' + error.message);
     }
   };
 

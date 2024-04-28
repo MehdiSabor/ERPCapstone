@@ -39,7 +39,7 @@ const validateBonLiv = async (refBL) => {
       // Create Facture based on validated BonLiv
       const newFacture = await prisma.facture.create({
         data: {
-          REF_FAC: `FA-${validatedBonLiv.REF_BL}`, // Generate REF_FAC based on REF_BL
+          REF_FAC: `FA${validatedBonLiv.REF_BL.slice(2)}`, // Generate REF_FAC based on REF_BL
           DATE_FAC: new Date(),
           REF_BL: refBL,
           COMPTE: validatedBonLiv.COMPTE,

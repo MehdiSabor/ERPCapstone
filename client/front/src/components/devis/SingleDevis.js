@@ -1,43 +1,93 @@
-import React, { useEffect } from 'react';
-import { Card, Button, List, Typography, Row, Col,Spin,Alert,Tag, Table } from 'antd';
+import React, { useState,useEffect } from 'react';
+import { Modal, Card,message, Button, List, Typography, Row, Col,Spin,Alert,Tag, Table } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchDevisById, useFetchItemsInDevis, useValidateDevis } from '../../hooks/devisHooks'; // Adjust the import path as necessary
+import DevisUpdateForm from './DevisupdateForm';  // You need to create this
+import DevisDeleteButton from './DevisDeleteButton';  // You need to create this
+import DevisAddItemForm from './AddItemToDevisForm'; // You need to create this
+import ItemsInDevisList from './ItemInDevisList';
+import UpdateItemInDevisForm from './updateItemInDevisForm';
 
 const { Title, Text } = Typography;
 
 const SingleDevis = ({ devisId, onChangeView }) => {
-  const { devis, loading: loadingDevis, error: errorDevis } = useFetchDevisById(devisId);
-  const { items, loading: loadingItems, error: errorItems } = useFetchItemsInDevis(devisId);
+  const { devis, loading: loadingDevis, error: errorDevis,refetch } = useFetchDevisById(devisId);
+  const { items, loading: loadingItems, error: errorItems, refetch: fetchItems } = useFetchItemsInDevis(devisId);
   const { validate, error, isValidated } = useValidateDevis(devisId);
   const { setSidebarButtons } = useSidebar();
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
+  const [isItemsModalVisible, setIsItemsModalVisible] = useState(false);
+  const [selectedItemForUpdate, setSelectedItemForUpdate] = useState(null);
 
+
+  const refetchData = () => {
+    refetch();
+     fetchItems(); // This function should be defined to fetch items related to the devis
+  };
   // Function to handle the click on the Validate button
   const handleValidateClick = async () => {
     try {
       await validate();
-      alert('Devis has been successfully validated.');
-      // Optionally, you can trigger other actions here, such as navigating away or refreshing the data
+      message.success('Devis has been successfully validated.');
+      refetchData();// Optionally, you can trigger other actions here, such as navigating away or refreshing the data
     } catch (error) {
-      alert(`Failed to validate devis: ${error}`);
+      message.error(`Failed to validate devis: ${error}`);
     }
   };
 
   useEffect(() => {
     const devisButtons = [
-      <Button key="update" onClick={() => onChangeView('update', devisId)}>Update Devis</Button>,
-      <Button key="delete" onClick={() => onChangeView('delete', devisId)}>Delete Devis</Button>,
-      <Button key="addItem" onClick={() => onChangeView('addItem', devisId)}>Add Item</Button>,
-      <Button key="viewItems" onClick={() => onChangeView('viewItems', devisId)}>View Items</Button>
+      <Button key="update" onClick={() => setIsUpdateModalVisible(true)}>Update Devis</Button>,
+      <Button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete Devis</Button>,
+      <Button key="addItem" onClick={() => setIsAddItemModalVisible(true)}>Add Item</Button>,
+     <Button key="viewItems" onClick={handleOpenItemsModal}>View Items</Button>
     ];
 
     setSidebarButtons(prevButtons => [
-      ...prevButtons.slice(0, 2), // Keep the first two base buttons
+      ...prevButtons.slice(0, 7), // Keep the first two base buttons
       ...devisButtons
     ]);
+
+    
 
     // Ensure that resetting the sidebar does not affect the validation button
     return () => setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
   }, [setSidebarButtons, onChangeView, devisId]);
+
+  const handleUpdateSuccess = () => {
+    message.success('Devis updated successfully!');
+    setIsUpdateModalVisible(false);
+    refetch();
+  };
+
+  const handleDeleteSuccess = () => {
+    message.success('Devis deleted successfully!');
+    setIsDeleteModalVisible(false);
+    onChangeView('list'); // Navigate back to the devisnisseur list or dashboard
+  };
+
+  const handleAddItemSuccess = () => {
+    message.success('Item added successfully!');
+    
+    refetchData(); // Refresh to display new items
+  };
+  const handleEditItem = (item) => {
+    setSelectedItemForUpdate(item);
+  };
+
+  const handleUpdateItemSuccess = () => {
+    message.success('Item updated successfully!');
+    setSelectedItemForUpdate(null);
+    refetchData();
+  };
+  const handleOpenItemsModal = () => {
+    setIsItemsModalVisible(true);
+  };
+  const handleCloseItemsModal = () => {
+    setIsItemsModalVisible(false);
+  };
 
   const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'Not provided';
 
@@ -49,6 +99,7 @@ const SingleDevis = ({ devisId, onChangeView }) => {
     marginBottom: '4px', // Reduce space between title and text
     marginTop: '0px' // Remove top margin
   };
+
   const columns = [
     {
       title: 'Code Art',
@@ -182,6 +233,55 @@ const SingleDevis = ({ devisId, onChangeView }) => {
   <Table columns={columns} dataSource={items} rowKey="CODE_ART" pagination={false} />
 </Card>
 
+<Modal
+        title="Update Devis"
+        visible={isUpdateModalVisible}
+        footer={null}
+        onCancel={() => setIsUpdateModalVisible(false)}
+      >
+        <DevisUpdateForm devisId={devisId} onFinishedUpdate={handleUpdateSuccess} />
+      </Modal>
+      <Modal
+        title="Delete Devis"
+        visible={isDeleteModalVisible}
+        footer={null}
+        onCancel={() => setIsDeleteModalVisible(false)}
+      >
+        <DevisDeleteButton devisId={devisId} onSuccess={handleDeleteSuccess} />
+      </Modal>
+      <Modal
+        title="Add Item to Devis"
+        visible={isAddItemModalVisible}
+        footer={null}
+        onCancel={() => setIsAddItemModalVisible(false)}
+        width= {1000}
+      >
+        <DevisAddItemForm refDevis={devis.REF_DEV} onSuccess={handleAddItemSuccess} />
+      </Modal>
+      <Modal
+        title="Items in Devis"
+        visible={isItemsModalVisible}
+        onCancel={handleCloseItemsModal}
+        footer={null}
+        width="80%"
+      >
+        <ItemsInDevisList
+          refDevis={devisId}
+          onSelectItemForUpdate={handleEditItem}
+          onCloseModal={handleCloseItemsModal}
+          onRefetch={refetchData}
+        />
+      </Modal>
+
+      {selectedItemForUpdate && (
+        <Card title="Update Item in Devis">
+          <UpdateItemInDevisForm
+            refDevis={devisId}
+            article={selectedItemForUpdate}
+            onSuccess={handleUpdateItemSuccess}
+          />
+        </Card>
+      )}
     </div>
   );
 

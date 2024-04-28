@@ -63,7 +63,7 @@ const getDevisById = async (id) => {
         // Create Bonliv based on the Devis
         const bonliv = await tx.bonliv.create({
           data: {
-            REF_BL: `BL${devis.id}`,
+            REF_BL: `BL${String(devis.id).padStart(5, '0')}`,
             REF_DEV: devis.REF_DEV,
             DATE_BL: new Date(),
             CODE_CLT: devis.CODE_CLT,
@@ -184,13 +184,15 @@ const getDevisByClient = async (clientId) => {
   
   const deleteItemFromDevis = async (refDevis, codeArt) => {
     
-    return await prisma.devisDetail.deleteMany({
+     const devisdetails = await prisma.devisDetail.deleteMany({
       
       where: {
         REF_DEV: refDevis,
         CODE_ART: codeArt,
       },
     });
+    await updateDevisTotal(refDevis);
+    return devisdetails;
   };
   
   const updateItemInDevis = async (refDevis, codeArt, updatedData) => {
@@ -259,8 +261,9 @@ const getDevisByClient = async (clientId) => {
       },
     });
   
-    const totalTTC = aggregate._sum.TotalTTC;
-    const totalHT = aggregateHT._sum.TotalHT;
+    const totalTTC = aggregate._sum.TotalTTC ?? 0;
+    const totalHT = aggregateHT._sum.TotalHT ?? 0;
+    
     // Update the Devis with the new total
     await prisma.devis.update({
       where: {

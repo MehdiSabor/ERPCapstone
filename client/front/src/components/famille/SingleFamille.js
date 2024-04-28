@@ -14,9 +14,14 @@ const SingleFamille = ({ familleId, onChangeView }) => {
       <button key="delete" onClick={() => onChangeView('delete', familleId)}>Delete Famille</button>
     ];
 
-    setSidebarButtons(familleButtons);
+    setSidebarButtons(prevButtons => [
+      ...prevButtons.slice(0, 2), // Adjust slice as necessary
+      ...familleButtons
+    ]);
 
-    return () => setSidebarButtons([]);
+    return () => {
+      setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
+    };
   }, [setSidebarButtons, onChangeView, familleId]);
 
   if (loading) return <p>Loading...</p>;
