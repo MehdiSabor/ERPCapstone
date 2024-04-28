@@ -130,6 +130,7 @@ const SingleArticle = ({ articleId, onChangeView }) => {
                     visible={isUpdateModalVisible}
                     footer={null}
                     onCancel={() => setIsUpdateModalVisible(false)}
+                    width={800}
                 >
                     <ArticleUpdateForm articleId={articleId} onFinishedUpdate={handleUpdateSuccess} />
                 </Modal>

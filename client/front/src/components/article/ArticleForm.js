@@ -4,17 +4,22 @@ import { UploadOutlined } from '@ant-design/icons';
 import { useCreateArticle } from '../../hooks/articleHooks';
 import FourList from '../four/FourList';
 import FamilleList from '../famille/ListFamilles';
+import axios from 'axios';
 
 const ArticleForm = () => {
   const { handleCreate } = useCreateArticle();
   const [showFourList, setShowFourList] = useState(false);
   const [showFamilleList, setShowFamilleList] = useState(false);
   const [form] = Form.useForm();
+  const instance = axios.create();
 
   const handleSubmit = async (values) => {
+    const imageUrl = await handleUpload(); // Modify handleUpload to return the imageUrl
+
     // Preprocess the values to ensure correct data types and handle empty strings
     const payload = {
       ...values,
+      photo: imageUrl,
       UAF: values.UAF ? parseInt(values.UAF, 10) : null,
       Code_fam: values.Code_fam ? parseInt(values.Code_fam, 10) : null,
       
@@ -30,9 +35,10 @@ const ArticleForm = () => {
       PV_TTC: values.PV_TTC ? parseFloat(values.PV_TTC) : null, 
       REMISEMAX: values.REMISEMAX ? parseFloat(values.REMISEMAX) : null, // Assuming these are computed and may need saving
     };
-  
+    await handleUpload();
     console.log('Submitting:', payload); // For debugging
     await handleCreate(payload);
+   
     form.resetFields(); // Reset form after submission
   };
   
@@ -49,13 +55,34 @@ const ArticleForm = () => {
   };
 
   // Upload properties
-  const uploadProps = {
-    beforeUpload: file => {
-      return false; // Prevent automatic upload
-    },
-    onChange: info => {
-      form.setFieldsValue({ photo: info.fileList });
-    },
+  
+
+  const [fileList, setFileList] = useState([]);
+
+  const handleFileChange = info => {
+    setFileList(info.fileList);
+  };
+
+
+  const handleUpload = async () => {
+    const formData = new FormData();
+    formData.append("file", fileList[0].originFileObj);
+    formData.append("upload_preset", "uozkyhrp"); // Replace with your upload preset name
+    formData.append("cloud_name", "dggqqwrib"); // Replace with your Cloudinary cloud name
+
+    try {
+      const response = await instance.post("https://api.cloudinary.com/v1_1/dggqqwrib/image/upload", formData); // Replace YOUR_CLOUD_NAME
+      const data = response.data;
+      
+      
+      const imageUrl = data.secure_url;
+      // Here you can send `imageUrl` to your backend to be saved in the DB
+      console.log(imageUrl);
+     return imageUrl;
+      
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
   };
 
   const handleValueChange = (_, allValues) => {
@@ -89,7 +116,11 @@ const ArticleForm = () => {
               <Input.TextArea rows={4} />
             </Form.Item>
             <Form.Item label="Upload Image" name="photo">
-              <Upload {...uploadProps} listType="picture">
+            <Upload
+                beforeUpload={() => false}
+                listType="picture"
+                onChange={handleFileChange}
+              >
                 <Button icon={<UploadOutlined />}>Click to Upload</Button>
               </Upload>
             </Form.Item>

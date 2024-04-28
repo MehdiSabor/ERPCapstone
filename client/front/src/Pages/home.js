@@ -1,15 +1,67 @@
 import React from 'react';
+import { Card, Col, Row } from 'antd';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-
+// Placeholder icons - you'll need to import the correct icons you want to use
+import {
+  UserOutlined,
+  ShoppingCartOutlined,
+  BankOutlined,
+  BoxPlotOutlined,
+  FileTextOutlined,
+  FileDoneOutlined,
+  FileExcelOutlined,
+  DollarOutlined ,
+  TeamOutlined,
+  RetweetOutlined 
+} from '@ant-design/icons';
 
 const Home = () => {
+  const user = useSelector(state => state.user); // Access user from Redux state
+  const isManager = user?.IsManager;
+  const canAccess = permission => isManager || (user && user[permission]);
+
+  const categories = [
+    { title: 'Clients', permission: 'CanManageClients', link: '/client', icon: <UserOutlined /> },
+    { title: 'Articles', permission: 'CanManageArticles', link: '/article', icon: <ShoppingCartOutlined /> },
+    { title: 'Commercials', permission: 'CanManageCommercials', link: '/com', icon: <BankOutlined /> },
+    { title: 'Fournisseurs', permission: 'CanManageFournisseurs', link: '/four', icon: <BoxPlotOutlined /> },
+    { title: 'Devis', permission: 'CanManageQuote', link: '/devis', icon: <FileTextOutlined /> },
+    { title: 'Bon de Livraison', permission: 'CanManageDeliveryNote', link: '/bonliv', icon: <FileDoneOutlined /> },
+    { title: 'Factures', permission: 'CanManageInvoice', link: '/facture', icon: <FileExcelOutlined /> },
+    { title: 'Avoirs', permission: 'CanManageReturns', link: '/avoir', icon: <RetweetOutlined />  },
+    { title: 'Règlements', permission: 'CanManagePayments', link: '/reg', icon: <DollarOutlined />  },
+    // Since isManager has all permissions, no specific permission is required for the 'Familles' and 'Accounts' categories
+    { title: 'Familles', permission: 'CanManageArticles', link: '/famille', icon: <TeamOutlined /> },
+    { title: 'Accounts', permission: 'IsManager', link: '/user', icon: <TeamOutlined /> },
+  ];
+
+  const cardStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '150px',
+  };
+
   return (
     <div style={{ padding: 20 }}>
-      <h2>Home View</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adip.</p>
+      <h2>IHSSAN ERP</h2>
+      <Row gutter={[16, 16]} justify="center">
+        {categories.map(cat => canAccess(cat.permission) && (
+          <Col xs={24} sm={12} md={8} lg={6} xl={4} key={cat.title}>
+            <Link to={cat.link}>
+              <Card hoverable style={cardStyle}>
+                {React.cloneElement(cat.icon, { style: { fontSize: '32px',textAlign: 'center' } })} {/* Making the icon larger */}
+                <Card.Meta title={cat.title} style={{ textAlign: 'center', marginTop: '12px' }} />
+              </Card>
+            </Link>
+          </Col>
+        ))}
+      </Row>
     </div>
   );
-}
-
+};
 
 export default Home;
