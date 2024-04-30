@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Row, Col, Modal, Card, Upload, Checkbox } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Row, Col, Modal, Card, Upload, Checkbox, message } from 'antd';
 import { useCreateArticle } from '../../hooks/articleHooks';
 import FourList from '../four/FourList';
 import FamilleList from '../famille/ListFamilles';
 import axios from 'axios';
+import {
+  IdcardOutlined,
+  TagsOutlined,
+  InfoCircleOutlined,
+  FileTextOutlined,
+  UploadOutlined,
+  DollarCircleOutlined,
+  PercentageOutlined,
+  TagOutlined,
+  StockOutlined,
+  BoxPlotOutlined,
+  SafetyCertificateOutlined,
+  FundProjectionScreenOutlined,UserOutlined,ClusterOutlined
+} from "@ant-design/icons";
+
 
 const ArticleForm = () => {
   const { handleCreate } = useCreateArticle();
@@ -38,6 +52,7 @@ const ArticleForm = () => {
     await handleUpload();
     console.log('Submitting:', payload); // For debugging
     await handleCreate(payload);
+    message.success("Item Created Successfully!");
    
     form.resetFields(); // Reset form after submission
   };
@@ -110,23 +125,58 @@ const ArticleForm = () => {
     form.setFieldsValue(newFields);
   };
 
+  // const titleStyle = {
+  //   fontSize: "24px", // Increased font size for titles
+  //   fontWeight: "bold",
+  //   color: "#333", // Darker font color for better visibility
+  //   marginBottom: "16px",
+  //   borderBottom: "2px solid #ccc", // Separator line
+  //   paddingBottom: "10px", // Spacing between title and separator line
+  // };
+
+  const cardStyle = {
+    marginTop: "20px",
+    backgroundColor: "#f8f8f8", // Lighter than the main background for emphasis
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Optional: adds subtle shadow for depth
+  };
+
+  const cardContentStyle = {
+    paddingLeft: "24px", // Add left padding to card content
+    paddingTop: "10px",
+  };
+
+  const titleStyle = {
+    fontSize: "18px",
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: "16px",
+  };
+
+
   return (
-    <Card title="Create Article" bordered={false} style={{ width: '100%' }}>
+    <Card
+      title="Create Article"
+      bordered={false}
+      style={{
+        width: '100%',
+        ...cardStyle,
+      }}
+    >
       <Form form={form} layout="vertical" onFinish={handleSubmit} onValuesChange={handleValueChange}>
-        <Row gutter={16}>
+        <Row gutter={16} style={cardContentStyle}>
           <Col span={12}>
             {/* Basic article information */}
-            <Form.Item label="Article Code" name="code_art" rules={[{ required: true }]}>
+            <Form.Item label={<span><IdcardOutlined /> Article Code</span>} name="code_art" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="Name" name="nom" rules={[{ required: true }]}>
+            <Form.Item label={<span><FileTextOutlined /> Name</span>} name="nom" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="Description" name="desc">
+            <Form.Item label={<span><FileTextOutlined /> Description</span>} name="desc">
               <Input.TextArea rows={4} />
             </Form.Item>
-            <Form.Item label="Upload Image" name="photo">
-            <Upload
+            <Form.Item label={<span><UploadOutlined /> Upload Image</span>} name="photo">
+              <Upload
                 beforeUpload={() => false}
                 listType="picture"
                 onChange={handleFileChange}
@@ -134,68 +184,68 @@ const ArticleForm = () => {
                 <Button icon={<UploadOutlined />}>Click to Upload</Button>
               </Upload>
             </Form.Item>
-            <Form.Item label="Unit of Account" name="UAF">
+            <Form.Item label={<span><TagsOutlined /> Unit of Account</span>} name="UAF">
               <Input />
             </Form.Item>
-            <Form.Item label="Purchase Price (HT)" name="PA_HT">
+            <Form.Item label={<span><DollarCircleOutlined /> Purchase Price (HT)</span>} name="PA_HT">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="VAT Rate (%)" name="TVA">
+            <Form.Item label={<span><PercentageOutlined /> VAT Rate (%)</span>} name="TVA">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="Selling Price (HT)" name="PV_HT">
+            <Form.Item label={<span><DollarCircleOutlined /> Selling Price (HT)</span>} name="PV_HT">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="Purchase Price Incl. VAT" name="PA_TTC">
+            <Form.Item label={<span><TagOutlined /> Purchase Price Incl. VAT</span>} name="PA_TTC">
               <Input prefix="€" readOnly />
             </Form.Item>
-            <Form.Item label="Selling Price Incl. VAT" name="PV_TTC">
+            <Form.Item label={<span><TagOutlined /> Selling Price Incl. VAT</span>} name="PV_TTC">
               <Input prefix="€" readOnly />
             </Form.Item>
-            <Form.Item label="Maximum Discount (%)" name="REMISEMAX">
+            <Form.Item label={<span><PercentageOutlined /> Maximum Discount (%)</span>} name="REMISEMAX">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="OEM Reference" name="REF_OEM">
+            <Form.Item label={<span><InfoCircleOutlined /> OEM Reference</span>} name="REF_OEM">
               <Input />
             </Form.Item>
           </Col>
           <Col span={12}>
             {/* Supplier and family selection */}
-            <Form.Item label="Supplier Code" name="code_frs">
-              <Button type="link" onClick={() => setShowFourList(true)}>Select Supplier</Button>
+            <Form.Item label={<span><IdcardOutlined /> Supplier Code</span>} name="code_frs">
+              <Button type="link" onClick={() => setShowFourList(true)} icon={<UserOutlined />}>Select Supplier</Button>
               {form.getFieldValue('code_frs') && <p>Selected Supplier: {form.getFieldValue('code_frs')}</p>}
             </Form.Item>
-            <Form.Item label="Family Code" name="Code_fam">
-              <Button type="link" onClick={() => setShowFamilleList(true)}>Select Family</Button>
+            <Form.Item label={<span><TagsOutlined /> Family Code</span>} name="Code_fam">
+              <Button type="link" onClick={() => setShowFamilleList(true)} icon={<ClusterOutlined />}>Select Family</Button>
               {form.getFieldValue('Code_fam') && <p>Selected Family: {form.getFieldValue('Code_fam')}</p>}
             </Form.Item>
             {/* Stock information */}
-            <Form.Item label="Maximum Stock" name="STK_MAX">
+            <Form.Item label={<span><StockOutlined /> Maximum Stock</span>} name="STK_MAX">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="Minimum Stock" name="STK_MIN">
+            <Form.Item label={<span><BoxPlotOutlined /> Minimum Stock</span>} name="STK_MIN">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="Security Stock" name="STK_SEC">
+            <Form.Item label={<span><SafetyCertificateOutlined /> Security Stock</span>} name="STK_SEC">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="Unit Volume per Case" name="UVC">
+            <Form.Item label={<span><FundProjectionScreenOutlined /> Unit Volume per Case</span>} name="UVC">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="Stock Quantity" name="qte_stk">
+            <Form.Item label={<span><BoxPlotOutlined /> Stock Quantity</span>} name="qte_stk">
               <Input type="number" />
             </Form.Item>
             <Form.Item name="VENTE_BLOQ" valuePropName="checked">
-              <Checkbox>Sales Block</Checkbox>
+              <Checkbox><StockOutlined /> Sales Block</Checkbox>
             </Form.Item>
             <Form.Item name="ACHAT_BLOQ" valuePropName="checked">
-              <Checkbox>Purchase Block</Checkbox>
+              <Checkbox><StockOutlined /> Purchase Block</Checkbox>
             </Form.Item>
             <Form.Item name="TRANS_BLOQ" valuePropName="checked">
-              <Checkbox>Transfer Block</Checkbox>
+              <Checkbox><StockOutlined /> Transfer Block</Checkbox>
             </Form.Item>
             <Form.Item name="LIQUIDER" valuePropName="checked">
-              <Checkbox>Liquidate</Checkbox>
+              <Checkbox><StockOutlined /> Liquidate</Checkbox>
             </Form.Item>
           </Col>
         </Row>
@@ -213,6 +263,7 @@ const ArticleForm = () => {
       </Modal>}
     </Card>
   );
+
 };
 
 export default ArticleForm;
