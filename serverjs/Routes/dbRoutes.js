@@ -13,5 +13,6 @@ router.get('/inventory/low-stock', dbController.getLowStockLevels);
 router.get('/financial/net-revenue', dbController.getNetRevenue);
 
 router.get('/customers/accounts', dbController.getClientAccountDetails);
+router.get('/article-sales/:code_art', dbController.fetchArticleSalesData);
 
 module.exports = router;

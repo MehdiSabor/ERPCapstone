@@ -67,3 +67,14 @@ exports.getClientAccountDetails = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+exports.fetchArticleSalesData = async (req, res) => {
+  const { code_art } = req.params;
+  try {
+    const data = await dbServices.getArticleSalesData(code_art);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch article sales data", error: error.message });
+  }
+};
