@@ -35,6 +35,7 @@ const Home = () => {
     // Since isManager has all permissions, no specific permission is required for the 'Familles' and 'Accounts' categories
     { title: 'Familles', permission: 'CanManageArticles', link: '/famille', icon: <TeamOutlined /> },
     { title: 'Accounts', permission: 'IsManager', link: '/user', icon: <TeamOutlined /> },
+    { title: 'Dashboard', permission: 'IsManager', link: '/dashboard', icon: <TeamOutlined /> }
   ];
 
   const cardStyle = {

@@ -79,7 +79,9 @@ const NavigationBar = () => {
       {canAccess('CanManageReturns') && <Link to="/avoir" style={navItemStyle}>Avoirs</Link>}
       {canAccess('CanManagePayments') && <Link to="/reg" style={navItemStyle}>Règlements</Link>}
       {canAccess('CanManageArticles') && <Link to="/famille" style={navItemStyle}>Familles</Link>}
+      
       {isManager && <Link to="/user" style={navItemStyle}>Accounts</Link>}
+      {isManager && <Link to="/dashboard" style={navItemStyle}>Dashboard</Link>}
     </div>
       {isAuthenticated ? (
         <Dropdown overlay={userDropdownMenu} trigger={['click']}>

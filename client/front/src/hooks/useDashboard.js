@@ -6,7 +6,8 @@ import {
   fetchProfitabilityAnalysis,
   fetchLowStockLevels,
   fetchNetRevenue,
-  fetchClientAccountDetails
+  fetchClientAccountDetails,
+  fetchArticleSalesData
 } from '../models/dashboardAPI';
 
 // Hook for fetching monthly order volumes
@@ -19,7 +20,12 @@ export const useFetchMonthlyOrderVolume = () => {
     setLoading(true);
     fetchMonthlyOrderVolume()
       .then(response => {
-        setData(response.data);
+        console.log(response);
+        const formattedData = response.data.map((total, index) => ({
+          month: `${index + 1}`,  // Convert month index to human-readable month (1 = January, etc.)
+          totalOrders: total
+        }));
+        setData(formattedData);
         setLoading(false);
       })
       .catch(err => {
@@ -164,3 +170,25 @@ export const useFetchRevenueRanking = () => {
     return { data, loading, error };
   };
   
+  export const useArticleSalesData = (code_art) => {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+  
+    useEffect(() => {
+      if (code_art) {
+        setLoading(true);
+        fetchArticleSalesData(code_art)
+          .then(response => {
+            setData(response.data);
+            setLoading(false);
+          })
+          .catch(err => {
+            setError(err.message);
+            setLoading(false);
+          });
+      }
+    }, [code_art]);
+  
+    return { data, loading, error };
+  };
