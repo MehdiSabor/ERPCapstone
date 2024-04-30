@@ -31,6 +31,7 @@ const RegManagementPage = () => {
 
   return (
     <div>
+    <h2>Reglement List</h2>
       {currentView === 'list' && <ReglementsList onSelectReglement={handleSelectReglement} />}
       {currentView === 'create' && <CreateReglementForm onReglementCreated={() => setCurrentView('list')} />}
       {currentView === 'view' && selectedReglementId && (

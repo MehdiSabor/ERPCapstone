@@ -105,7 +105,7 @@ const ReglementList = ({ onSelectReglement }) => {
 
     return (
       <div>
-        <h2>Reglement List</h2>
+        
         <Switch checked={showFullySettled} onChange={toggleFullySettled} checkedChildren="Fully Settled" unCheckedChildren="Outstanding" />
         <Table
           columns={columns}

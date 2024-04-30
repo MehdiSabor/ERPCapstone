@@ -26,6 +26,7 @@ const ArticleManagementPage = () => {
 
   return (
     <div>
+    
       {currentView === 'create' && <ArticleForm />}
       
       {currentView === 'list' && <ArticleList onSelectArticle={handleSelectArticle} />}

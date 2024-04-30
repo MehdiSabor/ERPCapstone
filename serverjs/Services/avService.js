@@ -33,10 +33,43 @@ const updateAvoir = async (id, data) => {
 };
 
 const deleteAvoir = async (id) => {
-  return await prisma.avoirs.delete({
-    where: { REF_AVR: id },
+  const transaction = await prisma.$transaction(async (prisma) => {
+      // Retrieve the Avoir to check its VALIDER status
+      const avoir = await prisma.avoirs.findUnique({
+          where: { REF_AVR: id },
+          select: { REF_AVR: true, VALIDER: true } // Only select necessary fields
+      });
+
+      if (!avoir) {
+          throw new Error('Avoir not found');
+      }
+
+      if (avoir.VALIDER) {
+          // Check if a corresponding record exists in UnifiedFactureAvoir
+          const unifiedEntry = await prisma.unifiedFactureAvoir.findUnique({
+              where: { REF_AV_FAC: avoir.REF_AVR },
+              select: { REF_AV_FAC: true } // Only select necessary field
+          });
+
+          // If a corresponding record exists, delete it
+          if (unifiedEntry) {
+              await prisma.unifiedFactureAvoir.delete({
+                  where: { REF_AV_FAC: unifiedEntry.REF_AV_FAC }
+              });
+          }
+      }
+
+      // Proceed to delete the Avoir
+      await prisma.avoirs.delete({
+          where: { REF_AVR: id },
+      });
+
+      return 'Avoir and corresponding UnifiedFactureAvoir deleted successfully';
   });
+
+  return transaction;
 };
+
 const validateAvoir = async (refAvoir) => {
     const result = await prisma.$transaction(async (tx) => {
       const avoir = await tx.avoirs.findUnique({

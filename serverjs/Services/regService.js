@@ -148,56 +148,64 @@ const getAllUnifiedFactureAvoir = async () => {
  
   const addDetailReglement = async (regDetailData) => {
     const transaction = await prisma.$transaction(async (tx) => {
-      const unified = await tx.unifiedFactureAvoir.findUnique({
-        where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
-      });
-  
-      if (!unified) {
-        throw new Error('UnifiedFactureAvoir not found for REF_AV_FAC: ' + regDetailData.REF_AV_FAC);
-      }
-  
-      const remainingAmountToRegister = unified.MNT_TTC - unified.MNT_REGLER;
-  
-      const reglement = await tx.reglement.findUnique({
-        where: { REF_REGV: regDetailData.REF_REGV },
-        include: { reglementdetails: true }
-      });
-  
-      if (!reglement) {
-        throw new Error('Reglement not found for REF_REGV: ' + regDetailData.REF_REGV);
-      }
-  
-      const totalRegistered = reglement.reglementdetails.reduce((acc, detail) => acc + detail.MNT_REGLER, 0);
-      const remainingReglementBalance = reglement.MNT_REGLER - totalRegistered;
-  
-      // Determine the actual amount to register, which is the lesser of the remaining amounts on both the reglement and the unified.
-      const actualAmountToRegister = Math.min(remainingAmountToRegister, remainingReglementBalance, regDetailData.MNT_REGLER);
-  
-      
-  
-      // Update the UnifiedFactureAvoir MNT_REGLER
-      await tx.unifiedFactureAvoir.update({
-        where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
-        data: { MNT_REGLER: { increment: actualAmountToRegister } },
-      });
-  
-      // Create the ReglementDetail with the adjusted MNT_REGLER
-      const regDetail = await tx.reglementDetail.create({
-        data: {
-          ...regDetailData,
-          MNT_REGLER: actualAmountToRegister,
-          MNT_ORIGINAL: unified.MNT_TTC
-        },
-      });
-  
-      // Update remaining amount after adding the detail
-      await updateRemainingAmount(tx, regDetailData.REF_REGV);
-  
-      return regDetail;
+        // Fetch the related UnifiedFactureAvoir to check current registration amounts
+        const unified = await tx.unifiedFactureAvoir.findUnique({
+            where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
+        });
+
+        if (!unified) {
+            throw new Error('UnifiedFactureAvoir not found for REF_AV_FAC: ' + regDetailData.REF_AV_FAC);
+        }
+
+        // Calculate remaining amount that can be registered to this invoice/avoir
+        const remainingAmountToRegister = unified.MNT_TTC - unified.MNT_REGLER;
+
+        // Fetch the related Reglement to check total registered amounts against this payment
+        const reglement = await tx.reglement.findUnique({
+            where: { REF_REGV: regDetailData.REF_REGV },
+            include: { reglementdetails: true }
+        });
+
+        if (!reglement) {
+            throw new Error('Reglement not found for REF_REGV: ' + regDetailData.REF_REGV);
+        }
+
+        // Calculate total registered amount for this reglement
+        const totalRegistered = reglement.reglementdetails.reduce((acc, detail) => acc + detail.MNT_REGLER, 0);
+        const remainingReglementBalance = reglement.MNT_REGLER - totalRegistered;
+
+        // Determine the actual amount to register, which is the lesser of the remaining amounts on both the reglement and the unified
+        const actualAmountToRegister = Math.min(remainingAmountToRegister, remainingReglementBalance, regDetailData.MNT_REGLER);
+
+        // Prevent adding the detail if the amount to register exceeds remaining balances
+        if (actualAmountToRegister <= 0) {
+            throw new Error('No amount available to register. Check the total and remaining balances.');
+        }
+
+        // Proceed to update UnifiedFactureAvoir with the actual amount to register
+        await tx.unifiedFactureAvoir.update({
+            where: { REF_AV_FAC: regDetailData.REF_AV_FAC },
+            data: { MNT_REGLER: { increment: actualAmountToRegister } },
+        });
+
+        // Create the ReglementDetail with the adjusted amount
+        const regDetail = await tx.reglementDetail.create({
+            data: {
+                ...regDetailData,
+                MNT_REGLER: actualAmountToRegister,
+                MNT_ORIGINAL: unified.MNT_TTC
+            },
+        });
+
+        // Optionally update remaining amounts or perform other logic after adding the detail
+        await updateRemainingAmount(tx, regDetailData.REF_REGV);
+
+        return regDetail;
     });
-  
+
     return transaction;
-  };
+};
+
   
 
  

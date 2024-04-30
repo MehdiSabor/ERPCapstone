@@ -196,42 +196,48 @@ const getDevisByClient = async (clientId) => {
   };
   
   const updateItemInDevis = async (refDevis, codeArt, updatedData) => {
-    const { PV_HT, TVA, QTE, ...otherDetails } = updatedData;
+    try {
+        const { PV_HT, TVA, QTE, ...otherDetails } = updatedData;
   
-    // Calculate new total prices if necessary
-    let updateFields = { ...otherDetails };
-    if (PV_HT !== undefined && TVA !== undefined) {
-      const PV_TTC = (PV_HT + (PV_HT * TVA / 100) );
-      const TotalTTC = PV_TTC*QTE;
-
-      const TotalHT = PV_HT*QTE;
-      // Calculate based on quantity
-      updateFields = {
-        ...updateFields,
-        PV_HT,
-        QTE,
-        TVA,
-        PV_TTC,
-        TotalHT,
-        TotalTTC // Update to calculated PV_TTC
-      };
+        // Calculate new total prices if necessary
+        let updateFields = { ...otherDetails };
+        
+            const PV_TTC = PV_HT + (PV_HT * TVA / 100);
+            const TotalTTC = PV_TTC * QTE;
+            const TotalHT = PV_HT * QTE;
+            // Calculate based on quantity
+            updateFields = {
+                ...updateFields,
+                PV_HT,
+                QTE,
+                TVA,
+                PV_TTC,
+                TotalHT,
+                TotalTTC // Update to calculated PV_TTC
+            };
+            
+  
+        // Update the item details
+        const detailDevis = await prisma.devisDetail.update({
+            where: {
+              REF_DEV_CODE_ART: {
+                REF_DEV: refDevis,
+                CODE_ART: codeArt,
+            },
+            },
+            data: updateFields,
+        });
+  
+        // Update total amounts in the devis
+        await updateDevisTotal(refDevis);
+  
+        return detailDevis;
+    } catch (error) {
+        console.error('Failed to update item in devis:', error);
+        throw error; // Optionally rethrow the error after logging it
     }
-  
-    // Update the item details
-    const detailDevis = await prisma.devisDetail.updateMany({
-      where: {
-        REF_DEV: refDevis,
-        CODE_ART: codeArt,
-      },
-      data: updateFields,
-    });
-  
-    // Update total amounts in the devis
-    await updateDevisTotal(refDevis);
-  
-    return detailDevis;
-  };
-  
+};
+
   
 
 

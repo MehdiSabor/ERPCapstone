@@ -14,7 +14,7 @@ const { Title, Text } = Typography;
 const SingleAvoir = ({ avoirId, onChangeView }) => {
   const { avoir, loading: loadingAvoir, error: errorAvoir,refetch } = useFetchAvoirById(avoirId);
   const { items, loading: loadingItems, error: errorItems, refetch: fetchItems } = useFetchItemsInAvoir(avoirId);
-  const { validate, error, isValidated } = useValidateAvoir(avoirId);
+  const { validate, error, isValidated } = useValidateAvoir();
   const { setSidebarButtons } = useSidebar();
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -31,7 +31,7 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
   // Function to handle the click on the Validate button
   const handleValidateClick = async () => {
     try {
-      await validate();
+      await validate(avoirId);
       message.success('Avoir has been successfully validated.');
       refetchData();// Optionally, you can trigger other actions here, such as navigating away or refreshing the data
     } catch (error) {
@@ -171,8 +171,8 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
       <Card
         title={
           <>
-            Avoir Details - {avoir.REF_AVOIR}
-            {isValidated ? (
+            Avoir Details - {avoir.REF_AVR}
+            {avoir.VALIDER ? (
               <Tag color="green" style={{ marginLeft: '8px' }}>
                 Validated
               </Tag>
@@ -185,7 +185,7 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
         }
         bordered={false}
         extra={
-    !isValidated && (
+    !avoir.VALIDER && (
       <Button type="primary" onClick={handleValidateClick}>
         Validate Avoir
       </Button>

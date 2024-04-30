@@ -20,6 +20,7 @@ import Sidebar from './Sidebar';
 import { SidebarProvider } from './SidebarContext';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
+import DashboardPage from './Pages/dashboard';
 
 function App() {
   const user = useSelector(state => state.user); // Use Redux state to get user and permissions
@@ -67,6 +68,7 @@ function App() {
                 <Route element={isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />}>
                 <Route path="/" element={<Home />} />
                   <Route path="/user" element={<PermissionRoute permission="IsManager"><UserManagementPage /></PermissionRoute>} />
+                  <Route path="/dashboard" element={<PermissionRoute permission="IsManager"><DashboardPage /></PermissionRoute>} />
                   <Route path="/client" element={<PermissionRoute permission="CanManageClients"><ClientManagementPage /></PermissionRoute>} />
                   <Route path="/article" element={<PermissionRoute permission="CanManageArticles"><ArticleManagementPage /></PermissionRoute>} />
                   <Route path="/com" element={<PermissionRoute permission="CanManageCommercials"><ComManagementPage /></PermissionRoute>} />

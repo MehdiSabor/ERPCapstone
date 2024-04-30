@@ -61,68 +61,78 @@ const getAllDetailFacturesByFacture = async (refFAC) => {
 
 
 const cancelFactureAndCreateAvoirs = async (refFAC) => {
-    const transaction = await prisma.$transaction(async (prisma) => {
-        // Fetch the Facture to be cancelled
-        const facture = await prisma.facture.findUnique({
-            where: { REF_FAC: refFAC },
-            include: { detailFactures: true }
-        });
+  const transaction = await prisma.$transaction(async (prisma) => {
+      // Fetch the Facture to be cancelled
+      const facture = await prisma.facture.findUnique({
+          where: { REF_FAC: refFAC },
+          include: { detailFactures: true }
+      });
 
-        if (!facture) {
-            throw new Error('Facture not found');
-        }
+      if (!facture) {
+          throw new Error('Facture not found');
+      }
 
-        // Cancel the Facture (update VALIDER to false or other status indicating cancellation)
-       
+      // Cancel the Facture (assuming update is needed to set some cancellation status)
+      await prisma.facture.update({
+          where: { REF_FAC: refFAC },
+          data: { VALIDER: false } // Example: Set VALIDER to false to indicate cancellation
+      });
 
-        // Create the Avoirs
-        const avoirs = await prisma.avoirs.create({
-            data: {
-                REF_AVR: `AV-F${refFAC.slice(2)}`,
-                DATE_AVR: new Date(),
-                
-                COMPTE: facture.COMPTE,
-                CODE_CLT: facture.CODE_CLT,
-                CLIENT: facture.CLIENT,
-                MNT_HT: -facture.MNT_HT,
-                MNT_TTC: -facture.MNT_TTC,
-                CODE_COM: facture.CODE_COM,
-                REMARQUE: facture.REMARQUE,
-                VALIDER: false, // Assuming direct validation for simplification
-            }
-        });
+      // Delete from UnifiedFactureAvoir if exists
+      await prisma.unifiedFactureAvoir.delete({
+          where: { REF_AV_FAC: facture.REF_FAC }
+      }).catch(error => {
+          console.error("No related record in UnifiedFactureAvoir or other error: ", error);
+      });
 
-        // Create Detailavoirs for each DetailFacture
-        const detailAvoirs = facture.detailFactures.map(detail => {
-            return {
-                REF_AVR: avoirs.REF_AVR,
-                CODE_ART: detail.CODE_ART,
-                ARTICLE: detail.ARTICLE,
-                QTE: detail.QTE,
-                GRATUIT: detail.GRATUIT,
-                PV_HT: detail.PV_HT,
-                PV_TTC: detail.PV_TTC,
-                PA_HT: detail.PA_HT, // Assume direct mapping, adjust as necessary
-                REMISE: detail.REMISE,
-                TVA: detail.TVA,
-                MAJ_STK: false, // Assume stock adjustment is required
-            };
-        });
+      // Create the Avoirs
+      const avoirs = await prisma.avoirs.create({
+          data: {
+              REF_AVR: `AV-F${refFAC.slice(2)}`,
+              DATE_AVR: new Date(),
+              COMPTE: facture.COMPTE,
+              CODE_CLT: facture.CODE_CLT,
+              CLIENT: facture.CLIENT,
+              MNT_HT: -facture.MNT_HT,
+              MNT_TTC: -facture.MNT_TTC,
+              CODE_COM: facture.CODE_COM,
+              REMARQUE: facture.REMARQUE,
+              VALIDER: false, // Assuming not directly validated
+          }
+      });
 
-        // Bulk create Detailavoirs
-        await prisma.detailAvoirs.createMany({
-            data: detailAvoirs
-        });
-        await prisma.facture.update({
+      // Create Detailavoirs for each DetailFacture
+      const detailAvoirs = facture.detailFactures.map(detail => ({
+          REF_AVR: avoirs.REF_AVR,
+          CODE_ART: detail.CODE_ART,
+          ARTICLE: detail.ARTICLE,
+          QTE: detail.QTE,
+          GRATUIT: detail.GRATUIT,
+          PV_HT: detail.PV_HT,
+          PV_TTC: detail.PV_TTC,
+          PA_HT: detail.PA_HT,
+          REMISE: detail.REMISE,
+          TVA: detail.TVA,
+          MAJ_STK: false, // Assuming no stock adjustment is required
+      }));
+
+      // Bulk create Detailavoirs
+      await prisma.detailAvoirs.createMany({
+          data: detailAvoirs
+      });
+
+      // Update facture as cancelled
+      await prisma.facture.update({
           where: { REF_FAC: refFAC },
           data: { IsCanceled: true }
       });
 
-        return { facture, avoirs, detailAvoirs };
-    });
+      return { facture, avoirs, detailAvoirs };
+  });
 
-    return transaction;
+  return transaction;
 };
+
 
 
 

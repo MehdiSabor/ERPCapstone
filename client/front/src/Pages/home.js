@@ -44,6 +44,12 @@ const Home = () => {
     justifyContent: 'center',
     height: '150px',
   };
+  const iconContainerStyle = {
+    display: 'flex', // Ensures flex properties apply to children, which is the icon here
+    alignItems: 'center', // Center align items vertically in the container
+    justifyContent: 'center', // Center align items horizontally in the container
+    width: '100%', // Takes full width of the card to center content properly
+  };
 
   return (
     <div style={{ padding: 20 }}>
@@ -53,7 +59,9 @@ const Home = () => {
           <Col xs={24} sm={12} md={8} lg={6} xl={4} key={cat.title}>
             <Link to={cat.link}>
               <Card hoverable style={cardStyle}>
-                {React.cloneElement(cat.icon, { style: { fontSize: '32px',textAlign: 'center' } })} {/* Making the icon larger */}
+              <div style={iconContainerStyle}>
+                {React.cloneElement(cat.icon, { style: { fontSize: '32px' } })} 
+                </div>
                 <Card.Meta title={cat.title} style={{ textAlign: 'center', marginTop: '12px' }} />
               </Card>
             </Link>

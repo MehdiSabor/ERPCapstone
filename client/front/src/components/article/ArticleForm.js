@@ -65,25 +65,35 @@ const ArticleForm = () => {
 
 
   const handleUpload = async () => {
-    const formData = new FormData();
-    formData.append("file", fileList[0].originFileObj);
-    formData.append("upload_preset", "uozkyhrp"); // Replace with your upload preset name
-    formData.append("cloud_name", "dggqqwrib"); // Replace with your Cloudinary cloud name
-
-    try {
-      const response = await instance.post("https://api.cloudinary.com/v1_1/dggqqwrib/image/upload", formData); // Replace YOUR_CLOUD_NAME
-      const data = response.data;
-      
-      
-      const imageUrl = data.secure_url;
-      // Here you can send `imageUrl` to your backend to be saved in the DB
-      console.log(imageUrl);
-     return imageUrl;
-      
-    } catch (error) {
-      console.error('Error uploading file:', error);
+    // Ensure there's a file to upload and an article code to use as an identifier
+    if (fileList.length > 0 && form.getFieldValue('code_art')) {
+      const formData = new FormData();
+      formData.append("file", fileList[0].originFileObj);
+      const articleCode = form.getFieldValue('code_art'); // Get the article code from the form
+  
+      // Use the article code as public_id and original_filename
+      formData.append("public_id", articleCode);  
+      formData.append("original_filename", articleCode);
+  
+      formData.append("upload_preset", "uozkyhrp"); // Replace with your upload preset name
+      formData.append("cloud_name", "dggqqwrib"); // Replace with your Cloudinary cloud name
+  
+      try {
+        const response = await instance.post("https://api.cloudinary.com/v1_1/dggqqwrib/image/upload", formData);
+        const data = response.data;
+        const imageUrl = data.secure_url;
+        console.log("Uploaded Image URL:", imageUrl);
+        return imageUrl;  // Return the image URL
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        return ''; // Return an empty string or handle as needed
+      }
+    } else {
+      console.log("No file to upload or article code is missing.");
+      return ''; // Return an empty string or handle as needed
     }
   };
+  
 
   const handleValueChange = (_, allValues) => {
     const PA_HT = parseFloat(allValues.PA_HT);

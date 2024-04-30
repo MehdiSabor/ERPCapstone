@@ -117,7 +117,7 @@ const SingleFacture = ({ factureId }) => {
         title={
           <>
             Facture Details - {facture.REF_FAC}
-            {!facture.isValidated ? (
+            {facture.isValidated ? (
               <Tag color="green" style={{ marginLeft: '8px' }}>
                 Validated
               </Tag>
@@ -130,7 +130,7 @@ const SingleFacture = ({ factureId }) => {
         }
         bordered={false}
         extra={
-  facture.isValidated ? (
+  !facture.isValidated ? (
     <Button type="primary" onClick={handleValidateClick}>
       Validate Facture
     </Button>

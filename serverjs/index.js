@@ -11,6 +11,7 @@ const avRoutes = require('./Routes/avRoutes');
 const regRoutes = require('./Routes/regRoutes');
 const famRoutes =require('./Routes/familleRoutes');
 const accountRoutes = require('./Routes/accountRoutes');
+const dashboardRoutes = require('./Routes/dbRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
@@ -27,7 +28,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json()); 
 app.use('/account', accountRoutes);
-
+app.use('/dashboard',dashboardRoutes);
 app.use(authMiddleware); 
 app.use('/client', clientRoutes); 
 app.use('/four', fournisseurRoutes);
