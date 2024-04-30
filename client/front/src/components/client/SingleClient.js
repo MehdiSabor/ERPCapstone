@@ -91,10 +91,13 @@ const SingleClient = ({ clientId, onChangeView }) => {
   };
 
   const titleStyle = {
-    fontSize: "18px", // Increased font size for titles
+    marginBottom: "20px",
     fontWeight: "bold",
     color: "#333", // Darker font color for better visibility
     marginBottom: "16px",
+    borderBottom: "2px solid #ccc", // Separator line
+    paddingBottom: "10px", // Spacing between title and separator line
+    marginTop: "-10px",
   };
 
   const dateStyle = {
@@ -111,14 +114,14 @@ const SingleClient = ({ clientId, onChangeView }) => {
   };
 
   const mainBackgroundStyle = {
-    background: "#ececec", // Main background color
+    background: "white", // Main background color
     padding: "20px",
   };
 
   return (
     <div style={mainBackgroundStyle}>
       <Title level={2} style={titleStyle}>
-        {client.nom} - Client Information
+        {client.nom} - {client.compte}
       </Title>
       <Tabs defaultActiveKey="1">
         <TabPane tab="Personal Information" key="1">
@@ -133,8 +136,8 @@ const SingleClient = ({ clientId, onChangeView }) => {
               </Col>
               <Col span={12}>
                 <Text style={textStyle}>
-                  <IdcardOutlined /> <strong>Code Clt:</strong>{" "}
-                  {client.code_clt}
+                  <IdcardOutlined /> <strong>Account Number:</strong>{" "}
+                  {client.compte}
                 </Text>
               </Col>
               <Col span={12}>

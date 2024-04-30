@@ -21,23 +21,14 @@ import {
 } from "@ant-design/icons";
 import { useCreateClient } from "../../hooks/clientHooks";
 import ComList from "../com/ComList";
+import cities from '../../lists/City.json';  // Make sure the path is correct
+import paymentModes from '../../lists/PaymentMode.json';  // Make sure the path is correct
 
 const { Option } = Select;
 const { Title } = Typography;
 
 const ClientForm = () => {
-  const cities = [
-    "Casablanca",
-    "Rabat",
-    "Marrakech",
-    "Fez",
-    "Tangier",
-    "Agadir",
-    "Meknes",
-    "Oujda",
-  ];
-  const paymentModes = ["Cash", "Credit Card", "Bank Transfer"];
-
+  
   const [showComList, setShowComList] = useState(false);
   const { handleCreate } = useCreateClient();
   const [form] = Form.useForm();

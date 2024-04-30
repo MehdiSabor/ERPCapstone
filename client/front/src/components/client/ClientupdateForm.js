@@ -24,23 +24,14 @@ import {
   PercentageOutlined,
   MoneyCollectOutlined,
 } from "@ant-design/icons";
+import cities from '../../lists/City.json';  // Make sure the path is correct
+import paymentModes from '../../lists/PaymentMode.json';  // Make sure the path is correct
 
 const { Option } = Select;
 const { Title } = Typography;
 
 const ClientUpdateForm = ({ clientId, onFinishedUpdate }) => {
-  const cities = [
-    "Casablanca",
-    "Rabat",
-    "Marrakech",
-    "Fez",
-    "Tangier",
-    "Agadir",
-    "Meknes",
-    "Oujda",
-  ];
-  const paymentModes = ["Cash", "Credit Card", "Bank Transfer"];
-
+  
   const { client, loading: fetching } = useFetchClientById(clientId);
   const { handleUpdate, isUpdated } = useUpdateClient();
   const [form] = Form.useForm();

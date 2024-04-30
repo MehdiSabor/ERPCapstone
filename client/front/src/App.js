@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux'; // Import Redux hooks
-
+import { ConfigProvider } from 'antd';
 // Import all necessary components and pages
 import Home from './Pages/home';
 import ClientManagementPage from './Pages/client';
@@ -53,7 +53,16 @@ function App() {
   };
 
   return (
+    
     <BrowserRouter>
+    <ConfigProvider
+    theme={{
+      token: {
+        fontFamilyBase: "'Poppins', sans-serif",  // Update with your font family
+        fontFamilyCode: "'Poppins', monospace"  // Optional: Set a specific font for code elements
+      }
+    }}
+  >
       <SidebarProvider>
         <div className="App" style={appStyle}>
           <NavigationBar />
@@ -85,7 +94,9 @@ function App() {
           </div>
         </div>
       </SidebarProvider>
+      </ConfigProvider>
     </BrowserRouter>
+    
   );
 }
 
