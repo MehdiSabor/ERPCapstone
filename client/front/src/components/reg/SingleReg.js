@@ -116,7 +116,7 @@ const SingleReglement = ({ reglementId, onChangeView }) => {
       <Card title={`Reglement Details - ${reglementId}`} >
         <Row gutter={16}>
           <Col span={12}>
-            <UnifiedFactureAvoirList reglementId={reglementId} handleRefetch={handleRefetch} />
+            <UnifiedFactureAvoirList reglementId={reglementId} code_clt={reglement.CODE_CLT} handleRefetch={handleRefetch} />
           </Col>
           <Col span={12}>
             <ReglementDetailsList reglementId={reglementId} reglement={reglement} handleRefetch={handleRefetch} loading={loading} error={error}/>

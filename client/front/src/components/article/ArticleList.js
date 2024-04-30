@@ -170,7 +170,7 @@ const ArticleList = ({ onSelectArticle }) => {
   };
 
   return (
-    <div style={mainBackgroundStyle}>
+    <div >
       <Card style={tableCardStyle}>
         <h2 style={titleStyle}>Articles List</h2>
         <Table columns={columns} dataSource={articles} rowKey="id" pagination={{ pageSize: 10 }} onRow={(record) => ({

@@ -67,7 +67,8 @@ exports.createReglementDetailsBatchController = async (req, res) => {
 
 exports.getAllUnifiedFactureAvoirController = async (req, res) => {
   try {
-    const unifiedFactureAvoir = await regService.getAllUnifiedFactureAvoir();
+    const code_clt = req.params ;
+    const unifiedFactureAvoir = await regService.getAllUnifiedFactureAvoir(code_clt);
     res.json(unifiedFactureAvoir);
   } catch (error) {
     res.status(500).json({ message: error.message });

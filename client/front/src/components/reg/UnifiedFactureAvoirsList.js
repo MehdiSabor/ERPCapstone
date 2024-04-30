@@ -3,8 +3,8 @@ import { Table, Button, Spin, Alert, Tag,message } from 'antd';
 
 import { useFetchAllUnifiedFactureAvoir, useAddDetailReglement } from '../../hooks/regHooks';
 
-const UnifiedFactureAvoirList = ({ reglementId,handleRefetch }) => {
-    const { unifiedRecords, loading, error } = useFetchAllUnifiedFactureAvoir();
+const UnifiedFactureAvoirList = ({ reglementId,handleRefetch,code_clt }) => {
+    const { unifiedRecords, loading, error } = useFetchAllUnifiedFactureAvoir(code_clt);
     const { handleAddDetail, isLoading, createError } = useAddDetailReglement();
     const [selectedUnified, setSelectedUnified] = useState(null);
 
@@ -58,7 +58,7 @@ const UnifiedFactureAvoirList = ({ reglementId,handleRefetch }) => {
             onFilter: (value, record) => (value === 'pending' ? (record.MNT_TTC - record.MNT_REGLER) > 0 : (record.MNT_TTC - record.MNT_REGLER) === 0),
             render: (_, record) => {
                 const amountLeft = record.MNT_TTC - record.MNT_REGLER;
-                return <Tag color={amountLeft > 0 ? 'green' : 'volcano'}>{amountLeft > 0 ? 'Pending' : 'Settled'}</Tag>;
+                return <Tag color={amountLeft != 0 ? 'green' : 'volcano'}>{amountLeft != 0 ? 'Pending' : 'Settled'}</Tag>;
             }
         }
     ];

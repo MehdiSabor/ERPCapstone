@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Row, Col, Modal } from 'antd';
+import { Select, Form, Input, Button, Card, Row, Col, Modal } from 'antd';
 import { useCreateReglement } from '../../hooks/regHooks';
 import { useFetchAllClients } from '../../hooks/clientHooks';
 import ClientList from '../client/ClientList';
+import paymentModes from '../../lists/PaymentMode.json';  // Make sure the path is correct
+import cities from '../../lists/City.json';  // Make sure the path is correct
+import banks from '../../lists/Bank.json';  // Make sure the path is correct
+
+
+const { Option } = Select;
+
 
 const CreateReglementForm = () => {
   const [form] = Form.useForm();
@@ -63,15 +70,21 @@ const CreateReglementForm = () => {
               <Input type="number" placeholder="Enter amount" />
             </Form.Item>
             <Form.Item label="Payment Mode" name="MODE_REG" rules={[{ required: true }]}>
-              <Input placeholder="Enter payment mode" />
+              <Select placeholder="Select payment mode">
+                {paymentModes.map(mode => <Option key={mode} value={mode}>{mode}</Option>)}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item label="Bank" name="BANQUE">
-              <Input placeholder="Enter bank name" />
+              <Select placeholder="Select bank">
+                {banks.map(bank => <Option key={bank} value={bank}>{bank}</Option>)}
+              </Select>
             </Form.Item>
             <Form.Item label="City" name="VILLE">
-              <Input placeholder="Enter city" />
+              <Select placeholder="Select city">
+                {cities.map(city => <Option key={city} value={city}>{city}</Option>)}
+              </Select>
             </Form.Item>
             <Form.Item label="Remark" name="REMARQUE">
               <Input placeholder="Enter any remarks" />

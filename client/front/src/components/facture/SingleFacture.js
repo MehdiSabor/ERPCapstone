@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Button, Card, Table, Typography, Tag, Row, Col, Spin, Alert } from 'antd';
+import { Modal, Button, Card, Table,message, Typography, Tag, Row, Col, Spin, Alert } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchFactureById, useFetchDetailFacturesByFacture, useValidateFacture } from '../../hooks/factureHooks';
 import CancelFactureButton from './CancelFactureButton';
@@ -8,8 +8,8 @@ import SingleClient from '../client/SingleClient';
 const { Title, Text } = Typography;
 
 
-const SingleFacture = ({ factureId }) => {
-  const { facture, loading: loadingFacture, error: errorFacture } = useFetchFactureById(factureId);
+const SingleFacture = ({ factureId, onCancel }) => {
+  const { facture, loading: loadingFacture, error: errorFacture,refetch } = useFetchFactureById(factureId);
   const { details, loading: loadingDetails, error: errorDetails } = useFetchDetailFacturesByFacture(factureId);
   const { validate, isValidated, error: validationError } = useValidateFacture(factureId);
   const { setSidebarButtons } = useSidebar();
@@ -31,7 +31,8 @@ const SingleFacture = ({ factureId }) => {
   const handleValidateClick = async () => {
     try {
       await validate(factureId);
-      alert('Facture has been successfully validated.');
+      refetch();
+      message.success('Facture has been successfully validated.');
     } catch (error) {
       alert(`Failed to validate facture: ${error}`);
     }
@@ -117,7 +118,7 @@ const SingleFacture = ({ factureId }) => {
         title={
           <>
             Facture Details - {facture.REF_FAC}
-            {facture.isValidated ? (
+            {facture.VALIDER ? (
               <Tag color="green" style={{ marginLeft: '8px' }}>
                 Validated
               </Tag>
@@ -130,12 +131,12 @@ const SingleFacture = ({ factureId }) => {
         }
         bordered={false}
         extra={
-  !facture.isValidated ? (
+  !facture.VALIDER ? (
     <Button type="primary" onClick={handleValidateClick}>
       Validate Facture
     </Button>
   ) : (
-    <CancelFactureButton refFAC={factureId} />
+    <CancelFactureButton refFAC={factureId} onCancel={onCancel}/>
   )
 }
 
