@@ -8,7 +8,7 @@ router.put('/update/:id', regController.updateReglementController);
 router.delete('/delete/:id', regController.deleteReglementController);
 router.get('/all', regController.getAllReglementsController);
 router.post('/createBatchDetails', regController.createReglementDetailsBatchController);
-router.get('/getAllUnified', regController.getAllUnifiedFactureAvoirController);
+router.get('/getAllUnified/:code_clt', regController.getAllUnifiedFactureAvoirController);
 router.post('/addDetail', regController.addDetailReglementController);
 router.delete('/deletedetail/:refRegV/:refAvFac', regController.deleteReglementDetail);
 

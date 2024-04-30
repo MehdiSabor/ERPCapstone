@@ -135,15 +135,25 @@ const createReglementDetailsBatch = async (regDetailsArray) => {
   };
   
 
-  // Get all UnifiedFactureAvoir records
-const getAllUnifiedFactureAvoir = async () => {
-    return await prisma.unifiedFactureAvoir.findMany({
-      include: {
-        reglementDetails: true,  // Optionally include related reglement details
-        client: true             // Optionally include related client data
-      }
-    });
-  };
+  const getAllUnifiedFactureAvoir = async (code_clt) => {
+    try {
+        const unifiedFactureAvoirRecords = await prisma.unifiedFactureAvoir.findMany({
+            where: { code_clt: parseInt(code_clt.code_clt) },
+            include: {
+                reglementDetails: true,  // Optionally include related reglement details
+                client: true,            // Optionally include related client data
+            }
+        });
+        return unifiedFactureAvoirRecords;
+    } catch (error) {
+        console.error("Failed to retrieve UnifiedFactureAvoir records:", error);
+        // Optionally, handle the error based on its type or content
+        // You might want to throw the error or handle it differently depending on your application's needs
+        throw error; // Rethrowing the error might be useful if you want calling functions to handle it
+    }
+};
+
+
 
  
   const addDetailReglement = async (regDetailData) => {
@@ -178,9 +188,7 @@ const getAllUnifiedFactureAvoir = async () => {
         const actualAmountToRegister = Math.min(remainingAmountToRegister, remainingReglementBalance, regDetailData.MNT_REGLER);
 
         // Prevent adding the detail if the amount to register exceeds remaining balances
-        if (actualAmountToRegister <= 0) {
-            throw new Error('No amount available to register. Check the total and remaining balances.');
-        }
+        
 
         // Proceed to update UnifiedFactureAvoir with the actual amount to register
         await tx.unifiedFactureAvoir.update({

@@ -41,7 +41,6 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
 
   useEffect(() => {
     const avoirButtons = [
-      <Button key="update" onClick={() => setIsUpdateModalVisible(true)}>Update Avoir</Button>,
       <Button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete Avoir</Button>,
       <Button key="addItem" onClick={() => setIsAddItemModalVisible(true)}>Add Item</Button>,
      <Button key="viewItems" onClick={handleOpenItemsModal}>View Items</Button>,
@@ -259,14 +258,7 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
         
       )}
     
-<Modal
-        title="Update Avoir"
-        visible={isUpdateModalVisible}
-        footer={null}
-        onCancel={() => setIsUpdateModalVisible(false)}
-      >
-        <AvoirUpdateForm avoirId={avoirId} onFinishedUpdate={handleUpdateSuccess} />
-      </Modal>
+
       <Modal
         title="Delete Avoir"
         visible={isDeleteModalVisible}

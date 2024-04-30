@@ -10,6 +10,7 @@ const getFactureById = async (id) => {
 
 const getAllFactures = async () => {
   return await prisma.facture.findMany({
+    where: { IsCanceled: false },
     include: { detailFactures: true },
   });
 };
@@ -78,12 +79,7 @@ const cancelFactureAndCreateAvoirs = async (refFAC) => {
           data: { VALIDER: false } // Example: Set VALIDER to false to indicate cancellation
       });
 
-      // Delete from UnifiedFactureAvoir if exists
-      await prisma.unifiedFactureAvoir.delete({
-          where: { REF_AV_FAC: facture.REF_FAC }
-      }).catch(error => {
-          console.error("No related record in UnifiedFactureAvoir or other error: ", error);
-      });
+     
 
       // Create the Avoirs
       const avoirs = await prisma.avoirs.create({

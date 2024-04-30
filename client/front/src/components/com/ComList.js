@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Table, Input, Button, Space } from 'antd';
+import { Table, Input, Button, Space,Card } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useFetchAllComs } from '../../hooks/comHooks';
 const ComList = ({ onSelectCom }) => {
@@ -90,11 +90,32 @@ const ComList = ({ onSelectCom }) => {
             key: 'email',
         },
     ];
+    const titleStyle = {
+        fontSize: "24px", // Increased font size for titles
+        fontWeight: "bold",
+        color: "#333", // Darker font color for better visibility
+        marginBottom: "16px",
+        borderBottom: "2px solid #ccc", // Separator line
+        paddingBottom: "10px", // Spacing between title and separator line
+        marginTop: "-10px",
+      };
+      
+      
+      const tableCardStyle = {
+        marginTop: "20px",
+        backgroundColor: "#ffffff", // Lighter than the main background for emphasis
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Optional: adds subtle shadow for depth
+      };
+      const mainBackgroundStyle = {
+        background: "#ececec", // Main background color
+        padding: "20px",
+      };
 
     return (
-        <div>
-            <h2>Commercials List</h2>
-            <Table
+        <div >
+           <Card style={tableCardStyle}>
+        <h2 style={titleStyle}>Commercial List</h2>
+         <Table
                 columns={columns}
                 dataSource={Coms}
                 rowKey="code_com"
@@ -103,6 +124,7 @@ const ComList = ({ onSelectCom }) => {
                     onClick: () => onSelectCom(record.code_com),
                 })}
             />
+            </Card>
         </div>
     );
 };

@@ -1,6 +1,9 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox, Row, Col, Card } from 'antd';
+import { Form, Input, Button, Checkbox, Row, Col, Card,Select } from 'antd';
 import { useCreateFour } from '../../hooks/fourHooks'; // Adjust the import path as necessary
+import countries from '../../lists/Country.json'; // Ensure the path matches your file structure
+
+const { Option } = Select;
 
 const FourForm = () => {
   const [form] = Form.useForm();
@@ -45,12 +48,24 @@ const FourForm = () => {
               <Input placeholder="Enter description" />
             </Form.Item>
             <Form.Item
-              label="Country"
-              name="pays"
-              rules={[{ required: true, message: 'Please enter the country!' }]}
-            >
-              <Input placeholder="Enter country" />
-            </Form.Item>
+  label="Country"
+  name="pays"
+  rules={[{ required: true, message: 'Please select the country!' }]}
+>
+  <Select
+    showSearch
+    placeholder="Select a country"
+    optionFilterProp="children"
+    filterOption={(input, option) =>
+      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    }
+  >
+    {countries.map(country => (
+      <Option key={country} value={country}>{country}</Option>
+    ))}
+  </Select>
+</Form.Item>
+
           </Col>
           <Col span={12}>
             <Form.Item
