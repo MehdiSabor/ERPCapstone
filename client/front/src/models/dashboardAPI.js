@@ -18,3 +18,8 @@ export const fetchNetRevenue = () => axios.get(`${API_BASE_URL}/financial/net-re
 
 // Customer Insights
 export const fetchClientAccountDetails = () => axios.get(`${API_BASE_URL}/customers/accounts`);
+
+
+export const fetchArticleSalesData = (code_art) => {
+    return axios.get(`${API_BASE_URL}/article-sales/${code_art}`);
+  };
