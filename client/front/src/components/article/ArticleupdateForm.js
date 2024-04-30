@@ -244,7 +244,6 @@ const ArticleUpdateForm = ({ articleId, onFinishedUpdate }) => {
               <Text strong>
                 <DollarCircleOutlined /> PA HT:
               </Text>
-              
               <Form.Item name="PA_HT">
                 <Input type="number" />
               </Form.Item>
