@@ -20,11 +20,16 @@ const FactureManagementPage = () => {
     setCurrentView('viewFacture');
   };
 
+  const handleCancelFacture = () => {
+    
+    setCurrentView('list');
+  };
+
   return (
     <div>
       {currentView === 'list' && <FactureList onSelectFacture={handleSelectFacture} />}
       {currentView === 'viewFacture' && selectedFactureId && (
-        <SingleFacture factureId={selectedFactureId} />
+        <SingleFacture factureId={selectedFactureId} onCancel={handleCancelFacture} />
       )}
     </div>
   );

@@ -42,43 +42,11 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
 
   useEffect(() => {
     const avoirButtons = [
-      <Button
-        key="update"
-        icon={<EditOutlined />}
-        onClick={() => setIsUpdateModalVisible(true)}
-      >
-        Update Avoir
-      </Button>,
-      <Button
-        key="delete"
-        icon={<DeleteOutlined />}
-        type="danger"
-        onClick={() => setIsDeleteModalVisible(true)}
-      >
-        Delete Avoir
-      </Button>,
-      <Button
-        key="addItem"
-        icon={<PlusOutlined />}
-        onClick={() => setIsAddItemModalVisible(true)}
-      >
-        Add Item
-      </Button>,
-      <Button
-        key="viewItems"
-        icon={<EyeOutlined />}
-        onClick={handleOpenItemsModal}
-      >
-        View Items
-      </Button>,
-      <Button
-        key="viewClient"
-        icon={<UserOutlined />}
-        type="primary"
-        onClick={() => setShowClientModal(true)}
-      >
-        View Client
-      </Button>
+      <Button key="update" onClick={() => setIsUpdateModalVisible(true)}>Update Avoir</Button>,
+      <Button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete Avoir</Button>,
+      <Button key="addItem" onClick={() => setIsAddItemModalVisible(true)}>Add Item</Button>,
+     <Button key="viewItems" onClick={handleOpenItemsModal}>View Items</Button>,
+    <Button key="viewClient" type="primary" onClick={() => setShowClientModal(true)}>View Client</Button>
     
     ];
 
@@ -292,14 +260,7 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
         
       )}
     
-<Modal
-        title="Update Avoir"
-        visible={isUpdateModalVisible}
-        footer={null}
-        onCancel={() => setIsUpdateModalVisible(false)}
-      >
-        <AvoirUpdateForm avoirId={avoirId} onFinishedUpdate={handleUpdateSuccess} />
-      </Modal>
+
       <Modal
         title="Delete Avoir"
         visible={isDeleteModalVisible}

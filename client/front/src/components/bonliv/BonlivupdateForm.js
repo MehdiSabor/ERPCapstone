@@ -1,6 +1,11 @@
 import React, { useEffect } from 'react';
-import { Form, Input, Button, Card, Typography, Row, Col, message } from 'antd';
+import { Select,Form, Input, Button, Card, Typography, Row, Col, message } from 'antd';
 import { useUpdateBonliv, useFetchBonlivById } from '../../hooks/bonlivHooks';
+import paymentModes from '../../lists/PaymentMode.json';  // Make sure the path is correct
+import deliveryModes from '../../lists/DeliveryMode.json';  // Make sure the path is correct
+
+const { Option } = Select;
+
 
 const { Title } = Typography;
 
@@ -33,14 +38,22 @@ const BonlivUpdateForm = ({ bonlivId,onSuccess }) => {
 
   return (
     <Card bordered={false} style={{ maxWidth: 800, margin: '20px auto' }}>
-      <Title level={4}>Update Bonliv</Title>
+    
       <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item name="MODELIV" label="Mode de Livraison">
-          <Input />
-        </Form.Item>
-        <Form.Item name="MODE_PAIE" label="Mode de Paiement">
-          <Input />
-        </Form.Item>
+      <Form.Item label="Mode of Delivery" name="MODELIV">
+              <Select placeholder="Select a delivery mode">
+                {deliveryModes.map(mode => (
+                  <Option key={mode} value={mode}>{mode}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item label="Payment Mode" name="MODE_PAIE">
+              <Select placeholder="Select a payment mode">
+                {paymentModes.map(mode => (
+                  <Option key={mode} value={mode}>{mode}</Option>
+                ))}
+              </Select>
+            </Form.Item>
         <Form.Item name="REMARQUE" label="Remarque">
           <Input.TextArea rows={4} />
         </Form.Item>

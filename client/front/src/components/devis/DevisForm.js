@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Row, Col, Modal } from 'antd';
+import { Form, Input, Button, Card, Row, Col, Modal,Select } from 'antd';
 import { useCreateDevis } from '../../hooks/devisHooks';
 import ClientList from '../client/ClientList';
 import ComList from '../com/ComList';
+import paymentModes from '../../lists/PaymentMode.json';  // Make sure the path is correct
+import deliveryModes from '../../lists/DeliveryMode.json';  // Make sure the path is correct
+
+const { Option } = Select;
+
+
 
 const DevisForm = () => {
   const { handleCreate } = useCreateDevis();
@@ -79,11 +85,19 @@ const DevisForm = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Mode of Delivery" name="MODELIV">
-              <Input placeholder="Delivery mode" />
+          <Form.Item label="Mode of Delivery" name="MODELIV">
+              <Select placeholder="Select a delivery mode">
+                {deliveryModes.map(mode => (
+                  <Option key={mode} value={mode}>{mode}</Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item label="Payment Mode" name="MODE_PAIE">
-              <Input placeholder="Payment mode" />
+              <Select placeholder="Select a payment mode">
+                {paymentModes.map(mode => (
+                  <Option key={mode} value={mode}>{mode}</Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item label="Notes" name="NOTES">
               <Input placeholder="Add notes if any" />
