@@ -1,9 +1,10 @@
 import React, { useEffect,useState } from 'react';
-import {message, Card,Modal, Row, Col, Typography } from 'antd';
+import {message, Card,Modal, Row, Col, Typography, Button } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchUserById } from '../../hooks/userHooks';
 import UserUpdateForm from './ModifyUserForm';  // You need to create this
 import UserDeleteButton from './DeleteUserButton';  // You need to create this
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -15,8 +16,21 @@ const SingleUser = ({ userId, onChangeView }) => {
  
   useEffect(() => {
     const userButtons = [
-      <button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete User</button>,
-    <button key="modify" onClick={() => setIsUpdateModalVisible(true)}>Modify User</button>
+      <Button
+        key="delete"
+        icon={<DeleteOutlined />}
+        type="danger"
+        onClick={() => setIsDeleteModalVisible(true)}
+      >
+        Delete User
+      </Button>,
+      <Button
+        key="modify"
+        icon={<EditOutlined />}
+        onClick={() => setIsUpdateModalVisible(true)}
+      >
+        Modify User
+      </Button>
      ];
 
      setSidebarButtons(prevButtons => [

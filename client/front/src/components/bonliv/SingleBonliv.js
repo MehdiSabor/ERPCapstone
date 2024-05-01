@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Table, Typography, Tag, Row, Col, Spin, Alert, Modal,message } from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchBonlivById, useFetchItemsInBonliv, useValidateBonliv } from '../../hooks/bonlivHooks';
+import {EditOutlined, DeleteOutlined, UnorderedListOutlined, }from "@ant-design/icons";
 
 // Assuming these forms exist
 import UpdateBonlivForm from './BonlivupdateForm';
@@ -96,9 +97,27 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
 
   useEffect(() => {
     const bonlivButtons = [
-      <Button key="update" onClick={() => setUpdateModalVisible(true)}>Update Bonliv</Button>,
-      <Button key="delete" onClick={() => setDeleteModalVisible(true)}>Delete Bonliv</Button>,
-      <Button key="viewItems" onClick={() => setUpdateItemsModalVisible(true)}>Update Items</Button>
+      <Button
+        key="update"
+        icon={<EditOutlined />}
+        onClick={() => setUpdateModalVisible(true)}
+      >
+        Update Bonliv
+      </Button>,
+      <Button
+        key="delete"
+        icon={<DeleteOutlined />}
+        onClick={() => setDeleteModalVisible(true)}
+      >
+        Delete Bonliv
+      </Button>,
+      <Button
+        key="viewItems"
+        icon={<UnorderedListOutlined />}
+        onClick={() => setUpdateItemsModalVisible(true)}
+      >
+        Update Items
+      </Button>
     ];
 
     setSidebarButtons(prevButtons => [

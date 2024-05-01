@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import { Modal, Card,message, Button, List, Typography, Row, Col,Spin,Alert,Tag, Table } from 'antd';
+import { Modal, Card,message, Button, List, Typography, Row, Col,Spin,Alert,Tag, Table,} from 'antd';
 import { useSidebar } from '../../SidebarContext';
 import { useFetchAvoirById, useFetchItemsInAvoir, useValidateAvoir } from '../../hooks/avoirHooks'; // Adjust the import path as necessary
 import AvoirUpdateForm from './AvoirupdateForm';  // You need to create this
@@ -8,6 +8,7 @@ import AvoirAddItemForm from './AddItemToAvoirForm'; // You need to create this
 import ItemsInAvoirList from './ItemInAvoirList';
 import UpdateItemInAvoirForm from './updateItemInAvoirForm';
 import SingleClient from '../client/SingleClient';
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -41,11 +42,43 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
 
   useEffect(() => {
     const avoirButtons = [
-      <Button key="update" onClick={() => setIsUpdateModalVisible(true)}>Update Avoir</Button>,
-      <Button key="delete" onClick={() => setIsDeleteModalVisible(true)}>Delete Avoir</Button>,
-      <Button key="addItem" onClick={() => setIsAddItemModalVisible(true)}>Add Item</Button>,
-     <Button key="viewItems" onClick={handleOpenItemsModal}>View Items</Button>,
-    <Button key="viewClient" type="primary" onClick={() => setShowClientModal(true)}>View Client</Button>
+      <Button
+        key="update"
+        icon={<EditOutlined />}
+        onClick={() => setIsUpdateModalVisible(true)}
+      >
+        Update Avoir
+      </Button>,
+      <Button
+        key="delete"
+        icon={<DeleteOutlined />}
+        type="danger"
+        onClick={() => setIsDeleteModalVisible(true)}
+      >
+        Delete Avoir
+      </Button>,
+      <Button
+        key="addItem"
+        icon={<PlusOutlined />}
+        onClick={() => setIsAddItemModalVisible(true)}
+      >
+        Add Item
+      </Button>,
+      <Button
+        key="viewItems"
+        icon={<EyeOutlined />}
+        onClick={handleOpenItemsModal}
+      >
+        View Items
+      </Button>,
+      <Button
+        key="viewClient"
+        icon={<UserOutlined />}
+        type="primary"
+        onClick={() => setShowClientModal(true)}
+      >
+        View Client
+      </Button>
     
     ];
 

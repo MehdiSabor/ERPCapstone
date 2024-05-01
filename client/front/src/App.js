@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux'; // Import Redux hooks
-
+import { ConfigProvider } from 'antd';
 // Import all necessary components and pages
 import Home from './Pages/home';
 import ClientManagementPage from './Pages/client';
@@ -54,6 +54,15 @@ function App() {
 
   return (
     <BrowserRouter>
+    <ConfigProvider
+  theme={{
+    token: {
+      fontFamily: "'Poppins', sans-serif",
+      fontFamilyCode: "'Poppins', monospace",
+      colorPrimary: '#0047AB',  // Blue color set as primary
+    }
+  }}
+>
       <SidebarProvider>
         <div className="App" style={appStyle}>
           <NavigationBar />
@@ -85,6 +94,7 @@ function App() {
           </div>
         </div>
       </SidebarProvider>
+      </ConfigProvider>
     </BrowserRouter>
   );
 }

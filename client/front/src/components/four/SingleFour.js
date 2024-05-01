@@ -4,6 +4,7 @@ import { useSidebar } from '../../SidebarContext';
 import { useFetchFourById } from '../../hooks/fourHooks';
 import FourUpdateForm from './FourupdateForm';  // You need to create this
 import FourDeleteButton from './FourDeleteButton';  // You need to create this
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -14,9 +15,22 @@ const SingleFour = ({ fourId, onChangeView }) => {
   const { setSidebarButtons } = useSidebar();
 
   useEffect(() => {
-    const fourButtons = [
-      <Button key="update" type="primary" onClick={() => setIsUpdateModalVisible(true)}>Update Fournisseur</Button>,
-      <Button key="delete" type="danger" onClick={() => setIsDeleteModalVisible(true)}>Delete Fournisseur</Button>
+    const fourButtons = [<Button
+      key="update"
+      type="primary"
+      icon={<EditOutlined />}
+      onClick={() => setIsUpdateModalVisible(true)}
+    >
+      Update Fournisseur
+    </Button>,
+    <Button
+      key="delete"
+      type="danger"
+      icon={<DeleteOutlined />}
+      onClick={() => setIsDeleteModalVisible(true)}
+    >
+      Delete Fournisseur
+    </Button>
     ];
     setSidebarButtons(prevButtons => [
       ...prevButtons.slice(0, 2),

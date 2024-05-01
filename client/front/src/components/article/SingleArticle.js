@@ -33,6 +33,7 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  EditOutlined,DeleteOutlined
 } from "@ant-design/icons";
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -51,8 +52,9 @@ const SingleArticle = ({ articleId, onChangeView }) => {
 
   useEffect(() => {
     const articleButtons = [
-      <Button
+        <Button
         key="update"
+        icon={<EditOutlined />}
         type="primary"
         onClick={() => setIsUpdateModalVisible(true)}
       >
@@ -60,6 +62,7 @@ const SingleArticle = ({ articleId, onChangeView }) => {
       </Button>,
       <Button
         key="delete"
+        icon={<DeleteOutlined />}
         type="danger"
         onClick={() => setIsDeleteModalVisible(true)}
       >

@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
-import { Card, Row, Col, Typography } from 'antd';
-import { useSidebar } from '../../SidebarContext';
-import { useFetchFamilleById } from '../../hooks/familleHooks';
+import React, { useEffect } from "react";
+import { Card, Row, Col, Typography, Button} from "antd";
+import { useSidebar } from "../../SidebarContext";
+import { useFetchFamilleById } from "../../hooks/familleHooks";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -11,16 +12,23 @@ const SingleFamille = ({ familleId, onChangeView }) => {
 
   useEffect(() => {
     const familleButtons = [
-      <button key="delete" onClick={() => onChangeView('delete', familleId)}>Delete Famille</button>
+      <Button
+        key="delete"
+        type="danger"
+        icon={<DeleteOutlined />}
+        onClick={() => onChangeView("delete", familleId)}
+      >
+        Delete Famille
+      </Button>,
     ];
 
-    setSidebarButtons(prevButtons => [
+    setSidebarButtons((prevButtons) => [
       ...prevButtons.slice(0, 2), // Adjust slice as necessary
-      ...familleButtons
+      ...familleButtons,
     ]);
 
     return () => {
-      setSidebarButtons(prevButtons => prevButtons.slice(0, 2));
+      setSidebarButtons((prevButtons) => prevButtons.slice(0, 2));
     };
   }, [setSidebarButtons, onChangeView, familleId]);
 
@@ -29,20 +37,23 @@ const SingleFamille = ({ familleId, onChangeView }) => {
   if (!famille) return <p>No Famille found</p>;
 
   const titleStyle = {
-    marginBottom: '4px', // Reduce space between title and text
-    marginTop: '0px' // Remove top margin
+    marginBottom: "4px", // Reduce space between title and text
+    marginTop: "0px", // Remove top margin
   };
-
 
   return (
     <Card title="Famille Details" bordered={false}>
       <Row gutter={16}>
         <Col span={12}>
-          <Title level={5}style={titleStyle}>Name</Title>
+          <Title level={5} style={titleStyle}>
+            Name
+          </Title>
           <Text>{famille.nom}</Text>
         </Col>
         <Col span={12}>
-          <Title level={5}style={titleStyle}>Code</Title>
+          <Title level={5} style={titleStyle}>
+            Code
+          </Title>
           <Text>{famille.code_fam}</Text>
         </Col>
       </Row>

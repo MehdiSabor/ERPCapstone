@@ -19,8 +19,8 @@ const ClientManagementPage = () => {
   };
   useEffect(() => {
     const buttons = [
-        <button key="list" onClick={() => setCurrentView('list')}>View Clients</button>,
-        <button key="create" onClick={() => setCurrentView('create')}>Create Client</button>
+    <button key="list" onClick={() => setCurrentView('list')}>View Clients</button>,
+    <button key="create" onClick={() => setCurrentView('create')}>Create Client</button>
     ];
     setSidebarButtons(buttons);
 }, [setSidebarButtons, setCurrentView]);

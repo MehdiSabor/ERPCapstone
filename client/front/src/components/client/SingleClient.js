@@ -18,7 +18,7 @@ import {
   TruckOutlined,
   TagsOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined,
+  CloseCircleOutlined,EditOutlined, DeleteOutlined
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -47,6 +47,7 @@ const SingleClient = ({ clientId, onChangeView }) => {
     const clientButtons = [
       <Button
         key="update"
+        icon={<EditOutlined />}
         type="primary"
         onClick={() => setIsUpdateModalVisible(true)}
       >
@@ -54,6 +55,7 @@ const SingleClient = ({ clientId, onChangeView }) => {
       </Button>,
       <Button
         key="delete"
+        icon={<DeleteOutlined />}
         type="danger"
         onClick={() => setIsDeleteModalVisible(true)}
       >
