@@ -58,8 +58,11 @@ function App() {
     <ConfigProvider
     theme={{
       token: {
-        fontFamilyBase: "'Poppins', sans-serif",  // Update with your font family
-        fontFamilyCode: "'Poppins', monospace"  // Optional: Set a specific font for code elements
+        fontFamily: "'Poppins', sans-serif",  // Update with your font family
+        fontFamilyCode: "'Poppins', monospace" ,
+        colorPrimary: '#0047AB',
+
+       
       }
     }}
   >

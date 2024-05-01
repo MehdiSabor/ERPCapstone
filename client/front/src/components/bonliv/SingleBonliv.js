@@ -212,7 +212,7 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
   </Row>
 </Card>
 
-      <Card title="Items in Bonliv">
+      <Card title="Items in Bonliv" style={{ marginTop: 20 }}>
         <Table columns={columns} dataSource={items} rowKey="CODE_ART" />
       </Card>
 

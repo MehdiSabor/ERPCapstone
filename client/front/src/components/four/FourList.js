@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Table, Input, Button, Space } from 'antd';
+import { Card,Table, Input, Button, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useFetchAllFours } from '../../hooks/fourHooks'; // Make sure the path matches your project structure
 
@@ -91,10 +91,26 @@ const FourList = ({ onSelectFour }) => {
           key: 'compte'
       }
   ];
-
+  const titleStyle = {
+    fontSize: "24px", // Increased font size for titles
+    fontWeight: "bold",
+    color: "#333", // Darker font color for better visibility
+    marginBottom: "16px",
+    borderBottom: "2px solid #ccc", // Separator line
+    paddingBottom: "10px", // Spacing between title and separator line
+    marginTop: "-10px",
+  };
+  
+  
+  const tableCardStyle = {
+    marginTop: "20px",
+    backgroundColor: "#ffffff", // Lighter than the main background for emphasis
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Optional: adds subtle shadow for depth
+  };
   return (
       <div>
-          <h2>Fournisseurs List</h2>
+      <Card style={tableCardStyle}>
+          <h2 style={titleStyle}>Fournisseurs List</h2>
           <Table
               columns={columns}
               dataSource={Fours}
@@ -105,6 +121,7 @@ const FourList = ({ onSelectFour }) => {
                   style: { cursor: 'pointer' }
               })}
           />
+          </Card>
       </div>
   );
 };

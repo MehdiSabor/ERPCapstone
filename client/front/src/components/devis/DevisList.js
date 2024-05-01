@@ -1,24 +1,20 @@
-import React, { useState, useRef } from 'react';
-import { Table, Input, Button, Space, Switch } from 'antd';
+import React, { useState } from 'react';
+import { Card, Table, Input, Button, Space, Tabs } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useFetchAllDevis } from '../../hooks/devisHooks'; // Ensure the path matches your project structure
 
+const { TabPane } = Tabs;
+
 const DevisList = ({ onSelectDevis }) => {
   const { devis, loading, error } = useFetchAllDevis();
-  const searchInput = useRef(null);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
-  const [showValidated, setShowValidated] = useState(false);
-
-  const toggleValidated = () => {
-    setShowValidated(!showValidated);
-  };
+  const [activeTab, setActiveTab] = useState('notValidated');
 
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div style={{ padding: 8 }}>
         <Input
-          ref={searchInput}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
           onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
@@ -53,7 +49,7 @@ const DevisList = ({ onSelectDevis }) => {
     setSearchedColumn(dataIndex);
   };
 
-  const handleReset = (clearFilters) => {
+  const handleReset = clearFilters => {
     clearFilters();
     setSearchText('');
   };
@@ -103,27 +99,52 @@ const DevisList = ({ onSelectDevis }) => {
     }
   ];
 
-  const filteredDevis = devis.filter(d => showValidated ? d.VALIDER : !d.VALIDER);
+  const filteredDevis = devis.filter(d => activeTab === 'validated' ? d.VALIDER : !d.VALIDER);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error fetching devis: {error}</p>;
 
+  const titleStyle = {
+    fontSize: "24px", // Increased font size for titles
+    fontWeight: "bold",
+    color: "#333", // Darker font color for better visibility
+    marginBottom: "16px",
+    borderBottom: "2px solid #ccc", // Separator line
+    paddingBottom: "10px", // Spacing between title and separator line
+    marginTop: "-10px",
+  };
+
+  const tableCardStyle = {
+    marginTop: "20px",
+    backgroundColor: "#ffffff", // Lighter than the main background for emphasis
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Optional: adds subtle shadow for depth
+  };
+
   return (
     <div>
-      <h2>Devis List</h2>
-      <Switch checked={showValidated} onChange={toggleValidated} checkedChildren="Validated" unCheckedChildren="Not Validated" />
-      <Table
-        columns={columns}
-        dataSource={filteredDevis}
-        rowKey="REF_DEV"
-        pagination={{ pageSize: 10 }}
-        onRow={(record) => ({
-          onClick: record.VALIDER ? null : () => onSelectDevis(record.REF_DEV),
-          style: { cursor: record.VALIDER ? 'not-allowed' : 'pointer' }
-        })}
-      />
+      <Card style={tableCardStyle}>
+        <h2 style={titleStyle}>Devis List</h2>
+        <Tabs defaultActiveKey="notValidated" onChange={setActiveTab}>
+          <TabPane tab="Not Validated" key="notValidated">
+            {/* Content of Not Validated tab */}
+          </TabPane>
+          <TabPane tab="Validated" key="validated">
+            {/* Content of Validated tab */}
+          </TabPane>
+        </Tabs>
+        <Table
+          columns={columns}
+          dataSource={filteredDevis}
+          rowKey="REF_DEV"
+          pagination={{ pageSize: 10 }}
+          onRow={(record) => ({
+            onClick: record.VALIDER ? null : () => onSelectDevis(record.REF_DEV),
+            style: { cursor: record.VALIDER ? 'not-allowed' : 'pointer' }
+          })}
+        />
+      </Card>
     </div>
   );
 };
 
-export default DevisList
+export default DevisList;

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Modal, Row, Col, message,Typography, Spin, Alert } from 'antd';
+import { Card, Button, Modal, Row, Col, message, Typography, Tabs } from 'antd';
+import { UserOutlined, PhoneOutlined, HomeOutlined, InfoCircleOutlined, CalendarOutlined } from '@ant-design/icons';
+
 import { useSidebar } from '../../SidebarContext';
 import { useFetchComById } from '../../hooks/comHooks';
-import ComUpdateForm from './ComupdateForm';  // You need to create this
-import ComDeleteButton from './ComDeleteButton';  // You need to create this
+import ComUpdateForm from './ComupdateForm';  // Ensure you have this form component created
+import ComDeleteButton from './ComDeleteButton';  // Ensure you have this button component created
 
 const { Title, Text } = Typography;
+const { TabPane } = Tabs;
 
 const SingleCom = ({ comId, onChangeView }) => {
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
@@ -44,51 +47,71 @@ const SingleCom = ({ comId, onChangeView }) => {
   if (error) return <p>Error: {error}</p>;
   if (!Com) return <p>No commercial found</p>;
 
-  const itemStyle = {
-    marginBottom: '16px'
+  const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'Not provided';
+
+  const textStyle = {
+    marginBottom: '10px',
+    display: 'block',
+    fontSize: '16px', // Adjust the font size as needed
   };
+
+  const cardContentStyle = {
+    paddingLeft: '24px', // Add left padding to card content
+    paddingTop: '10px',
+  };
+
   const titleStyle = {
-    marginBottom: '4px', // Reduce space between title and text
-    marginTop: '0px' // Remove top margin
+    marginBottom: '20px',
+    fontWeight: 'bold',
+    color: '#333', // Darker font color for better visibility
+    borderBottom: '2px solid #ccc', // Separator line
+    paddingBottom: '10px', // Spacing between title and separator line
+    marginTop: '-10px',
+  };
+
+  const cardStyle = {
+    marginTop: '20px',
+    backgroundColor: '#f8f8f8', // Lighter than the main background for emphasis
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', // Optional: adds subtle shadow for depth
+  };
+
+  const mainBackgroundStyle = {
+    background: 'white', // Main background color
+    padding: '20px',
   };
 
   return (
-    <div>
-     
-        {/* Dynamic content based on Com properties */}
-        <Card title="Commercial Details" >
-      {loading ? (
-        <Spin tip="Loading..." />
-      ) : error ? (
-        <Alert message="Error" description={error} type="error" showIcon />
-      ) : !Com ? (
-        <Alert message="No commercial found" type="info" showIcon />
-      ) : (
-        <div>
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Title level={5} style={titleStyle}>Code</Title>
-              <Text>{Com.code_com}</Text>
-            </Col>
-            <Col span={12} >
-              <Title level={5} style={titleStyle}>Name</Title>
-              <Text>{Com.nom}</Text>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]} style={itemStyle}>
-            <Col span={12}>
-              <Title level={5}>Telephone</Title>
-              <Text>{Com.tel}</Text>
-            </Col>
-            <Col span={12}>
-              <Title level={5}>Email</Title>
-              <Text>{Com.email}</Text>
-            </Col>
-          </Row>
-        </div>
-      )}
-    </Card>
-     
+    <div style={mainBackgroundStyle}>
+      <Title level={2} style={titleStyle}>{Com.nom} - {Com.code_com}</Title>
+      <Tabs defaultActiveKey="1">
+        <TabPane tab="Commercial Information" key="1">
+          <Card style={cardStyle}>
+            <Row gutter={[24, 24]} style={cardContentStyle}>
+              <Col span={12}>
+                <Text style={textStyle}>
+                  <UserOutlined /> <strong>Name:</strong> {Com.nom}
+                </Text>
+              </Col>
+              <Col span={12}>
+                <Text style={textStyle}>
+                  <PhoneOutlined /> <strong>Phone:</strong> {Com.tel}
+                </Text>
+              </Col>
+              <Col span={12}>
+                <Text style={textStyle}>
+                  <HomeOutlined /> <strong>Email:</strong> {Com.email}
+                </Text>
+              </Col>
+              <Col span={12}>
+                <Text style={textStyle}>
+                  <InfoCircleOutlined /> <strong>Employee Code:</strong> {Com.code_com}
+                </Text>
+              </Col>
+              {/* Additional fields can be added here with similar styling */}
+            </Row>
+          </Card>
+        </TabPane>
+      </Tabs>
       <Modal
         title="Update Commercial"
         visible={isUpdateModalVisible}

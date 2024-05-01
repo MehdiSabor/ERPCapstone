@@ -1,24 +1,20 @@
-import React, { useState, useRef } from 'react';
-import { Table, Input, Button, Space, Switch } from 'antd';
+import React, { useState } from 'react';
+import { Table, Input, Button, Space, Tabs, Card } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useFetchAllBonliv } from '../../hooks/bonlivHooks'; // Ensure the path matches your project structure
 
+const { TabPane } = Tabs;
+
 const BonlivList = ({ onSelectBonliv }) => {
   const { bonliv, loading, error } = useFetchAllBonliv();
-  const searchInput = useRef(null);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
-  const [showValidated, setShowValidated] = useState(false);
-
-  const toggleValidated = () => {
-    setShowValidated(!showValidated);
-  };
+  const [activeTab, setActiveTab] = useState('notValidated');
 
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div style={{ padding: 8 }}>
         <Input
-          ref={searchInput}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
           onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
@@ -43,7 +39,7 @@ const BonlivList = ({ onSelectBonliv }) => {
     ),
     filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
     onFilter: (value, record) =>
-      record[dataIndex] ? record[dataIndex].toString().lowercase().includes(value.lowercase()) : '',
+      record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
     render: text => text
   });
 
@@ -53,7 +49,7 @@ const BonlivList = ({ onSelectBonliv }) => {
     setSearchedColumn(dataIndex);
   };
 
-  const handleReset = (clearFilters) => {
+  const handleReset = clearFilters => {
     clearFilters();
     setSearchText('');
   };
@@ -91,25 +87,50 @@ const BonlivList = ({ onSelectBonliv }) => {
     }
   ];
 
-  const filteredBonliv = bonliv.filter(b => showValidated ? b.VALIDER : !b.VALIDER);
+  const filteredBonliv = bonliv.filter(b => activeTab === 'validated' ? b.VALIDER : !b.VALIDER);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error fetching bonliv: {error}</p>;
 
+  const titleStyle = {
+    fontSize: "24px", // Increased font size for titles
+    fontWeight: "bold",
+    color: "#333", // Darker font color for better visibility
+    marginBottom: "16px",
+    borderBottom: "2px solid #ccc", // Separator line
+    paddingBottom: "10px", // Spacing between title and separator line
+    marginTop: "-10px",
+  };
+
+  const tableCardStyle = {
+    marginTop: "20px",
+    backgroundColor: "#ffffff", // Lighter than the main background for emphasis
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Optional: adds subtle shadow for depth
+  };
+
   return (
     <div>
-      <h2>Bonliv List</h2>
-      <Switch checked={showValidated} onChange={toggleValidated} checkedChildren="Validated" unCheckedChildren="Not Validated" />
-      <Table
-        columns={columns}
-        dataSource={filteredBonliv}
-        rowKey="REF_BL"
-        pagination={{ pageSize: 10 }}
-        onRow={(record) => ({
-          onClick: record.VALIDER ? null : () => onSelectBonliv(record.REF_BL),
-          style: { cursor: record.VALIDER ? 'not-allowed' : 'pointer' }
-        })}
-      />
+      <Card style={tableCardStyle}>
+        <h2 style={titleStyle}>Bonliv List</h2>
+        <Tabs defaultActiveKey="notValidated" onChange={setActiveTab}>
+          <TabPane tab="Not Validated" key="notValidated">
+            {/* Content of Not Validated tab */}
+          </TabPane>
+          <TabPane tab="Validated" key="validated">
+            {/* Content of Validated tab */}
+          </TabPane>
+        </Tabs>
+        <Table
+          columns={columns}
+          dataSource={filteredBonliv}
+          rowKey="REF_BL"
+          pagination={{ pageSize: 10 }}
+          onRow={(record) => ({
+            onClick: record.VALIDER ? null : () => onSelectBonliv(record.REF_BL),
+            style: { cursor: record.VALIDER ? 'not-allowed' : 'pointer' }
+          })}
+        />
+      </Card>
     </div>
   );
 };
