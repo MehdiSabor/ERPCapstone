@@ -17,6 +17,7 @@ import ComDeleteButton from "./ComDeleteButton"; // You need to create this
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
+const { TabPane } = Tabs;
 
 const SingleCom = ({ comId, onChangeView }) => {
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
@@ -72,6 +73,7 @@ const SingleCom = ({ comId, onChangeView }) => {
   const itemStyle = {
     marginBottom: "16px",
   };
+
   const titleStyle = {
     marginBottom: "4px", // Reduce space between title and text
     marginTop: "0px", // Remove top margin

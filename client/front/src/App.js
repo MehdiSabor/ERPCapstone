@@ -53,8 +53,10 @@ function App() {
   };
 
   return (
+    
     <BrowserRouter>
     <ConfigProvider
+<<<<<<< HEAD
   theme={{
     token: {
       fontFamily: "'Poppins', sans-serif",
@@ -63,6 +65,18 @@ function App() {
     }
   }}
 >
+=======
+    theme={{
+      token: {
+        fontFamily: "'Poppins', sans-serif",  // Update with your font family
+        fontFamilyCode: "'Poppins', monospace" ,
+        colorPrimary: '#0047AB',
+
+       
+      }
+    }}
+  >
+>>>>>>> 136b7930ebe2e539b55d14e6f68710a507ba94fa
       <SidebarProvider>
         <div className="App" style={appStyle}>
           <NavigationBar />
@@ -96,6 +110,7 @@ function App() {
       </SidebarProvider>
       </ConfigProvider>
     </BrowserRouter>
+    
   );
 }
 

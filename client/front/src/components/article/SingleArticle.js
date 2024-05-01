@@ -117,7 +117,7 @@ const SingleArticle = ({ articleId, onChangeView }) => {
   };
 
   const mainBackgroundStyle = {
-    background: "#ececec", // Main background color
+    background: "#fff", // Main background color
     padding: "20px",
   };
 
