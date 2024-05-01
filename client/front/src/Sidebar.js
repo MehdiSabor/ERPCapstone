@@ -92,7 +92,6 @@ const Sidebar = () => {
                 style={menuItemStyle}
                 onClick={button.props.onClick}
                 itemActiveBg = '#ffffff'
-
               >
                 {React.cloneElement(button, {
                   style: { ...button.props.style, ...menuItemStyle },
