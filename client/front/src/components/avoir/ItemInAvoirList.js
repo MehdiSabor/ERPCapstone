@@ -37,7 +37,7 @@ const ItemsInAvoirList = ({ refAvoir, onRefetch }) => {
             >
               <List.Item.Meta
                 title={`${item.ARTICLE} - Quantity: ${item.QTE}`}
-                description={`€${item.PV_TTC} Total: €${item.TotalTTC}`}
+                description={`MAD${item.PV_TTC} Total: MAD${item.TotalTTC}`}
               />
             </List.Item>
           )}

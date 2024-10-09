@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/dashboard'; // Adjust this as necessary
+const API_BASE_URL = 'http://localhost:5500/dashboard'; // Adjust this as necessary
 
 // Order Tracking
 export const fetchMonthlyOrderVolume = () => axios.get(`${API_BASE_URL}/orders/monthly`);

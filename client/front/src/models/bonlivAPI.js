@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/bl'; // Adjust this as necessary
+const API_BASE_URL = 'http://localhost:5500/bl'; // Adjust this as necessary
 
 export const createBonliv = (bonlivData) => axios.post(`${API_BASE_URL}/createbl`, bonlivData);
 

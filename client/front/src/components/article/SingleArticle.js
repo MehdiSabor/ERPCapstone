@@ -222,7 +222,7 @@ const SingleArticle = ({ articleId, onChangeView }) => {
     <Row gutter={24} style={cardContentStyle}>
       <Col span={12}>
         <Text style={textStyle}>
-          <DollarCircleOutlined /> <strong>PA HT:</strong> {article.PA_HT}
+          <DollarCircleOutlined /> <strong>PA HT:</strong> {article.PA_HT} MAD
         </Text>
         <Text style={textStyle}>
           <PercentageOutlined /> <strong>TVA:</strong> {article.TVA}

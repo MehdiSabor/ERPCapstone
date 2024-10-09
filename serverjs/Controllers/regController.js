@@ -1,3 +1,4 @@
+// controllers/regController.js
 const regService = require('../services/regService');
 
 // Create a Reglement

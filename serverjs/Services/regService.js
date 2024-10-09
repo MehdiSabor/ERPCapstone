@@ -1,3 +1,4 @@
+// services/regService.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -52,6 +53,7 @@ const getReglementById = async (id) => {
 
 // Update a Reglement
 const updateReglement = async (id, data) => {
+  
   return await prisma.reglement.update({
     where: { REF_REGV: id },
     data,

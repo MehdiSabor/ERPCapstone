@@ -49,7 +49,7 @@ const RevenueRanking = () => {
       title: 'Revenue',
       dataIndex: 'revenue',
       key: 'revenue',
-      render: (value) => `€${value.toFixed(2)}`, // Format currency
+      render: (value) => `MAD${value.toFixed(2)}`, // Format currency
     },
     {
       title: 'Units Sold',

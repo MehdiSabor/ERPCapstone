@@ -67,7 +67,7 @@ const AvoirList = ({ onSelectAvoir }) => {
       ...getColumnSearchProps('REF_AVR'),
     },
     {
-      title: 'Total (€)',
+      title: 'Total (mad)',
       dataIndex: 'MNT_TTC',
       key: 'MNT_TTC',
       render: value => value.toFixed(2),

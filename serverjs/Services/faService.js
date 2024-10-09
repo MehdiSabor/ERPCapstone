@@ -1,3 +1,4 @@
+// services/faService.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -74,10 +75,7 @@ const cancelFactureAndCreateAvoirs = async (refFAC) => {
       }
 
       // Cancel the Facture (assuming update is needed to set some cancellation status)
-      await prisma.facture.update({
-          where: { REF_FAC: refFAC },
-          data: { VALIDER: false } // Example: Set VALIDER to false to indicate cancellation
-      });
+      
 
      
 
@@ -118,10 +116,10 @@ const cancelFactureAndCreateAvoirs = async (refFAC) => {
       });
 
       // Update facture as cancelled
-      await prisma.facture.update({
-          where: { REF_FAC: refFAC },
-          data: { IsCanceled: true }
-      });
+      await prisma.facture.delete({
+        where: { REF_FAC: refFAC }
+        // Example: Set VALIDER to false to indicate cancellation
+    });
 
       return { facture, avoirs, detailAvoirs };
   });

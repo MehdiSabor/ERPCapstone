@@ -72,7 +72,7 @@ const ReglementList = ({ onSelectReglement }) => {
             dataIndex: 'MNT_REGLER',
             key: 'MNT_REGLER',
             ...getColumnSearchProps('MNT_REGLER'),
-            render: value => value.toFixed(2) + '€',
+            render: value => value.toFixed(2) + 'MAD',
         },
         {
             title: 'Payment Mode',
@@ -90,7 +90,7 @@ const ReglementList = ({ onSelectReglement }) => {
             title: 'Remaining',
             dataIndex: 'remainingAmount',
             key: 'remainingAmount',
-            render: value => value ? value.toFixed(2) + '€' : '0.00€',
+            render: value => value ? value.toFixed(2) + 'MAD' : '0.00MAD',
         },
     ];
 

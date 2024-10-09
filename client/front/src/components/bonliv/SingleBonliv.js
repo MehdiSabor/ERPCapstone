@@ -130,9 +130,9 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
   const handleValidateClick = async () => {
     try {
       await validate();
-      alert('Bonliv has been successfully validated.');
+      message.success('Bonliv has been successfully validated.');
     } catch (error) {
-      alert(`Failed to validate bonliv: ${error}`);
+      message.error(`Failed to validate bonliv: ${error}`);
     }
   };
 
@@ -198,11 +198,11 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
     
     <Col span={8}>
       <Title level={5} style={{ marginBottom: '4px', marginTop: '0px' }}>Total HT Liv</Title>
-      <Text>{bonliv.MNT_HTliv ? bonliv.MNT_HTliv.toFixed(2) : 'N/A'}€</Text>
+      <Text>{bonliv.MNT_HTliv ? bonliv.MNT_HTliv.toFixed(2) : 'N/A'}MAD</Text>
     </Col>
     <Col span={8}>
       <Title level={5} style={{ marginBottom: '4px', marginTop: '0px' }}>Total TTC Liv</Title>
-      <Text>{bonliv.MNT_TTCliv ? bonliv.MNT_TTCliv.toFixed(2) : 'N/A'}€</Text>
+      <Text>{bonliv.MNT_TTCliv ? bonliv.MNT_TTCliv.toFixed(2) : 'N/A'}MAD</Text>
     </Col>
     <Col span={8}>
       <Title level={5} style={{ marginBottom: '4px', marginTop: '0px' }}>Delivery Mode</Title>
@@ -258,6 +258,7 @@ const SingleBonliv = ({ bonlivId, onChangeView }) => {
         visible={updateItemsModalVisible}
         onCancel={() => setUpdateItemsModalVisible(false)}
         footer={null}
+        width={800}
       >
         <ItemInBonlivList refBonliv={bonliv.REF_BL} onSuccess={handleItemUpdateSuccess} />
       </Modal>

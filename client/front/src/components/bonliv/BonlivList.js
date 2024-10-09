@@ -74,7 +74,7 @@ const BonlivList = ({ onSelectBonliv }) => {
       ...getColumnSearchProps('REF_BL'),
     },
     {
-      title: 'Total (€)',
+      title: 'Total (MAD)',
       dataIndex: 'MNT_TTC',
       key: 'MNT_TTC',
       render: value => value.toFixed(2),

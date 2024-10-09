@@ -131,7 +131,7 @@ const SingleReglement = ({ reglementId, onChangeView }) => {
             <Title level={5} style={titleStyle}>
               Amount to Regulate
             </Title>
-            <Text>{`${reglement.MNT_REGLER.toFixed(2)} €`}</Text>
+            <Text>{`${reglement.MNT_REGLER.toFixed(2)} MAD`}</Text>
           </Col>
           <Col span={8}>
             <Title level={5} style={titleStyle}>
@@ -181,6 +181,7 @@ const SingleReglement = ({ reglementId, onChangeView }) => {
             <UnifiedFactureAvoirList
               reglementId={reglementId}
               handleRefetch={handleRefetch}
+              code_clt={reglement.CODE_CLT}
             />
           </Col>
           <Col span={12}>

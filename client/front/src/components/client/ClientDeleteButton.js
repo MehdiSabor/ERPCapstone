@@ -6,7 +6,7 @@ import { useDeleteClient } from '../../hooks/clientHooks';
 
 const { Title, Paragraph } = Typography;
 
-const ClientDeletePage = ({ clientId }) => {
+const ClientDeletePage = ({ clientId ,onSuccess}) => {
   const [loading, setLoading] = useState(false);
 
   const { handleDelete } = useDeleteClient();
@@ -16,7 +16,7 @@ const ClientDeletePage = ({ clientId }) => {
     try {
       await handleDelete(clientId);
       // Navigate back or to another relevant page on success
-      
+      onSuccess();
     } catch (error) {
       Modal.error({
         title: 'Failed to delete client',

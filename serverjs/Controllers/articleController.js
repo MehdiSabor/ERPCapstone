@@ -1,3 +1,5 @@
+// controllers/articleController.js
+
 const articleService = require('../services/articleService');
 
 exports.createArticle = async (req, res) => {

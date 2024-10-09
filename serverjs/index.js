@@ -17,7 +17,7 @@ const authMiddleware = require('./middleware/authMiddleware');
 const app = express();
 
 const corsOptions = {
-  origin: 'http://localhost:5001' 
+  origin: 'http://localhost:5000' 
 };
 
 app.use(cors(corsOptions)); 
@@ -41,7 +41,7 @@ app.use('/av',avRoutes);
 app.use('/reglement',regRoutes);
 app.use('/fam', famRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

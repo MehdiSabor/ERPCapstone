@@ -28,13 +28,13 @@ const ReglementDetailsList = ({ reglementId,reglement,handleRefetch , loading, e
       title: 'Total Amount',
       dataIndex: 'MNT_ORIGINAL',
       key: 'MNT_ORIGINAL',
-      render: (text) => `€${text.toFixed(2)}`
+      render: (text) => `MAD${text.toFixed(2)}`
     },
     {
       title: 'Amount Registered',
       dataIndex: 'MNT_REGLER',
       key: 'MNT_REGLER',
-      render: (text) => `€${text.toFixed(2)}`
+      render: (text) => `MAD${text.toFixed(2)}`
     },
     {
       title: 'Action',

@@ -53,6 +53,7 @@ const AvoirForm = () => {
                                 visible={showComList}
                                 onCancel={() => setShowComList(false)}
                                 footer={null}
+                                width={800}
                             >
                                 <ComList onSelectCom={handleComSelect} />
                             </Modal>
@@ -65,6 +66,7 @@ const AvoirForm = () => {
                                 visible={showClientList}
                                 onCancel={() => setShowClientList(false)}
                                 footer={null}
+                                width={800}
                             >
                                 <ClientList onSelectClient={handleClientSelect} />
                             </Modal>

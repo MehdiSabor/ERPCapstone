@@ -1,5 +1,5 @@
 // services/authService.js
-const API_URL = 'http://localhost:3000/account'; // Adjust as per your server's URL
+const API_URL = 'http://localhost:5500/account'; // Adjust as per your server's URL
 
 export const register = async (email, name, password) => {
     try {

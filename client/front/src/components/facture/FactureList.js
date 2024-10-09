@@ -68,7 +68,7 @@ const FactureList = ({ onSelectFacture }) => {
       ...getColumnSearchProps('REF_FAC'),
     },
     {
-      title: 'Total (€)',
+      title: 'Total (MAD)',
       dataIndex: 'MNT_TTC',
       key: 'MNT_TTC',
       render: value => value.toFixed(2),

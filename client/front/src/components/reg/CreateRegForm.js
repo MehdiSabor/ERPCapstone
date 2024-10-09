@@ -62,6 +62,7 @@ const CreateReglementForm = () => {
                 visible={showClientList}
                 onCancel={() => setShowClientList(false)}
                 footer={null}
+                width={800}
               >
                 <ClientList onSelectClient={handleClientSelect} />
               </Modal>

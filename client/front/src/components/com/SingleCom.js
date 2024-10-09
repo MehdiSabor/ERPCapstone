@@ -9,6 +9,7 @@ import {
   Typography,
   Spin,
   Alert,
+  Tabs
 } from "antd";
 import { useSidebar } from "../../SidebarContext";
 import { useFetchComById } from "../../hooks/comHooks";

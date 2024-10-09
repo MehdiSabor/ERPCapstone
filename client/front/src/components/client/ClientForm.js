@@ -156,7 +156,7 @@ const ClientForm = () => {
               >
                 <Input />
               </Form.Item>
-              <Form.Item>
+              <Form.Item name="code_com">
                 <Button
                   type="primary"
                   onClick={showModal}

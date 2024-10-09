@@ -1,7 +1,7 @@
 import axios from 'axios';
 import store from '../store';  // Ensure the store is properly imported
 
-const API_BASE_URL = 'http://localhost:3000/article';
+const API_BASE_URL = 'http://localhost:5500/article';
 
 // Set up request interceptor to attach token
 axios.interceptors.request.use(config => {

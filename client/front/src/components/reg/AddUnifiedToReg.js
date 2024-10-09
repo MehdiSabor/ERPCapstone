@@ -50,11 +50,11 @@ const AddUnifiedToReglement = ({ reglementId, reglementMaxAmount }) => {
   return (
     <div>
       <h3>Add Unified to Reglement</h3>
-      <p>Total Selected: {selectedAmount}€ (Max: {reglementMaxAmount}€)</p>
+      <p>Total Selected: {selectedAmount}MAD (Max: {reglementMaxAmount}MAD)</p>
       <ul>
         {unifiedRecords.map(unified => (
           <li key={unified.REF_AV_FAC} onClick={() => handleSelect(unified)} style={{ cursor: 'pointer', backgroundColor: selectedUnified.find(item => item.REF_AV_FAC === unified.REF_AV_FAC) ? '#ccc' : 'transparent' }}>
-            {unified.REF_AV_FAC} - Remaining: {unified.MNT_TTC - unified.MNT_REGLER}€
+            {unified.REF_AV_FAC} - Remaining: {unified.MNT_TTC - unified.MNT_REGLER}MAD
           </li>
         ))}
       </ul>

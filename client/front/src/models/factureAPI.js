@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/fa'; // Adjust this as necessary
+const API_BASE_URL = 'http://localhost:5500/fa'; // Adjust this as necessary
 
 export const getFactureById = (id) => axios.get(`${API_BASE_URL}/getfacture/${id}`);
 export const getAllFactures = () => axios.get(`${API_BASE_URL}/getallfactures`);

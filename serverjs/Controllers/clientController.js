@@ -1,3 +1,4 @@
+// controllers/clientController.js
 const clientService = require('../Services/clientService');
 
 exports.createClient = async (req, res) => {
@@ -34,8 +35,8 @@ exports.updateClient = async (req, res) => {
 
 exports.deleteClient = async (req, res) => {
   try {
-    await clientService.deleteClient(parseInt(req.params.id));
-    res.status(204).send();
+    const client = await clientService.deleteClient(parseInt(req.params.id));
+    res.json(client);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

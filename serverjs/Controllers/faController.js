@@ -1,3 +1,4 @@
+// controllers/faController.js
 const factureService = require('../Services/faService');
 
 exports.getFactureById = async (req, res) => {

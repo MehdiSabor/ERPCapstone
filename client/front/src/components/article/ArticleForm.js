@@ -49,6 +49,7 @@ const ArticleForm = () => {
       PV_TTC: values.PV_TTC ? parseFloat(values.PV_TTC) : null, 
       REMISEMAX: values.REMISEMAX ? parseFloat(values.REMISEMAX) : null, // Assuming these are computed and may need saving
     };
+    console.log(payload);
     await handleUpload();
     console.log('Submitting:', payload); // For debugging
     await handleCreate(payload);
@@ -197,10 +198,10 @@ const ArticleForm = () => {
               <Input type="number" />
             </Form.Item>
             <Form.Item label={<span><TagOutlined /> Purchase Price Incl. VAT</span>} name="PA_TTC">
-              <Input prefix="€" readOnly />
+              <Input prefix="mad" readOnly />
             </Form.Item>
             <Form.Item label={<span><TagOutlined /> Selling Price Incl. VAT</span>} name="PV_TTC">
-              <Input prefix="€" readOnly />
+              <Input prefix="mad" readOnly />
             </Form.Item>
             <Form.Item label={<span><PercentageOutlined /> Maximum Discount (%)</span>} name="REMISEMAX">
               <Input type="number" />

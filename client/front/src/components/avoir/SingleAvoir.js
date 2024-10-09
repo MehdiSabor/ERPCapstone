@@ -212,11 +212,11 @@ const SingleAvoir = ({ avoirId, onChangeView }) => {
     </Col>
     <Col span={8}>
       <Title level={5} style={titleStyle}>Amount HT</Title>
-      <Text>{`${avoir.MNT_HT.toFixed(2)} €`}</Text>
+      <Text>{`${avoir.MNT_HT.toFixed(2)} MAD`}</Text>
     </Col>
     <Col span={8}>
       <Title level={5} style={titleStyle}>Amount TTC</Title>
-      <Text>{`${avoir.MNT_TTC.toFixed(2)} €`}</Text>
+      <Text>{`${avoir.MNT_TTC.toFixed(2)} MAD`}</Text>
     </Col>
     <Col span={8}>
       <Title level={5} style={titleStyle}>Salesperson Code</Title>

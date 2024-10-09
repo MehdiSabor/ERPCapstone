@@ -120,13 +120,10 @@ const ClientList = ({ onSelectClient }) => {
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Optional: adds subtle shadow for depth
   };
   
-  const mainBackgroundStyle = {
-    background: "#ececec", // Main background color
-    padding: "20px",
-  };
+  
 
   return (
-    <div style={mainBackgroundStyle}>
+    <div >
           <Card style={tableCardStyle}>
           <h2 style={titleStyle}>Clients List</h2>
           <Table

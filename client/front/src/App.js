@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux'; // Import Redux hooks
 import { ConfigProvider } from 'antd';
 // Import all necessary components and pages
@@ -54,29 +54,18 @@ function App() {
 
   return (
     
-    <BrowserRouter>
+    <Router>
     <ConfigProvider
-<<<<<<< HEAD
-  theme={{
-    token: {
-      fontFamily: "'Poppins', sans-serif",
-      fontFamilyCode: "'Poppins', monospace",
-      colorPrimary: '#0047AB',  // Blue color set as primary
-    }
-  }}
->
-=======
     theme={{
       token: {
         fontFamily: "'Poppins', sans-serif",  // Update with your font family
         fontFamilyCode: "'Poppins', monospace" ,
-        colorPrimary: '#0047AB',
+        colorPrimary: '#000',
 
        
       }
     }}
   >
->>>>>>> 136b7930ebe2e539b55d14e6f68710a507ba94fa
       <SidebarProvider>
         <div className="App" style={appStyle}>
           <NavigationBar />
@@ -109,7 +98,7 @@ function App() {
         </div>
       </SidebarProvider>
       </ConfigProvider>
-    </BrowserRouter>
+    </Router>
     
   );
 }

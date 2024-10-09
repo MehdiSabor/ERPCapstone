@@ -41,8 +41,8 @@ const ModifyReglementForm = ({ reglementId, onFinishedUpdate }) => {
             style={{ width: '100%' }}
             min={0}
             step={0.01}
-            formatter={value => `€ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-            parser={value => value.replace(/€\s?|(,*)/g, '')}
+            formatter={value => `MAD ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            parser={value => value.replace(/MAD\s?|(,*)/g, '')}
           />
         </Form.Item>
         <Row justify="end">

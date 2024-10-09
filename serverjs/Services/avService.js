@@ -1,3 +1,4 @@
+// services/avService.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -114,7 +115,7 @@ const validateAvoir = async (refAvoir) => {
       if (avoir.client) {
         await tx.client.update({
           where: { code_clt: avoir.CODE_CLT },
-          data: { SOLDE: { decrement: avoir.MNT_TTC } }
+          data: { SOLDE: { increment: avoir.MNT_TTC } }
         });
       }
   

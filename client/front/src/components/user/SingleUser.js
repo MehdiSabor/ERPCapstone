@@ -133,7 +133,7 @@ const SingleUser = ({ userId, onChangeView }) => {
         <UserUpdateForm userId={userId} onFinishedUpdate={handleUpdateSuccess} />
       </Modal>
       <Modal
-        title="Delete Commercial"
+        title="Delete User"
         visible={isDeleteModalVisible}
         footer={null}
         onCancel={() => setIsDeleteModalVisible(false)}

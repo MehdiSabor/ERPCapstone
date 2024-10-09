@@ -28,7 +28,7 @@ model Client {
   SOLDE               Int
   avoirs              Avoirs[]
   bonliv              Bonliv[]
-  comercial           Comercial             @relation(fields: [code_com], references: [code_com])
+  comercial           Comercial             @relation(fields: [code_com], references: [code_com], onDelete: Cascade)
   devis               Devis[]
   facture             Facture[]
   reglements          Reglement[]
@@ -71,8 +71,8 @@ model Article {
   LIQUIDER        Boolean         @default(false)
   code_frs        String
   qte_stk         Int
-  fournisseur     Fournisseur     @relation(fields: [code_frs], references: [code_frs])
-  famille         famille?        @relation(fields: [Code_fam], references: [code_fam])
+  fournisseur     Fournisseur     @relation(fields: [code_frs], references: [code_frs], onDelete: Cascade)
+  famille         famille?        @relation(fields: [Code_fam], references: [code_fam], onDelete: Cascade)
   bonlivDetails   DetailBonliv[]
   factureDetails  DetailFacture[]
   avoirDetails    DetailAvoirs[]
@@ -118,8 +118,8 @@ model Devis {
   MODELIV      String
   MODE_PAIE    String
   NOTES        String?
-  client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
-  comercial    Comercial     @relation(fields: [CODE_COM], references: [code_com])
+  client       Client        @relation(fields: [CODE_CLT], references: [code_clt], onDelete: Cascade)
+  comercial    Comercial     @relation(fields: [CODE_COM], references: [code_com], onDelete: Cascade)
   devisDetails DevisDetail[]  
 }
 
@@ -166,7 +166,7 @@ model Bonliv {
   IMPRIMER      Boolean?
   REMISEG  Float?
 
-  client        Client        @relation(fields: [CODE_CLT], references: [code_clt])
+  client        Client        @relation(fields: [CODE_CLT], references: [code_clt], onDelete: Cascade)
   detailBonlivs DetailBonliv[] 
 }
 
@@ -213,7 +213,7 @@ model Facture {
   VALIDER        Boolean
   IMPRIMER       Boolean?
   detailFactures DetailFacture[] 
-  client         Client         @relation(fields: [CODE_CLT], references: [code_clt])
+  client         Client         @relation(fields: [CODE_CLT], references: [code_clt], onDelete: Cascade)
 }
 
   model DetailFacture {
@@ -252,7 +252,7 @@ model Avoirs {
   REMARQUE     String?
   BASEHT       Boolean?
   
-  client       Client        @relation(fields: [CODE_CLT], references: [code_clt])
+  client       Client        @relation(fields: [CODE_CLT], references: [code_clt], onDelete: Cascade)
   detailAvoirs DetailAvoirs[]
 }
 
@@ -297,7 +297,7 @@ model Reglement {
   VILLE            String?
   remainingAmount Float?
   DATE_REG         DateTime
-  client           Client           @relation(fields: [CODE_CLT], references: [code_clt])
+  client           Client           @relation(fields: [CODE_CLT], references: [code_clt], onDelete: Cascade)
   reglementdetails ReglementDetail[]
 }
 
@@ -307,8 +307,8 @@ model ReglementDetail {
   DATE_DOC            DateTime @default(now())
   MNT_ORIGINAL        Float
   MNT_REGLER          Float
-  unifiedFactureAvoir UnifiedFactureAvoir @relation(fields: [REF_AV_FAC], references: [REF_AV_FAC])
-  reglement           Reglement           @relation(fields: [REF_REGV], references: [REF_REGV])
+  unifiedFactureAvoir UnifiedFactureAvoir @relation(fields: [REF_AV_FAC], references: [REF_AV_FAC], onDelete: Cascade)
+  reglement           Reglement           @relation(fields: [REF_REGV], references: [REF_REGV], onDelete: Cascade)
 @@id([REF_REGV,  REF_AV_FAC])
 }
 
@@ -319,7 +319,7 @@ model UnifiedFactureAvoir {
   MNT_REGLER       Float
   code_clt         Int
   reglementDetails ReglementDetail[]
-  client           Client            @relation(fields: [code_clt], references: [code_clt])
+  client           Client            @relation(fields: [code_clt], references: [code_clt], onDelete: Cascade)
 }
 
 

@@ -5,6 +5,7 @@ import { useFetchAllUnifiedFactureAvoir, useAddDetailReglement } from '../../hoo
 
 const UnifiedFactureAvoirList = ({ reglementId,handleRefetch,code_clt }) => {
     const { unifiedRecords, loading, error } = useFetchAllUnifiedFactureAvoir(code_clt);
+    
     const { handleAddDetail, isLoading, createError } = useAddDetailReglement();
     const [selectedUnified, setSelectedUnified] = useState(null);
 
@@ -45,7 +46,7 @@ const UnifiedFactureAvoirList = ({ reglementId,handleRefetch,code_clt }) => {
             title: 'Remaining Amount',
             dataIndex: 'MNT_REGLER',
             key: 'remaining',
-            render: (_, record) => `€${(record.MNT_TTC - record.MNT_REGLER).toFixed(2)}`,
+            render: (_, record) => `MAD${(record.MNT_TTC - record.MNT_REGLER).toFixed(2)}`,
             sorter: (a, b) => (a.MNT_TTC - a.MNT_REGLER) - (b.MNT_TTC - b.MNT_REGLER)
         },
         {

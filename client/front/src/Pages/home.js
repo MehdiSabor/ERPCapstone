@@ -1,5 +1,6 @@
-import React from 'react';
-import { Card, Col, Row } from 'antd';
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col, Typography, Modal, Button, message, Tabs } from "antd";
+import { useSidebar } from "../SidebarContext";
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -14,13 +15,35 @@ import {
   FileExcelOutlined,
   DollarOutlined ,
   TeamOutlined,
-  RetweetOutlined 
+  RetweetOutlined ,
+  DashboardOutlined 
 } from '@ant-design/icons';
+
 
 const Home = () => {
   const user = useSelector(state => state.user); // Access user from Redux state
   const isManager = user?.IsManager;
   const canAccess = permission => isManager || (user && user[permission]);
+
+  const { setSidebarButtons } = useSidebar();
+
+  useEffect(() => {
+    const userButtons = [
+      
+     ];
+
+     setSidebarButtons([
+      // Adjust slice as necessary
+       ...userButtons
+     ]);
+
+    return () => {
+      setSidebarButtons([
+        // Adjust slice as necessary
+         ...userButtons
+       ]);
+    };
+  }, [setSidebarButtons, user]);
 
   const categories = [
     { title: 'Clients', permission: 'CanManageClients', link: '/client', icon: <UserOutlined /> },
@@ -35,7 +58,7 @@ const Home = () => {
     // Since isManager has all permissions, no specific permission is required for the 'Familles' and 'Accounts' categories
     { title: 'Familles', permission: 'CanManageArticles', link: '/famille', icon: <TeamOutlined /> },
     { title: 'Accounts', permission: 'IsManager', link: '/user', icon: <TeamOutlined /> },
-    { title: 'Dashboard', permission: 'IsManager', link: '/dashboard', icon: <TeamOutlined /> }
+    { title: 'Dashboard', permission: 'IsManager', link: '/dashboard', icon: <DashboardOutlined /> }
   ];
 
   const cardStyle = {
@@ -54,7 +77,7 @@ const Home = () => {
 
   return (
     <div style={{ padding: 20 }}>
-      <h2>IHSSAN ERP</h2>
+      <h2>MY APPS</h2>
       <Row gutter={[16, 16]} justify="center">
         {categories.map(cat => canAccess(cat.permission) && (
           <Col xs={24} sm={12} md={8} lg={6} xl={4} key={cat.title}>
