@@ -1,5 +1,6 @@
-// controllers/clientController.js
-const clientService = require('../Services/clientService');
+//  controllers/clientController.js
+const clientService = require('../services/clientService');
+const xlsx = require('xlsx');
 
 exports.createClient = async (req, res) => {
   try {
@@ -48,5 +49,25 @@ exports.getAllClients = async (req, res) => {
     res.json(clients);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+exports.bulkUploadClients = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data = xlsx.utils.sheet_to_json(sheet);
+
+    const result = await clientService.bulkCreateOrUpdateClients(data);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

@@ -11,3 +11,9 @@ export const updateClient = (id, clientData) => axios.put(`${API_BASE_URL}/updat
 export const deleteClient = (id) => axios.delete(`${API_BASE_URL}/deleteclient/${id}`);
 
 export const getAllClients = () => axios.get(`${API_BASE_URL}/getallclients`);
+
+export const bulkUploadClients = (formData) => axios.post(`${API_BASE_URL}/bulk-upload`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });

@@ -35,3 +35,8 @@ export const getArticleById = (id) => axios.get(`${API_BASE_URL}/getarticle/${id
 export const updateArticle = (id, articleData) => axios.put(`${API_BASE_URL}/updatearticle/${id}`, articleData);
 export const deleteArticle = (id) => axios.delete(`${API_BASE_URL}/deletearticle/${id}`);
 export const getAllArticles = () => axios.get(`${API_BASE_URL}/getallarticles`);
+export const bulkUploadArticles = (formData) => axios.post(`${API_BASE_URL}/bulk-upload`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });

@@ -1,3 +1,5 @@
+// In hooks/clientHooks.js
+import { bulkUploadClients } from '../models/clientAPI';
 import { useState, useCallback, useEffect } from 'react';
 import { getAllClients,getClientById, updateClient,createClient,deleteClient } from '../models/clientAPI';
 
@@ -112,4 +114,29 @@ export const useDeleteClient = () => {
 
 
 
+export const useBulkUploadClients = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [uploadResult, setUploadResult] = useState(null);
+
+  const handleBulkUpload = async (file) => {
+    setLoading(true);
+    setError('');
+    setUploadResult(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await bulkUploadClients(formData);
+      setUploadResult(response.data);
+    } catch (err) {
+      setError(err.message || 'An error occurred during upload');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleBulkUpload, loading, error, uploadResult };
+};
 

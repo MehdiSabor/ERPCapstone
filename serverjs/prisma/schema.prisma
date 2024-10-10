@@ -6,29 +6,49 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model Client {
   code_clt            Int                   @id @default(autoincrement())
-  nom                 String
-  compte              String
-  tel                 String?
-  adresse             String?
-  ville               String
-  note                String?
+  CLIENT              String
+  COMPTE              String          @unique
+  TEL                 String?
+  MOBILE              String?
+  CONTACT             String?
+  ADRESSE_SIEGE       String?
+  ADRESSE_LIV         String?
+  VILLE               String
+  PAYS                String?
+  nat_clt             String?
+  conditions          String?
+  NOTES               String?
+  ECHEANCE            Int
+  MODE_PAIE           String?
+  BLOQUER             Boolean               @default(false)
+  CODE_PST            String?
+  PLAFOND_SLD         Float
+  CODE_COM            Int?
+  MODELIV             String?
+  CODE_CAT            Int?
+  plaf_ech            Float?
+  mode_paie_final     String?
+  PATENTE             String?
+  BANQUE              String?
+  COMPTEBNQ           String?
+  reg_trans           String?
+  CAPSOC              String?
+  FORMJUR             String?
+  ICE                 String?
+  objectif            Float?
+  remise_sp           Float?
+  email               String?
+  REMISE_G            Float?
+  SOLDE               Int?
   createdAt           DateTime              @default(now())
-  echeance            Int
-  mode_paie           String?
-  REMISE_G            Float
-  bloquer             Boolean               @default(false)
-  plafond             Float
-  code_com            Int
-  cond_paie           Int?
-  mode_liv            String?
-  code_cat            Int?
-  SOLDE               Int
+  updatedAt           DateTime              @updatedAt
+
+  // Relationships
+  //comercial           Comercial             @relation(fields: [CODE_COM], references: [code_com], onDelete: Cascade)
   avoirs              Avoirs[]
   bonliv              Bonliv[]
-  comercial           Comercial             @relation(fields: [code_com], references: [code_com], onDelete: Cascade)
   devis               Devis[]
   facture             Facture[]
   reglements          Reglement[]
@@ -40,39 +60,45 @@ model Comercial {
   nom      String
   tel      String?
   email    String?
-  clients  Client[]
+  //clients  Client[]
   Devis    Devis[]
 }
+
 
 model Article {
   id              Int             @id @default(autoincrement())
   code_art        String          @unique
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime?       @updatedAt
-  nom             String
-  desc            String?
+  ARTICLE         String
   photo           String?
-  UAF             Int?
+  qt_cart         Int?
   PA_HT           Float
   TVA             Float
   PA_TTC          Float
   PV_HT           Float
   PV_TTC          Float
-  Code_fam        Int?
-  STK_MAX         Int
+  CODE_FAM        String?
+  CODE_SFAM       String?
+  CODE_MAR        String?
   STK_MIN         Int
+  STK_MAX         Int
   STK_SEC         Int?
-  UVC             Int?
-  REMISEMAX       Float?
+  q_paquet        Int?
+  Remise          Float?
   REF_OEM         String?
   VENTE_BLOQ      Boolean         @default(false)
   ACHAT_BLOQ      Boolean         @default(false)
-  TRANS_BLOQ      Boolean         @default(false)
-  LIQUIDER        Boolean         @default(false)
-  code_frs        String
-  qte_stk         Int
-  fournisseur     Fournisseur     @relation(fields: [code_frs], references: [code_frs], onDelete: Cascade)
-  famille         famille?        @relation(fields: [Code_fam], references: [code_fam], onDelete: Cascade)
+  uav             String?
+  frs             String?
+  Remarque        String?
+  substitution    String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime?       @updatedAt
+  qte_stk         Int             @default(0)
+
+  // Keep existing relationships if needed
+  // famille         famille?        @relation(fields: [CODE_FAM], references: [code_fam])
+  // fournisseur     Fournisseur?    @relation(fields: [frs], references: [code_frs])
+  
   bonlivDetails   DetailBonliv[]
   factureDetails  DetailFacture[]
   avoirDetails    DetailAvoirs[]
@@ -82,7 +108,7 @@ model Article {
 model famille {
   code_fam  Int        @id @default(autoincrement())
   nom       String
-  articles  Article[]
+  //articles  Article[]
   
 }
 
@@ -98,7 +124,7 @@ model Fournisseur {
   note      String?
   cond_paie Boolean @default(false)
   bloquer   Boolean @default(false)
-  articles  Article[]
+  //articles  Article[]
 }
 
 model Devis {

@@ -1,3 +1,5 @@
+// In hooks/articleHooks.js
+import { bulkUploadArticles } from '../models/articleAPI';
 import { useState, useEffect,useCallback } from 'react';
 import { getAllArticles,getArticleById, updateArticle,createArticle,deleteArticle } from '../models/articleAPI';
 
@@ -111,4 +113,29 @@ export const useDeleteArticle = () => {
 
 
 
+export const useBulkUploadArticles = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [uploadResult, setUploadResult] = useState(null);
+
+  const handleBulkUpload = async (file) => {
+    setLoading(true);
+    setError('');
+    setUploadResult(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await bulkUploadArticles(formData);
+      setUploadResult(response.data);
+    } catch (err) {
+      setError(err.message || 'An error occurred during upload');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleBulkUpload, loading, error, uploadResult };
+};
 

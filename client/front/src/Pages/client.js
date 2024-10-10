@@ -5,6 +5,7 @@ import SingleClient from '../components/client/SingleClient';
 import ClientDeleteButton from '../components/client/ClientDeleteButton';
 import ClientUpdateForm from '../components/client/ClientupdateForm';
 import { useSidebar } from '../SidebarContext';
+import BulkUploadClients from '../components/client/BulkUploadClients';
 
 
 const ClientManagementPage = () => {
@@ -20,7 +21,8 @@ const ClientManagementPage = () => {
   useEffect(() => {
     const buttons = [
     <button key="list" onClick={() => setCurrentView('list')}>View Clients</button>,
-    <button key="create" onClick={() => setCurrentView('create')}>Create Client</button>
+    <button key="create" onClick={() => setCurrentView('create')}>Create Client</button>,
+    <button key="bulkUpload" onClick={() => setCurrentView('bulkUpload')}>Bulk Upload Clients</button>
     ];
     setSidebarButtons(buttons);
 }, [setSidebarButtons, setCurrentView]);
@@ -32,7 +34,7 @@ const ClientManagementPage = () => {
       {currentView === 'create' && <ClientForm />}
       {currentView === 'update' && <ClientUpdateForm clientId={selectedClientId} />}
       {currentView === 'delete' && <ClientDeleteButton clientId={selectedClientId} onSuccess={() => setCurrentView('list')} />}
-  
+      {currentView === 'bulkUpload' && <BulkUploadClients />}
       {currentView === 'list' && <ClientList onSelectClient={handleSelectClient} />}
       {currentView === 'view' && selectedClientId && (
         <SingleClient clientId={selectedClientId} onChangeView={setCurrentView} />
